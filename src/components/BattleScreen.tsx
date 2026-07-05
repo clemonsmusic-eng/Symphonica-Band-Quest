@@ -1630,6 +1630,21 @@ function getEnemyEmoji(id: string): string {
     crotale_cretin: '🔔',
     timpani_titan: '🥁',
     gong_guardian: '🛕',
+    // Extra roster fill (1–2 per area)
+    rest_wraith: '😶',
+    dissonant_din: '💢',
+    metronome_menace: '🕰️',
+    cadence_cur: '🐕',
+    stagefright_shade: '😰',
+    fermata_fiend: '🛑',
+    semitone_serpent: '🐍',
+    glissghast: '💨',
+    reprise_revenant: '♻️',
+    staccato_stinger: '🐝',
+    downbeat_drowner: '🌑',
+    dissonaut: '👹',
+    coda_colossus: '🏛️',
+    tacet_titan: '🤐',
   };
   return map[id] ?? '👾';
 }

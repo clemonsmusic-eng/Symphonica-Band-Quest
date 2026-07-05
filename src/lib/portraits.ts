@@ -64,4 +64,19 @@ export const ENEMY_PORTRAITS: Record<string, string> = {
   crotale_cretin: '/portraits/crotale_cretin.png',         // Z11
   timpani_titan: '/portraits/timpani_titan.png',           // Z12
   gong_guardian: '/portraits/gong_guardian.png',           // Z12
+  // Extra roster fill (1–2 per area)
+  rest_wraith: '/portraits/rest_wraith.png',               // Z1
+  dissonant_din: '/portraits/dissonant_din.png',           // Z1
+  metronome_menace: '/portraits/metronome_menace.png',     // Z2
+  cadence_cur: '/portraits/cadence_cur.png',               // Z3
+  stagefright_shade: '/portraits/stagefright_shade.png',   // Z4
+  fermata_fiend: '/portraits/fermata_fiend.png',           // Z5
+  semitone_serpent: '/portraits/semitone_serpent.png',     // Z6
+  glissghast: '/portraits/glissghast.png',                 // Z7
+  reprise_revenant: '/portraits/reprise_revenant.png',     // Z8
+  staccato_stinger: '/portraits/staccato_stinger.png',     // Z9
+  downbeat_drowner: '/portraits/downbeat_drowner.png',     // Z10
+  dissonaut: '/portraits/dissonaut.png',                   // Z11
+  coda_colossus: '/portraits/coda_colossus.png',           // Z12
+  tacet_titan: '/portraits/tacet_titan.png',               // Z12
 };

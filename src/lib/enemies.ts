@@ -720,6 +720,133 @@ export const ENEMIES: Record<string, EnemyDef> = {
     specialAttackName: 'Resonant Crash', specialAttackChallengeType: 'aural_chord_oracle',
     debuff: 'vulnerable', debuffDuration: 2, vulnerableTo: ['trumpet', 'trombone'], isBoss: false,
   },
+
+  // ── Extra roster fill, 1–2 per area (musical themes, not all instruments) ────
+  // Encounter-ready like the set above; not slotted into any BATTLES/zone config
+  // yet, so no balance impact until placed. Portraits drop-in via ENEMY_PORTRAITS.
+
+  // Zone 1 — The Rehearsal Halls
+  rest_wraith: {
+    id: 'rest_wraith', tier: 1, zone: 1, name: 'Rest Wraith',
+    description: 'A patch of unnatural silence drifting the practice rooms, swallowing sound and lulling the unwary into missing their entrance.',
+    power: 9, maxHp: 55, attackDescription: 'A smothering hush that dulls the senses',
+    specialAttackName: 'Dead Air', specialAttackChallengeType: 'aural_rhythm_echo',
+    debuff: 'sleep', debuffDuration: 2, vulnerableTo: ['flute', 'oboe', 'clarinet'], isBoss: false,
+    lore: 'Where a whole rest is held too long, something learns to like the quiet.',
+  },
+  dissonant_din: {
+    id: 'dissonant_din', tier: 1, zone: 1, name: 'Dissonant Din',
+    description: 'A clattering knot of clashing beginner-band noise that skitters underfoot, all squeaks and cracked reeds.',
+    power: 10, maxHp: 50, attackDescription: 'A grating burst of wrong notes',
+    specialAttackName: 'Sour Blast', specialAttackChallengeType: 'aural_pitch_spy',
+    debuff: 'manic', debuffDuration: 2, vulnerableTo: ['clarinet', 'flute'], isBoss: false,
+  },
+
+  // Zone 2 — The Theory Wing
+  metronome_menace: {
+    id: 'metronome_menace', tier: 2, zone: 2, name: 'Metronome Menace',
+    description: 'A brass-and-pendulum construct guarding the theory stacks, its merciless tick dragging every tempo to its own.',
+    power: 13, maxHp: 85, attackDescription: 'An unyielding tick that forces the pace',
+    specialAttackName: 'Iron Tempo', specialAttackChallengeType: 'aural_rhythm_echo',
+    debuff: 'slow', debuffDuration: 2, vulnerableTo: ['percussion', 'trumpet'], isBoss: false,
+  },
+
+  // Zone 3 — The City of Concerta
+  cadence_cur: {
+    id: 'cadence_cur', tier: 2, zone: 3, name: 'Cadence Cur',
+    description: 'A stray of the contest city that trails performers in packs, snapping on the final beat of every phrase.',
+    power: 15, maxHp: 95, attackDescription: 'A snapping lunge on the downbeat',
+    specialAttackName: 'Final Snap', specialAttackChallengeType: 'aural_progression_master',
+    vulnerableTo: ['alto_sax', 'trumpet'], isBoss: false,
+  },
+
+  // Zone 4 — The Grand Auditorium
+  stagefright_shade: {
+    id: 'stagefright_shade', tier: 2, zone: 4, name: 'Stagefright Shade',
+    description: "Graduation-night nerves given a shivering shape, it thrives on trembling hands and forgotten measures.",
+    power: 16, maxHp: 100, attackDescription: 'A wave of cold dread that scatters the mind',
+    specialAttackName: 'Blank Stare', specialAttackChallengeType: 'aural_melody_mapper',
+    debuff: 'confusion', debuffDuration: 2, vulnerableTo: ['clarinet', 'flute', 'oboe'], isBoss: false,
+  },
+
+  // Zone 5 — Melodious Meadows
+  fermata_fiend: {
+    id: 'fermata_fiend', tier: 3, zone: 5, name: 'Fermata Fiend',
+    description: 'A bloated meadow-spirit that seizes a note and refuses to let it end, holding friend and foe frozen in place.',
+    power: 16, maxHp: 120, attackDescription: 'A held tone that roots the target in place',
+    specialAttackName: 'Endless Hold', specialAttackChallengeType: 'aural_interval_quest',
+    debuff: 'cramped', debuffDuration: 1, vulnerableTo: ['oboe', 'bassoon'], isBoss: false,
+  },
+
+  // Zone 6 — Sands of Time
+  semitone_serpent: {
+    id: 'semitone_serpent', tier: 3, zone: 6, name: 'Semitone Serpent',
+    description: 'A dune-snake that slides forever a half-step off, its hypnotic chromatic slither churning the sand.',
+    power: 18, maxHp: 130, attackDescription: 'A sliding, off-pitch coil-strike',
+    specialAttackName: 'Chromatic Coil', specialAttackChallengeType: 'aural_pitch_spy',
+    debuff: 'poison', debuffDuration: 3, vulnerableTo: ['clarinet', 'oboe'], isBoss: false,
+  },
+
+  // Zone 7 — Clef Cliffs
+  glissghast: {
+    id: 'glissghast', tier: 4, zone: 7, name: 'Glissghast',
+    description: 'A smear of sliding sound haunting the passes, never quite settling on a pitch as it swoops the cliff faces.',
+    power: 20, maxHp: 145, attackDescription: 'A dizzying swoop that blurs the vision',
+    specialAttackName: 'Falling Slide', specialAttackChallengeType: 'aural_melody_mapper',
+    debuff: 'blind', debuffDuration: 2, vulnerableTo: ['trombone', 'french_horn'], isBoss: false,
+  },
+
+  // Zone 8 — Forgotten Forest
+  reprise_revenant: {
+    id: 'reprise_revenant', tier: 4, zone: 8, name: 'Reprise Revenant',
+    description: 'A forest ghost trapped in a repeat sign, doomed to play the same haunted phrase until the trees themselves forget it.',
+    power: 23, maxHp: 160, attackDescription: 'A looping refrain that muddles memory',
+    specialAttackName: 'Da Capo', specialAttackChallengeType: 'aural_progression_master',
+    debuff: 'confusion', debuffDuration: 2, vulnerableTo: ['flute', 'oboe'], isBoss: false,
+  },
+
+  // Zone 9 — Chromatic Coasts
+  staccato_stinger: {
+    id: 'staccato_stinger', tier: 5, zone: 9, name: 'Staccato Stinger',
+    description: 'A swarm of needle-sharp coastal darters that attack in clipped, stabbing bursts and scatter before you can answer.',
+    power: 25, maxHp: 200, attackDescription: 'A flurry of short, stabbing strikes',
+    specialAttackName: 'Pizzicato Volley', specialAttackChallengeType: 'aural_rhythm_echo',
+    vulnerableTo: ['percussion', 'trumpet'], isBoss: false,
+  },
+
+  // Zone 10 — Syncopated Seas
+  downbeat_drowner: {
+    id: 'downbeat_drowner', tier: 5, zone: 10, name: 'Downbeat Drowner',
+    description: 'A heavy undertow-spirit that drags the tempo — and the swimmer — down hard on every first beat of the bar.',
+    power: 28, maxHp: 205, attackDescription: 'A crushing pull on the downbeat',
+    specialAttackName: 'Undertow', specialAttackChallengeType: 'aural_interval_quest',
+    debuff: 'slow', debuffDuration: 3, vulnerableTo: ['bassoon', 'clarinet'], isBoss: false,
+  },
+
+  // Zone 11 — Dissonant Dunes
+  dissonaut: {
+    id: 'dissonaut', tier: 6, zone: 11, name: 'Dissonaut',
+    description: 'A wanderer of the dunes warped by raw dissonance, its every step ringing two clashing pitches at once.',
+    power: 31, maxHp: 240, attackDescription: 'A grinding double-pitch assault',
+    specialAttackName: 'Tritone Lurch', specialAttackChallengeType: 'aural_interval_quest',
+    debuff: 'manic', debuffDuration: 2, vulnerableTo: ['euphonium', 'tuba'], isBoss: false,
+  },
+
+  // Zone 12 — The Hall of Discord
+  coda_colossus: {
+    id: 'coda_colossus', tier: 6, zone: 12, name: 'Coda Colossus',
+    description: 'A hulking sentinel that guards the final movement of the hall, built to end any music that dares approach the stage.',
+    power: 34, maxHp: 285, attackDescription: 'A final-bar hammerblow meant to end the piece',
+    specialAttackName: 'Final Cadence', specialAttackChallengeType: 'aural_progression_master',
+    debuff: 'vulnerable', debuffDuration: 2, vulnerableTo: ['trumpet', 'trombone'], isBoss: false,
+  },
+  tacet_titan: {
+    id: 'tacet_titan', tier: 6, zone: 12, name: 'Tacet Titan',
+    description: 'A vast, silent warden of the inner hall that answers sound with a suffocating void, letting no note ring twice.',
+    power: 35, maxHp: 290, attackDescription: 'A wave of imposed silence that smothers the ensemble',
+    specialAttackName: 'Total Tacet', specialAttackChallengeType: 'aural_chord_oracle',
+    debuff: 'sleep', debuffDuration: 2, vulnerableTo: ['flute', 'clarinet'], isBoss: false,
+  },
 };
 
 // ── Class effectiveness (GDD: "Highly Effective ×1.5") ─────────────────────────
