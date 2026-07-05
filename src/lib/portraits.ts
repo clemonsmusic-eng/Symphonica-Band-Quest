@@ -48,35 +48,25 @@ export const ENEMY_PORTRAITS: Record<string, string> = {
   piano_commander: '/portraits/piano_commander.png',     // Piano (Z11)
   forte_commander: '/portraits/forte_commander.png',     // Forte (Z11)
   // Instrument-inspired roster (zones 5–12)
-  piccolo_pixie: '/portraits/piccolo_pixie.png',           // Z5
-  fife_flitter: '/portraits/fife_flitter.png',             // Z5
-  ocarina_ogre: '/portraits/ocarina_ogre.png',             // Z6
-  sistrum_shade: '/portraits/sistrum_shade.png',           // Z6
-  saxhorn_stalker: '/portraits/saxhorn_stalker.png',       // Z7
-  glocken_golem: '/portraits/glocken_golem.png',           // Z7
+  pixielo: '/portraits/pixielo.png',           // Z5
+  fiferfly: '/portraits/fiferfly.png',             // Z5
+  ghoulgenspiel: '/portraits/ghoulgenspiel.png',           // Z7
   bagpipe_banshee: '/portraits/bagpipe_banshee.png',       // Z8
-  marimba_marauder: '/portraits/marimba_marauder.png',     // Z8
   flugel_fiend: '/portraits/flugel_fiend.png',             // Z9
-  concertina_crawler: '/portraits/concertina_crawler.png', // Z9
-  theremin_terror: '/portraits/theremin_terror.png',       // Z10
-  vibra_wraith: '/portraits/vibra_wraith.png',             // Z10
-  castanet_chatterer: '/portraits/castanet_chatterer.png', // Z11
-  crotale_cretin: '/portraits/crotale_cretin.png',         // Z11
-  timpani_titan: '/portraits/timpani_titan.png',           // Z12
-  gong_guardian: '/portraits/gong_guardian.png',           // Z12
+  therrormin: '/portraits/therrormin.png',       // Z10
+  vibrawraith: '/portraits/vibrawraith.png',             // Z10
+  chastanet: '/portraits/chastanet.png', // Z11
+  crotentacle: '/portraits/crotentacle.png',         // Z11
+  timptanic: '/portraits/timptanic.png',           // Z12
+  gongolem: '/portraits/gongolem.png',           // Z12
   // Extra roster fill (1–2 per area)
   rest_wraith: '/portraits/rest_wraith.png',               // Z1
-  dissonant_din: '/portraits/dissonant_din.png',           // Z1
-  metronome_menace: '/portraits/metronome_menace.png',     // Z2
-  cadence_cur: '/portraits/cadence_cur.png',               // Z3
-  stagefright_shade: '/portraits/stagefright_shade.png',   // Z4
-  fermata_fiend: '/portraits/fermata_fiend.png',           // Z5
-  semitone_serpent: '/portraits/semitone_serpent.png',     // Z6
-  glissghast: '/portraits/glissghast.png',                 // Z7
-  reprise_revenant: '/portraits/reprise_revenant.png',     // Z8
-  staccato_stinger: '/portraits/staccato_stinger.png',     // Z9
-  downbeat_drowner: '/portraits/downbeat_drowner.png',     // Z10
+  frat: '/portraits/frat.png',           // Z1
+  stage_phantom: '/portraits/stage_phantom.png',   // Z4
+  fermata_s: '/portraits/fermata_s.png',           // Z5
+  saxerpent: '/portraits/saxerpent.png',     // Z6
+  glissanghost: '/portraits/glissanghost.png',                 // Z7
+  stingcatto: '/portraits/stingcatto.png',     // Z9
   dissonaut: '/portraits/dissonaut.png',                   // Z11
-  coda_colossus: '/portraits/coda_colossus.png',           // Z12
-  tacet_titan: '/portraits/tacet_titan.png',               // Z12
+  tacetus: '/portraits/tacetus.png',               // Z12
 };
