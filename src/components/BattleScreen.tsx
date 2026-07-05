@@ -22,6 +22,7 @@ import { ALLY_BATTLE_DEFS, getAllyForInstrument, SUMMON_SCALE } from '../lib/all
 import type { AllyId } from '../types/game';
 import ChallengeModal from './ChallengeModal';
 import MaestroPortrait from './MaestroPortrait';
+import { ENEMY_PORTRAITS } from '../lib/portraits';
 import Avatar from './Avatar';
 
 // ── State types ───────────────────────────────────────────────────────────────
@@ -1121,7 +1122,16 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
                         className={`${multiEnemy ? 'text-5xl' : 'text-7xl'} transition-transform duration-200`}
                         style={{ transform: enemyActingIdx === i ? 'translateX(14px) scale(1.08)' : 'translateX(0) scale(1)' }}
                       >
-                        {getEnemyEmoji(unit.def.id)}
+                        {ENEMY_PORTRAITS[unit.def.id] ? (
+                          <MaestroPortrait
+                            src={ENEMY_PORTRAITS[unit.def.id]}
+                            emoji={getEnemyEmoji(unit.def.id)}
+                            size={multiEnemy ? 64 : 96}
+                            full
+                          />
+                        ) : (
+                          getEnemyEmoji(unit.def.id)
+                        )}
                       </div>
                     </div>
                     <div className={`mt-1 ${multiEnemy ? 'w-12' : 'w-16'} h-1.5 rounded-full bg-black/50 blur-[1px]`} />
