@@ -46,15 +46,18 @@ export const ENEMIES: Record<string, EnemyDef> = {
     id: 'sharp_creature',
     tier: 1,
     zone: 1,
-    name: 'Sharp',
-    description: 'Red-orange, spiked, aggressive. Screeches piercing tones.',
+    name: 'Sharpie',
+    description: 'A red-orange, bat-winged accidental — half harpy, half half-step. It wheels overhead on leathery wings and dives shrieking a semitone too high.',
     power: 12,
     maxHp: 50,
-    attackDescription: 'Fast physical spike attack, high crit chance',
-    specialAttackName: 'Shriek',
+    attackDescription: 'Swooping dive from above; a piercing, sharpened screech',
+    specialAttackName: 'Screech Dive',
     specialAttackChallengeType: 'aural_pitch_spy',
+    debuff: 'blind',
+    debuffDuration: 2,
     vulnerableTo: ['oboe', 'clarinet', 'flute'],
     isBoss: false,
+    lore: 'Born when a note is played sharp and left to fester, it takes wing and hunts the flat that fled.',
   },
   natural_creature: {
     id: 'natural_creature',
@@ -582,6 +585,140 @@ export const ENEMIES: Record<string, EnemyDef> = {
     specialAttackName: 'Atonal Assault', specialAttackChallengeType: 'aural_interval_quest',
     debuff: 'confusion', debuffDuration: 2, vulnerableTo: [], isBoss: true, phase2Threshold: 0.4,
     lore: 'He cannot hear what he has done. Beat back his phantom orchestra — and then answer it with living music.',
+  },
+
+  // ── Instrument-inspired roster, Act 2–3 (zones 5–12) ─────────────────────────
+  // Added as encounter-ready definitions; not yet slotted into any BATTLES/zone
+  // config, so they carry no balance impact until placed. Portraits are drop-in
+  // via ENEMY_PORTRAITS (public/portraits/<id>.png), emoji fallback until then.
+
+  // Zone 5 — Melodious Meadows
+  piccolo_pixie: {
+    id: 'piccolo_pixie', tier: 3, zone: 5, name: 'Piccolo Pixie',
+    description: 'A thumb-sized sprite that shrieks in the highest register, flitting through the tall grass faster than the eye can follow.',
+    power: 15, maxHp: 110, attackDescription: 'A darting, ear-splitting piccolo trill',
+    specialAttackName: 'Register Shriek', specialAttackChallengeType: 'aural_pitch_spy',
+    debuff: 'manic', debuffDuration: 2, vulnerableTo: ['tuba', 'trombone', 'euphonium'], isBoss: false,
+    lore: 'The smallest voice, and the loudest — it delights in the low brass that cannot chase it.',
+  },
+  fife_flitter: {
+    id: 'fife_flitter', tier: 3, zone: 5, name: 'Fife Flitter',
+    description: 'A ragged, drum-and-fife revenant that marches nowhere, piping a thin field tune on repeat.',
+    power: 17, maxHp: 125, attackDescription: 'A relentless marching cadence that wears the ear down',
+    specialAttackName: 'Quickstep', specialAttackChallengeType: 'aural_rhythm_echo',
+    debuff: 'slow', debuffDuration: 2, vulnerableTo: ['bassoon', 'euphonium'], isBoss: false,
+  },
+
+  // Zone 6 — Sands of Time
+  ocarina_ogre: {
+    id: 'ocarina_ogre', tier: 3, zone: 6, name: 'Ocarina Ogre',
+    description: 'A clay-bodied desert brute, its hollow torso whistling breathy vessel-flute tones with every lumbering step.',
+    power: 19, maxHp: 140, attackDescription: 'A heavy clay-fisted swing and a hollow moan',
+    specialAttackName: 'Hollow Bellow', specialAttackChallengeType: 'aural_interval_quest',
+    vulnerableTo: ['trumpet', 'percussion'], isBoss: false,
+  },
+  sistrum_shade: {
+    id: 'sistrum_shade', tier: 3, zone: 6, name: 'Sistrum Shade',
+    description: 'An ancient rattling wraith of dry bronze rings, hissing across the dunes like the ghost of a forgotten temple band.',
+    power: 18, maxHp: 120, attackDescription: 'A shivering rattle that scrambles concentration',
+    specialAttackName: 'Rattle Hex', specialAttackChallengeType: 'aural_rhythm_echo',
+    debuff: 'confusion', debuffDuration: 2, vulnerableTo: ['clarinet', 'oboe'], isBoss: false,
+  },
+
+  // Zone 7 — Clef Cliffs
+  saxhorn_stalker: {
+    id: 'saxhorn_stalker', tier: 4, zone: 7, name: 'Saxhorn Stalker',
+    description: 'A prowling brass beast, valves for eyes, that hunts the mountain passes with a low, closing-in fanfare.',
+    power: 21, maxHp: 145, attackDescription: 'A pouncing charge behind a blaring fanfare',
+    specialAttackName: 'Ambush Fanfare', specialAttackChallengeType: 'aural_melody_mapper',
+    debuff: 'vulnerable', debuffDuration: 2, vulnerableTo: ['alto_sax', 'clarinet'], isBoss: false,
+  },
+  glocken_golem: {
+    id: 'glocken_golem', tier: 4, zone: 7, name: 'Glockenspiel Golem',
+    description: 'A slab of struck stone and steel bars, each footfall ringing a bright, merciless chime off the cliff walls.',
+    power: 23, maxHp: 170, attackDescription: 'A ringing stone slam that leaves the ears stunned',
+    specialAttackName: 'Chime Stun', specialAttackChallengeType: 'aural_chord_oracle',
+    debuff: 'cramped', debuffDuration: 1, vulnerableTo: ['tuba', 'euphonium'], isBoss: false,
+  },
+
+  // Zone 8 — Forgotten Forest
+  bagpipe_banshee: {
+    id: 'bagpipe_banshee', tier: 4, zone: 8, name: 'Bagpipe Banshee',
+    description: 'A droning forest wraith wrapped in tattered tartan, its endless bagpipe wail curdling the air between the trees.',
+    power: 22, maxHp: 155, attackDescription: 'An unbroken drone that muddies every thought',
+    specialAttackName: 'Drone Wail', specialAttackChallengeType: 'aural_progression_master',
+    debuff: 'confusion', debuffDuration: 2, vulnerableTo: ['flute', 'oboe'], isBoss: false,
+  },
+  marimba_marauder: {
+    id: 'marimba_marauder', tier: 4, zone: 8, name: 'Marimba Marauder',
+    description: 'A raider of rosewood slats and hollow gourds, drumming a rolling forest ambush on its own resonant ribs.',
+    power: 24, maxHp: 165, attackDescription: 'A rolling wooden barrage of mallet strikes',
+    specialAttackName: 'Mallet Roll', specialAttackChallengeType: 'aural_rhythm_echo',
+    debuff: 'slow', debuffDuration: 2, vulnerableTo: ['trumpet', 'french_horn'], isBoss: false,
+  },
+
+  // Zone 9 — Chromatic Coasts
+  flugel_fiend: {
+    id: 'flugel_fiend', tier: 5, zone: 9, name: 'Flugelhorn Fiend',
+    description: 'A mellow-voiced coastal fiend that lures sailors with a warm, rounded brass song before the tide takes them.',
+    power: 26, maxHp: 205, attackDescription: 'A deceptively soft song that swells into a crushing blast',
+    specialAttackName: "Siren's Swell", specialAttackChallengeType: 'aural_melody_mapper',
+    debuff: 'sleep', debuffDuration: 2, vulnerableTo: ['alto_sax', 'oboe'], isBoss: false,
+  },
+  concertina_crawler: {
+    id: 'concertina_crawler', tier: 5, zone: 9, name: 'Concertina Crawler',
+    description: 'A bellows-backed crab that scuttles the shoreline, wheezing squeezebox chords as it pinches at ankles.',
+    power: 25, maxHp: 195, attackDescription: 'A pinching scuttle and a wheezing chord',
+    specialAttackName: 'Bellows Squeeze', specialAttackChallengeType: 'aural_chord_oracle',
+    debuff: 'poison', debuffDuration: 3, vulnerableTo: ['percussion', 'trumpet'], isBoss: false,
+  },
+
+  // Zone 10 — Syncopated Seas
+  theremin_terror: {
+    id: 'theremin_terror', tier: 5, zone: 10, name: 'Theremin Terror',
+    description: 'A wavering, half-there specter of pure pitch, its eerie glissando bending the sea air into shivering waves.',
+    power: 28, maxHp: 210, attackDescription: 'A sliding, disembodied wail that warps the senses',
+    specialAttackName: 'Aether Glissando', specialAttackChallengeType: 'aural_interval_quest',
+    debuff: 'confusion', debuffDuration: 2, vulnerableTo: ['french_horn', 'flute'], isBoss: false,
+  },
+  vibra_wraith: {
+    id: 'vibra_wraith', tier: 5, zone: 10, name: 'Vibraphone Wraith',
+    description: 'A shimmering sea-ghost of spinning motor-vanes, its cold metallic tremolo rippling out across the syncopated swells.',
+    power: 27, maxHp: 200, attackDescription: 'A cold, pulsing tremolo that saps the will',
+    specialAttackName: 'Tremolo Chill', specialAttackChallengeType: 'aural_progression_master',
+    debuff: 'slow', debuffDuration: 3, vulnerableTo: ['bassoon', 'clarinet'], isBoss: false,
+  },
+
+  // Zone 11 — Dissonant Dunes
+  castanet_chatterer: {
+    id: 'castanet_chatterer', tier: 6, zone: 11, name: 'Castanet Chatterer',
+    description: 'A skittering swarm of clacking shells that boils up out of the dunes, chattering a frantic, maddening rhythm.',
+    power: 30, maxHp: 235, attackDescription: 'A furious clattering swarm-strike',
+    specialAttackName: 'Clatter Frenzy', specialAttackChallengeType: 'aural_rhythm_echo',
+    debuff: 'manic', debuffDuration: 2, vulnerableTo: ['euphonium', 'tuba'], isBoss: false,
+  },
+  crotale_cretin: {
+    id: 'crotale_cretin', tier: 6, zone: 11, name: 'Crotale Cretin',
+    description: 'A hunched horror crowned with ringing bronze discs, each shake loosing a piercing, sustained overtone across the wastes.',
+    power: 31, maxHp: 245, attackDescription: 'A sustained ringing tone that splits the focus',
+    specialAttackName: 'Overtone Ring', specialAttackChallengeType: 'aural_chord_oracle',
+    debuff: 'blind', debuffDuration: 2, vulnerableTo: ['oboe', 'alto_sax'], isBoss: false,
+  },
+
+  // Zone 12 — The Hall of Discord
+  timpani_titan: {
+    id: 'timpani_titan', tier: 6, zone: 12, name: 'Timpani Titan',
+    description: 'A colossus of stretched hide and burnished copper kettles, each thunderous footfall tuned to a different rolling note of doom.',
+    power: 34, maxHp: 280, attackDescription: 'A ground-shaking kettledrum stomp',
+    specialAttackName: 'Thunder Roll', specialAttackChallengeType: 'aural_progression_master',
+    debuff: 'cramped', debuffDuration: 1, vulnerableTo: ['flute', 'clarinet'], isBoss: false,
+  },
+  gong_guardian: {
+    id: 'gong_guardian', tier: 6, zone: 12, name: 'Gong Guardian',
+    description: 'A towering bronze sentinel of the inner hall, a single struck note from its vast disc enough to buckle a whole ensemble.',
+    power: 33, maxHp: 270, attackDescription: 'A single, world-swallowing bronze crash',
+    specialAttackName: 'Resonant Crash', specialAttackChallengeType: 'aural_chord_oracle',
+    debuff: 'vulnerable', debuffDuration: 2, vulnerableTo: ['trumpet', 'trombone'], isBoss: false,
   },
 };
 

@@ -1573,7 +1573,7 @@ function getEnemyEmoji(id: string): string {
   const map: Record<string, string> = {
     // Act 1
     flatling: '😞',
-    sharp_creature: '🔺',
+    sharp_creature: '🦇',
     natural_creature: '⬜',
     double_flat_wretch: '😔',
     chronoton_scout: '🤖',
@@ -1613,6 +1613,23 @@ function getEnemyEmoji(id: string): string {
     commander_mesto: '🦢',
     general_grave: '🐘',
     vexus: '🪄',
+    // Instrument-inspired roster (zones 5–12)
+    piccolo_pixie: '🧚',
+    fife_flitter: '🎏',
+    ocarina_ogre: '🏺',
+    sistrum_shade: '🌵',
+    saxhorn_stalker: '🎺',
+    glocken_golem: '🗿',
+    bagpipe_banshee: '🌲',
+    marimba_marauder: '🪵',
+    flugel_fiend: '🐚',
+    concertina_crawler: '🦀',
+    theremin_terror: '🌊',
+    vibra_wraith: '👻',
+    castanet_chatterer: '👏',
+    crotale_cretin: '🔔',
+    timpani_titan: '🥁',
+    gong_guardian: '🛕',
   };
   return map[id] ?? '👾';
 }

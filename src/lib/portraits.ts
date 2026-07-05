@@ -47,4 +47,21 @@ export const ENEMY_PORTRAITS: Record<string, string> = {
   ostinato_usher: '/portraits/ostinato_usher.png',       // Ostinato, the Usher (Z12)
   piano_commander: '/portraits/piano_commander.png',     // Piano (Z11)
   forte_commander: '/portraits/forte_commander.png',     // Forte (Z11)
+  // Instrument-inspired roster (zones 5–12)
+  piccolo_pixie: '/portraits/piccolo_pixie.png',           // Z5
+  fife_flitter: '/portraits/fife_flitter.png',             // Z5
+  ocarina_ogre: '/portraits/ocarina_ogre.png',             // Z6
+  sistrum_shade: '/portraits/sistrum_shade.png',           // Z6
+  saxhorn_stalker: '/portraits/saxhorn_stalker.png',       // Z7
+  glocken_golem: '/portraits/glocken_golem.png',           // Z7
+  bagpipe_banshee: '/portraits/bagpipe_banshee.png',       // Z8
+  marimba_marauder: '/portraits/marimba_marauder.png',     // Z8
+  flugel_fiend: '/portraits/flugel_fiend.png',             // Z9
+  concertina_crawler: '/portraits/concertina_crawler.png', // Z9
+  theremin_terror: '/portraits/theremin_terror.png',       // Z10
+  vibra_wraith: '/portraits/vibra_wraith.png',             // Z10
+  castanet_chatterer: '/portraits/castanet_chatterer.png', // Z11
+  crotale_cretin: '/portraits/crotale_cretin.png',         // Z11
+  timpani_titan: '/portraits/timpani_titan.png',           // Z12
+  gong_guardian: '/portraits/gong_guardian.png',           // Z12
 };
