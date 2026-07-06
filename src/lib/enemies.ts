@@ -588,9 +588,9 @@ export const ENEMIES: Record<string, EnemyDef> = {
   },
 
   // ── Instrument-inspired roster, Act 2–3 (zones 5–12) ─────────────────────────
-  // Added as encounter-ready definitions; not yet slotted into any BATTLES/zone
-  // config, so they carry no balance impact until placed. Portraits are drop-in
-  // via ENEMY_PORTRAITS (public/portraits/<id>.png), emoji fallback until then.
+  // Wired into each zone's random skirmishes via zoneMobs()/randomSkirmish()
+  // (they self-register by their `zone` field). Portraits are drop-in via
+  // ENEMY_PORTRAITS (public/portraits/<id>.png), emoji fallback until then.
 
   // Zone 5 — Melodious Meadows
   pixielo: {
@@ -778,6 +778,20 @@ export const EFFECTIVENESS_MULT = 1.5;
 
 export function isHighlyEffective(def: EnemyDef, instrument: InstrumentId): boolean {
   return def.vulnerableTo.includes(instrument);
+}
+
+// ── Skirmish composition ──────────────────────────────────────────────────────
+// Non-boss enemies native to a zone — the pool a random skirmish draws from.
+// New instrument-themed mobs land here automatically via their `zone` field.
+export function zoneMobs(zoneId: number): EnemyDef[] {
+  return Object.values(ENEMIES).filter((e) => !e.isBoss && e.zone === zoneId);
+}
+
+// Compose a random skirmish group of `size` enemies from a zone's mob pool.
+export function randomSkirmish(zoneId: number, size = 2): EnemyDef[] {
+  const pool = zoneMobs(zoneId);
+  if (pool.length === 0) return [];
+  return Array.from({ length: Math.max(1, size) }, () => pool[Math.floor(Math.random() * pool.length)]);
 }
 
 export type BattleId = string;

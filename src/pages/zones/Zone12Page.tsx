@@ -4,7 +4,7 @@ import { useGameStore } from '../../store/gameStore';
 import ChallengeModal from '../../components/ChallengeModal';
 import BattleScreen from '../../components/BattleScreen';
 import LiberationScene, { type LibBeat } from '../../components/LiberationScene';
-import { ENEMIES } from '../../lib/enemies';
+import { ENEMIES, randomSkirmish } from '../../lib/enemies';
 import type { Rating } from '../../types/game';
 
 interface Room { id: string; title: string; type: string; description: string; xpBase: number; }
@@ -109,7 +109,9 @@ export default function Zone12Page() {
     return (
       <BattleScreen
         character={character}
-        enemies={BATTLE_ENEMIES[activeBattle].map((k) => ENEMIES[k])}
+        // The 'knight' guard is the zone's trash battle → random Hall-of-Discord
+        // mob group (Vexian Knights + the new instrument-themed elites).
+        enemies={activeBattle === 'knight' ? randomSkirmish(12, 2) : BATTLE_ENEMIES[activeBattle].map((k) => ENEMIES[k])}
         onVictory={handleVictory}
         onDefeat={() => setActiveBattle(null)}
       />

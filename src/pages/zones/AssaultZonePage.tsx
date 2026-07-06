@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/gameStore';
 import ChallengeModal from '../../components/ChallengeModal';
 import BattleScreen from '../../components/BattleScreen';
-import { ENEMIES } from '../../lib/enemies';
+import { ENEMIES, randomSkirmish } from '../../lib/enemies';
 import type { Rating, ZoneId } from '../../types/game';
 
 // ── Config types ────────────────────────────────────────────────────────────────
@@ -70,11 +70,15 @@ export default function AssaultZonePage({ cfg }: { cfg: AssaultConfig }) {
   }
 
   if (activeBattle) {
-    const keys = activeBattle.kind === 'skirmish' ? cfg.skirmish!.enemyKeys : cfg.bosses[activeBattle.idx].enemyKeys;
+    // Skirmishes draw a random group from the zone's mob pool (new instrument-
+    // themed enemies included); bosses use their fixed roster.
+    const battleEnemies = activeBattle.kind === 'skirmish'
+      ? randomSkirmish(cfg.zoneId, Math.max(2, cfg.skirmish!.enemyKeys.length))
+      : cfg.bosses[activeBattle.idx].enemyKeys.map((k) => ENEMIES[k]);
     return (
       <BattleScreen
         character={character}
-        enemies={keys.map((k) => ENEMIES[k])}
+        enemies={battleEnemies}
         onVictory={handleVictory}
         onDefeat={() => setActiveBattle(null)}
       />

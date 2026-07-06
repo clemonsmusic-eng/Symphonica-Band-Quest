@@ -6,7 +6,7 @@ import BattleScreen from '../../components/BattleScreen';
 import LiberationScene, { type LibBeat } from '../../components/LiberationScene';
 import { useNpcQuestOffers } from '../../components/NpcQuestOffer';
 import { MAESTRO_PORTRAITS } from '../../lib/portraits';
-import { ENEMIES } from '../../lib/enemies';
+import { ENEMIES, randomSkirmish } from '../../lib/enemies';
 import type { Rating, AllyId } from '../../types/game';
 
 interface Scene {
@@ -120,7 +120,7 @@ export default function Zone7Page() {
 
   if (activeBattle) {
     const battleEnemies =
-      activeBattle === 'skirmish' ? [ENEMIES.discordian_sentry, ENEMIES.discordian_sentry] :
+      activeBattle === 'skirmish' ? randomSkirmish(7) :
       activeBattle === 'adolpha'  ? [ENEMIES.sound_shadow] :
       activeBattle === 'contra'   ? [ENEMIES.lieutenant_contra] :
       activeBattle === 'sackbut'  ? [ENEMIES.sliding_chaos_knight] :

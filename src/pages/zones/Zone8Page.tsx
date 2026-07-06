@@ -6,7 +6,7 @@ import BattleScreen from '../../components/BattleScreen';
 import LiberationScene, { type LibBeat } from '../../components/LiberationScene';
 import { useNpcQuestOffers } from '../../components/NpcQuestOffer';
 import { MAESTRO_PORTRAITS } from '../../lib/portraits';
-import { ENEMIES } from '../../lib/enemies';
+import { ENEMIES, randomSkirmish } from '../../lib/enemies';
 import type { Rating, AllyId } from '../../types/game';
 
 interface Scene {
@@ -113,7 +113,7 @@ export default function Zone8Page() {
 
   if (activeBattle) {
     const battleEnemies =
-      activeBattle === 'skirmish' ? [ENEMIES.echoing_wisp, ENEMIES.echoing_wisp] :
+      activeBattle === 'skirmish' ? randomSkirmish(8) :
       activeBattle === 'waldhorn' ? [ENEMIES.forest_flogger] :
       activeBattle === 'hautbois' ? [ENEMIES.double_reed_specter] :
                                     [ENEMIES.ancient_revenant];
