@@ -1,5 +1,6 @@
 import type { InstrumentId } from '../types/game';
 import type { StatusType } from './statusEffects';
+import { enemyZone } from './enemyPlacement';
 
 export type EnemyTier = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -781,10 +782,10 @@ export function isHighlyEffective(def: EnemyDef, instrument: InstrumentId): bool
 }
 
 // ── Skirmish composition ──────────────────────────────────────────────────────
-// Non-boss enemies native to a zone — the pool a random skirmish draws from.
-// New instrument-themed mobs land here automatically via their `zone` field.
+// Non-boss enemies whose placement (authored location → zone, else their default
+// `zone`) puts them in this zone — the pool a random skirmish draws from.
 export function zoneMobs(zoneId: number): EnemyDef[] {
-  return Object.values(ENEMIES).filter((e) => !e.isBoss && e.zone === zoneId);
+  return Object.values(ENEMIES).filter((e) => !e.isBoss && enemyZone(e.id, e.zone) === zoneId);
 }
 
 // Compose a random skirmish group of `size` enemies from a zone's mob pool.
