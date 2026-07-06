@@ -34,6 +34,32 @@ export interface Ability {
   flavorText?: string;
 }
 
+// ── Ability ranks (RP-funded upgrades) ────────────────────────────────────────
+// Abilities unlock by level (rank 1). Resonance Points rank them up to a cap,
+// each rank boosting the ability's damage / healing output.
+export const ABILITY_MAX_RANK = 3;
+
+// Damage/heal multiplier for an ability at a given rank: r1 ×1.00, r2 ×1.15, r3 ×1.30.
+export function abilityRankMult(rank: number): number {
+  const r = Math.max(1, Math.min(ABILITY_MAX_RANK, Math.floor(rank)));
+  return 1 + 0.15 * (r - 1);
+}
+
+// RP cost to reach targetRank (2 or 3) from the rank below it, by ability tier.
+export function abilityUpgradeCost(tier: AbilityTier, targetRank: number): number {
+  const table: Record<AbilityTier, Record<number, number>> = {
+    basic:  { 2: 40,  3: 70 },
+    medium: { 2: 80,  3: 140 },
+    strong: { 2: 150, 3: 260 },
+  };
+  return table[tier]?.[targetRank] ?? 0;
+}
+
+// Look up a single ability definition by id (for store/skill-tree use).
+export function getAbilityById(id: string): Ability | undefined {
+  return ABILITIES[id];
+}
+
 // Beat counts scale by act (zones 1-4, 5-8, 9-12)
 export function battleBeatCount(tier: AbilityTier, zone: number): number {
   const act = zone <= 4 ? 0 : zone <= 8 ? 1 : 2;

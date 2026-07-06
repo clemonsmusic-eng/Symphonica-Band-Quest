@@ -143,6 +143,7 @@ export default function HubPage() {
             <NavCard icon="🏆" label="Leaderboard" sublabel="Class standings" onClick={() => navigate('/leaderboard')} />
             <NavCard icon="🎶" label="Symphony Allies" sublabel={`${character.freedAllies.length}/10 freed`} onClick={() => navigate('/allies')} />
             <NavCard icon="🎼" label="Your Band" sublabel="Choose your party" onClick={() => navigate('/party')} />
+            <NavCard icon="✨" label="Skill Tree" sublabel={`Upgrade abilities · ${character.resonancePoints} RP`} onClick={() => navigate('/abilities')} />
             <NavCard icon="📜" label="Quest Board" sublabel={questCount > 0 ? `${questCount} active` : 'Side quests'} onClick={() => navigate('/quests')} />
             <NavCard icon="⚙️" label="Equipment" sublabel="Gear & effective stats" onClick={() => navigate('/gear')} />
             <NavCard icon="🪙" label="Gear Shop" sublabel={`${character.resonanceCoins} coins`} onClick={() => navigate('/shop')} />

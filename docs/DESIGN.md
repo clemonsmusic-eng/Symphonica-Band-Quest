@@ -132,9 +132,10 @@ zone-boss 1500 · side-quest (short) 500 · side-quest (long) 1000.
 (mini-boss +15, zone-boss +40).
 
 - **XP** → levels → stat growth.
-- **Resonance Points (RP)** → [Q7-DECIDED] fund the **ability/skill tree** —
-  spend RP to unlock/upgrade `abilities.ts` entries (`levelGate`/`tier`). Not yet
-  wired to a spend UI (`spendResonancePoints` exists, no caller).
+- **Resonance Points (RP)** → [Q7-BUILT] fund the **ability skill tree**
+  (`AbilitiesPage.tsx`). Abilities unlock by level; RP ranks them up 1→3
+  (×1.00/1.15/1.30 output) via `gameStore.upgradeAbility`, stored on
+  `Character.abilityRanks`.
 - **Coins** → the **Gear Shop** (`src/pages/ShopPage.tsx`), unlocked at Zone 3 /
   Concerta.
 - **Summon Points (SP)** → spent to call freed maestros in battle (§8).
@@ -330,11 +331,13 @@ implementation. Add, reorder, and answer these inline.
 
 **Systems & economy**
 7. Resonance Points: finalize their role/sink (currently accrued, under-used).
-   → **Decision: RP fund an ability/skill tree.** Spend RP to unlock/upgrade the
-   `abilities.ts` entries gated by `levelGate`/`tier`. Clean four-currency split:
-   **XP → levels/stats · Coins → gear · SP → summons · RP → musical skill tree.**
-   (`spendResonancePoints` already exists in `gameStore` with no caller — this is
-   its sink.)
+   → **Decision: RP fund an ability skill tree — BUILT** (`AbilitiesPage.tsx`,
+   `gameStore.upgradeAbility`). **Leveling up unlocks abilities** (free, by
+   `levelGate`); **RP ranks them up** 1→3, each rank scaling damage/heal
+   (×1.00 / ×1.15 / ×1.30). Upgrade cost by tier: basic 40/70 · medium 80/140 ·
+   strong 150/260 RP. Persisted on `Character.abilityRanks` (jsonb
+   `ability_ranks`, migration 006; guests via localStorage). Clean four-currency
+   split: **XP → levels/stats · Coins → gear · SP → summons · RP → skill tree.**
 8. Difficulty curve & mic-vs-Demo default for a first-time player.
    → **Decision: default Demo Mode ON** for first-timers (guaranteed-playable,
    no mic-permission wall) with a prominent "Enable microphone" upsell.

@@ -13,6 +13,7 @@ import ClassSelectPage from './pages/ClassSelectPage';
 import InstrumentSelectPage from './pages/InstrumentSelectPage';
 import BootCampPage from './pages/BootCampPage';
 import HubPage from './pages/HubPage';
+import AbilitiesPage from './pages/AbilitiesPage';
 import ZonePage from './pages/ZonePage';
 import TeacherDashboardPage from './pages/TeacherDashboardPage';
 import LeaderboardPage from './pages/LeaderboardPage';
@@ -149,6 +150,11 @@ export default function App() {
       {/* Battle Simulator */}
       <Route path="/simulator" element={
         <RequireCharacter><SimulatorPage /></RequireCharacter>
+      } />
+
+      {/* Skill Tree — RP ability upgrades */}
+      <Route path="/abilities" element={
+        <RequireCharacter><AbilitiesPage /></RequireCharacter>
       } />
 
       {/* Equipment / Gear */}

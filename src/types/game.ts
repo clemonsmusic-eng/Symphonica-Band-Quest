@@ -208,6 +208,9 @@ export interface Character {
   summonPoints: number;
   gear: Partial<Record<GearSlot, GearItem>>;
   freedAllies: AllyId[];
+  // Ability upgrade ranks (RP-funded). Maps ability id → rank (2–3); absent or 1
+  // = base. Abilities unlock automatically by level; RP only ranks them up.
+  abilityRanks: Record<string, number>;
   completedChallenges: string[];
   completedQuests: string[];
   bootCampComplete: boolean;

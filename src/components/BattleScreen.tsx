@@ -3,7 +3,7 @@ import type { Character, Rating } from '../types/game';
 import type { EnemyDef } from '../lib/enemies';
 import { EFFECTIVENESS_MULT } from '../lib/enemies';
 import type { Ability } from '../lib/abilities';
-import { getAbilitiesForInstrument, battleBeatCount, battleBpm, battleBpmRange } from '../lib/abilities';
+import { getAbilitiesForInstrument, battleBeatCount, battleBpm, battleBpmRange, abilityRankMult } from '../lib/abilities';
 import type { AbilityTier } from '../lib/abilities';
 import { getInstrumentColor, pitchToleranceCents } from '../lib/instruments';
 import { buildParty } from '../lib/party';
@@ -727,9 +727,11 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
   }
 
   // factor is the effective power fraction (Basic = 1.0, Superior = accuracy band).
+  // The ability's RP rank (1–3) scales output on top of that.
+  const abilityRank = (ability: Ability) => character.abilityRanks[ability.id] ?? 1;
   function computeAbilityDamage(ability: Ability, factor: number): number {
     const actor = stateRef.current.party[actorRef.current];
-    return finalizeDamage(actor.def.stats.power * ability.damageMultiplier * factor);
+    return finalizeDamage(actor.def.stats.power * ability.damageMultiplier * factor * abilityRankMult(abilityRank(ability)));
   }
 
   async function handleAbilityComplete(rating: Rating, score: number) {
@@ -810,7 +812,7 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
       const tIdx = targetAllyRef.current;
       const target = stateRef.current.party[tIdx];
       if (target && target.hp <= 0) {
-        const revived = Math.max(1, Math.round(target.maxHp * factor));
+        const revived = Math.max(1, Math.round(target.maxHp * factor * abilityRankMult(abilityRank(ability))));
         healMember(tIdx, revived);
         addLog(`${ability.name} — ${target.def.name} returns with ${revived} HP!`);
       } else {
@@ -823,7 +825,7 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
     if (ability.isHealing) {
       const tIdx = targetAllyRef.current;
       const target = stateRef.current.party[tIdx];
-      const healAmount = Math.round(actor.def.stats.endurance * 3 * factor);
+      const healAmount = Math.round(actor.def.stats.endurance * 3 * factor * abilityRankMult(abilityRank(ability)));
       healMember(tIdx, healAmount);
       addLog(`${ability.name} — restored ${healAmount} HP to ${target?.def.name} (${Math.round(factor * 100)}%)`);
       afterMemberAction(actorIdx);
