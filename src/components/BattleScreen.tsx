@@ -1629,7 +1629,7 @@ function getEnemyEmoji(id: string): string {
     rest_wraith: '😶',
     frat: '🐀',
     stage_phantom: '😰',
-    fermata_s: '🛑',
+    fermoctopus: '🐙',
     saxerpent: '🐍',
     glissanghost: '💨',
     stingcatto: '🐝',

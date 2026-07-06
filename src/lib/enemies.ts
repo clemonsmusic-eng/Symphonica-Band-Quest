@@ -715,9 +715,9 @@ export const ENEMIES: Record<string, EnemyDef> = {
   },
 
   // Zone 5 — Melodious Meadows
-  fermata_s: {
-    id: 'fermata_s', tier: 3, zone: 5, name: 'Fermata S',
-    description: 'A bloated meadow-spirit that seizes a note and refuses to let it end, holding friend and foe frozen in place.',
+  fermoctopus: {
+    id: 'fermoctopus', tier: 3, zone: 5, name: 'Fermoctopus',
+    description: 'A many-armed meadow-pond octopus with a single great fermata for an eye — that unblinking hold-mark fixes a note in place and lets its tentacles seize the frozen prey.',
     power: 16, maxHp: 120, attackDescription: 'A held tone that roots the target in place',
     specialAttackName: 'Endless Hold', specialAttackChallengeType: 'aural_interval_quest',
     debuff: 'cramped', debuffDuration: 1, vulnerableTo: ['oboe', 'bassoon'], isBoss: false,

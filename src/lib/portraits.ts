@@ -63,7 +63,7 @@ export const ENEMY_PORTRAITS: Record<string, string> = {
   rest_wraith: '/portraits/rest_wraith.png',               // Z1
   frat: '/portraits/frat.png',           // Z1
   stage_phantom: '/portraits/stage_phantom.png',   // Z4
-  fermata_s: '/portraits/fermata_s.png',           // Z5
+  fermoctopus: '/portraits/fermoctopus.png',       // Z5
   saxerpent: '/portraits/saxerpent.png',     // Z6
   glissanghost: '/portraits/glissanghost.png',                 // Z7
   stingcatto: '/portraits/stingcatto.png',     // Z9
