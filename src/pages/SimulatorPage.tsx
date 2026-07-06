@@ -4,7 +4,7 @@ import { useGameStore } from '../store/gameStore';
 import BattleScreen from '../components/BattleScreen';
 import { ENEMIES } from '../lib/enemies';
 import type { EnemyDef } from '../lib/enemies';
-import { enemyZone } from '../lib/enemyPlacement';
+import { enemyMinZone } from '../lib/enemyPlacement';
 import type { Rating } from '../types/game';
 import { getInstrumentColor } from '../lib/instruments';
 
@@ -66,7 +66,7 @@ export default function SimulatorPage() {
   const maxZone = char.currentZone;
 
   // All enemies available up to the player's current zone
-  const available = Object.values(ENEMIES).filter((e) => enemyZone(e.id, e.zone) <= maxZone);
+  const available = Object.values(ENEMIES).filter((e) => enemyMinZone(e.id, e.zone) <= maxZone);
 
   // Group by tier, preserving order
   const byTier = available.reduce<Record<number, EnemyDef[]>>((acc, e) => {

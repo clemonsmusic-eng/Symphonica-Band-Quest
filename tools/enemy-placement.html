@@ -169,6 +169,15 @@
   .card .nm { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .card .tier { font-size: 9.5px; font-variant-numeric: tabular-nums; color: var(--muted); border: 1px solid var(--hair-strong); border-radius: 5px; padding: 1px 4px; flex-shrink: 0; }
   .card .crown { font-size: 11px; color: var(--discord); flex-shrink: 0; }
+  .card.dup-source { outline: 1px dashed var(--accent); outline-offset: 1px; }
+  .card .mini {
+    border: none; background: transparent; color: var(--muted); font-size: 12px;
+    line-height: 1; padding: 3px 4px; border-radius: 5px; cursor: pointer;
+    opacity: .5; flex-shrink: 0; transition: opacity .12s, background .12s, color .12s;
+  }
+  .card .mini:hover { opacity: 1; color: var(--ink); background: color-mix(in srgb, var(--accent) 20%, transparent); }
+  .card .mini.rm:hover { color: var(--discord); background: color-mix(in srgb, var(--discord) 16%, transparent); }
+  .card .mini:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; opacity: 1; }
   .tray .col-body { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
 
   /* ── Export drawer ───────────────────────────────────────── */
@@ -298,21 +307,44 @@
   const zonePrimary = {};
   LOCATIONS.forEach(l => { if (zonePrimary[l.zone] === undefined) zonePrimary[l.zone] = l.id; });
 
-  const LS_KEY = 'bq_enemy_placement_tool_v1';
-  const seedFromZones = () => Object.fromEntries(ENEMIES.map(e => [e.id, zonePrimary[e.zone] || 'unassigned']));
-
-  let placement;
-  try { placement = JSON.parse(localStorage.getItem(LS_KEY)) || null; } catch (e) { placement = null; }
-  if (!placement) placement = seedFromZones();
-  // Heal any unknown ids/locations
-  ENEMIES.forEach(e => { if (!placement[e.id] || (placement[e.id] !== 'unassigned' && !LOC_BY_ID[placement[e.id]])) placement[e.id] = 'unassigned'; });
-
+  const LS_KEY = 'bq_enemy_placement_tool_v2';
+  const OLD_KEY = 'bq_enemy_placement_tool_v1';
   const ENEMY_BY_ID = Object.fromEntries(ENEMIES.map(e => [e.id, e]));
-  let selected = null;
+  let iidSeq = 0;
+  const newIid = () => 'x' + (++iidSeq);
+  const validLoc = (l) => l === 'unassigned' || !!LOC_BY_ID[l];
+
+  // A creature may live in many places, so state is a flat list of instances:
+  //   { iid, enemyId, loc }   (loc = a location id, or 'unassigned')
+  const seedInstances = () => ENEMIES.map(e => ({ iid: newIid(), enemyId: e.id, loc: zonePrimary[e.zone] || 'unassigned' }));
+
+  function loadInstances() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(LS_KEY));
+      if (Array.isArray(raw)) {
+        const out = raw.filter(i => i && ENEMY_BY_ID[i.enemyId])
+          .map(i => ({ iid: newIid(), enemyId: i.enemyId, loc: validLoc(i.loc) ? i.loc : 'unassigned' }));
+        const have = new Set(out.map(i => i.enemyId));
+        ENEMIES.forEach(e => { if (!have.has(e.id)) out.push({ iid: newIid(), enemyId: e.id, loc: 'unassigned' }); });
+        return out;
+      }
+    } catch (e) {}
+    // Migrate a v1 single-location map, if present.
+    try {
+      const old = JSON.parse(localStorage.getItem(OLD_KEY));
+      if (old && typeof old === 'object') {
+        return ENEMIES.map(e => ({ iid: newIid(), enemyId: e.id, loc: validLoc(old[e.id]) ? old[e.id] : (zonePrimary[e.zone] || 'unassigned') }));
+      }
+    } catch (e) {}
+    return seedInstances();
+  }
+
+  let instances = loadInstances();
+  let armed = null;   // { mode:'move', iid } | { mode:'dup', enemyId }
   let query = '';
 
   const $ = s => document.querySelector(s);
-  const save = () => { try { localStorage.setItem(LS_KEY, JSON.stringify(placement)); } catch (e) {} };
+  const save = () => { try { localStorage.setItem(LS_KEY, JSON.stringify(instances.map(i => ({ enemyId: i.enemyId, loc: i.loc })))); } catch (e) {} };
 
   // Build the Act bands + location columns once.
   const actsEl = $('#acts');
@@ -339,46 +371,67 @@
     actsEl.appendChild(sec);
   });
 
-  function makeCard(e) {
+  function makeCard(inst) {
+    const e = ENEMY_BY_ID[inst.enemyId];
+    const where = inst.loc === 'unassigned' ? 'unassigned' : LOC_BY_ID[inst.loc].name;
     const card = document.createElement('div');
     card.className = 'card';
     card.draggable = true;
-    card.dataset.id = e.id;
+    card.dataset.iid = inst.iid;
     card.tabIndex = 0;
     card.setAttribute('role', 'button');
-    card.setAttribute('aria-label', e.name + (e.boss ? ' (boss)' : '') + ', tier ' + e.tier);
+    card.setAttribute('aria-label', e.name + (e.boss ? ' (boss)' : '') + ', tier ' + e.tier + ', in ' + where);
     card.innerHTML = '<span class="emoji">' + e.emoji + '</span>' +
       '<span class="nm">' + e.name + '</span>' +
       (e.boss ? '<span class="crown" title="Boss">♛</span>' : '') +
-      '<span class="tier" title="Tier">T' + e.tier + '</span>';
+      '<span class="tier" title="Tier">T' + e.tier + '</span>' +
+      '<button class="mini dup" tabindex="-1" title="Duplicate — place a copy in another location" aria-label="Duplicate ' + e.name + '">⧉</button>' +
+      '<button class="mini rm" tabindex="-1" title="Remove from this location" aria-label="Remove ' + e.name + ' from ' + where + '">✕</button>';
     card.addEventListener('dragstart', ev => {
-      ev.dataTransfer.setData('text/plain', e.id);
+      ev.dataTransfer.setData('text/plain', inst.iid);
       ev.dataTransfer.effectAllowed = 'move';
       card.classList.add('dragging');
     });
     card.addEventListener('dragend', () => card.classList.remove('dragging'));
     card.addEventListener('click', ev => {
       ev.stopPropagation();
-      // If another card is armed, clicking here drops it into THIS card's location.
-      if (selected && selected !== e.id) place(selected, placement[e.id]);
-      else toggleSelect(e.id);
+      if (armed) resolveArmedAt(inst.loc);
+      else armMove(inst.iid);
     });
     card.addEventListener('keydown', ev => {
-      if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggleSelect(e.id); }
+      if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); if (armed) resolveArmedAt(inst.loc); else armMove(inst.iid); }
     });
+    const dupBtn = card.querySelector('.dup');
+    const rmBtn = card.querySelector('.rm');
+    [dupBtn, rmBtn].forEach(b => { b.draggable = false; b.addEventListener('mousedown', ev => ev.stopPropagation()); });
+    dupBtn.addEventListener('click', ev => { ev.stopPropagation(); armDuplicate(inst.enemyId); });
+    rmBtn.addEventListener('click', ev => { ev.stopPropagation(); removeInstance(inst.iid); });
     return card;
   }
 
-  function place(id, locId) {
-    if (!ENEMY_BY_ID[id]) return;
-    placement[id] = locId;
-    if (selected === id) selected = null;
-    save(); render();
-  }
-
-  function toggleSelect(id) {
-    selected = (selected === id) ? null : id;
+  function armMove(iid) {
+    armed = (armed && armed.mode === 'move' && armed.iid === iid) ? null : { mode: 'move', iid };
     render();
+  }
+  function armDuplicate(enemyId) { armed = { mode: 'dup', enemyId }; render(); }
+
+  // Drop the armed card (move that instance, or add a duplicate) at a location.
+  function resolveArmedAt(loc) {
+    if (!armed) return;
+    if (armed.mode === 'move') { const inst = instances.find(i => i.iid === armed.iid); if (inst) inst.loc = loc; }
+    else if (armed.mode === 'dup') { instances.push({ iid: newIid(), enemyId: armed.enemyId, loc }); }
+    armed = null; save(); render();
+  }
+  function moveInstanceTo(iid, loc) { const inst = instances.find(i => i.iid === iid); if (inst) { inst.loc = loc; save(); render(); } }
+  function removeInstance(iid) {
+    const inst = instances.find(i => i.iid === iid);
+    if (!inst) return;
+    const enemyId = inst.enemyId;
+    instances = instances.filter(i => i.iid !== iid);
+    // Never lose a creature entirely — its last card falls back to Unassigned.
+    if (!instances.some(i => i.enemyId === enemyId)) instances.push({ iid: newIid(), enemyId, loc: 'unassigned' });
+    if (armed && armed.mode === 'move' && armed.iid === iid) armed = null;
+    save(); render();
   }
 
   // Drop targets
@@ -388,28 +441,28 @@
     col.addEventListener('dragleave', () => col.classList.remove('drop-target'));
     col.addEventListener('drop', ev => {
       ev.preventDefault(); col.classList.remove('drop-target');
-      const id = ev.dataTransfer.getData('text/plain');
-      if (id) place(id, locId);
+      const iid = ev.dataTransfer.getData('text/plain');
+      if (iid) moveInstanceTo(iid, locId);
     });
-    col.addEventListener('click', () => { if (selected) place(selected, locId); });
+    col.addEventListener('click', () => { if (armed) resolveArmedAt(locId); });
   });
 
   function render() {
-    // clear bodies
     document.querySelectorAll('.col-body').forEach(b => (b.innerHTML = ''));
     const counts = {};
     LOCATIONS.forEach(l => (counts[l.id] = 0));
-    let placed = 0;
+    const placedEnemies = new Set();
 
-    ENEMIES.forEach(e => {
-      const loc = placement[e.id] || 'unassigned';
-      const body = document.getElementById('body-' + loc);
+    instances.forEach(inst => {
+      const body = document.getElementById('body-' + inst.loc);
       if (!body) return;
-      const card = makeCard(e);
-      if (selected === e.id) card.classList.add('selected');
+      const e = ENEMY_BY_ID[inst.enemyId];
+      const card = makeCard(inst);
+      if (armed && armed.mode === 'move' && armed.iid === inst.iid) card.classList.add('selected');
+      if (armed && armed.mode === 'dup' && armed.enemyId === inst.enemyId) card.classList.add('dup-source');
       if (query && !e.name.toLowerCase().includes(query)) card.classList.add('dimmed');
       body.appendChild(card);
-      if (loc !== 'unassigned') { counts[loc]++; placed++; }
+      if (inst.loc !== 'unassigned') { counts[inst.loc]++; placedEnemies.add(inst.enemyId); }
     });
 
     LOCATIONS.forEach(l => {
@@ -419,46 +472,53 @@
       if (body && counts[l.id] === 0) { const d = document.createElement('div'); d.className = 'col-empty'; d.textContent = 'drop here'; body.appendChild(d); }
     });
 
+    const placed = placedEnemies.size;
     $('#placed').textContent = placed;
     $('#meter').style.width = Math.round((placed / ENEMIES.length) * 100) + '%';
-    const trayCount = ENEMIES.length - placed;
-    $('#tray-sub').textContent = trayCount === 0 ? 'all creatures placed — the world is populated' : trayCount + ' unplaced · nothing here appears in the world yet';
+    const trayN = instances.filter(i => i.loc === 'unassigned').length;
+    $('#tray-sub').textContent = trayN === 0 ? 'empty — every creature is placed' : trayN + ' in the pen · nothing here appears in the world yet';
 
     const hint = $('#hint');
-    if (selected) {
+    const span = hint.querySelector('span');
+    if (armed && armed.mode === 'move') {
+      const inst = instances.find(i => i.iid === armed.iid);
       hint.classList.add('armed');
-      hint.querySelector('span').innerHTML = '<span class="pin">' + ENEMY_BY_ID[selected].name + '</span> selected — click a location to place it, or click the creature again to cancel.';
+      span.innerHTML = 'Moving <span class="pin">' + (inst ? ENEMY_BY_ID[inst.enemyId].name : '') + '</span> — click a location to drop it (or the card again to cancel).';
+    } else if (armed && armed.mode === 'dup') {
+      hint.classList.add('armed');
+      span.innerHTML = 'Duplicating <span class="pin">' + ENEMY_BY_ID[armed.enemyId].name + '</span> — click a location to add a copy there.';
     } else {
       hint.classList.remove('armed');
-      hint.querySelector('span').innerHTML = 'Drag a creature onto a location — or <span class="pin">click a creature</span>, then click a location to place it.';
+      span.innerHTML = 'Drag to move · <span class="pin">⧉</span> duplicates into another location · <span class="pin">✕</span> removes it from one.';
     }
   }
 
   // Search
   $('#search').addEventListener('input', ev => { query = ev.target.value.trim().toLowerCase(); render(); });
 
-  // Reset / clear
+  // Reset / clear — each rebuilds one instance per creature (no duplicates).
   $('#reset').addEventListener('click', () => {
-    if (confirm('Seed every creature back into its current campaign zone? This replaces your current arrangement.')) {
-      placement = seedFromZones(); selected = null; save(); render();
+    if (confirm('Reset to one card per creature in its current campaign zone? This discards duplicates and your arrangement.')) {
+      instances = seedInstances(); armed = null; save(); render();
     }
   });
   $('#clear').addEventListener('click', () => {
-    if (confirm('Send every creature back to the Unassigned tray?')) {
-      ENEMIES.forEach(e => (placement[e.id] = 'unassigned')); selected = null; save(); render();
+    if (confirm('Send every creature back to the Unassigned pen (one card each)?')) {
+      instances = ENEMIES.map(e => ({ iid: newIid(), enemyId: e.id, loc: 'unassigned' })); armed = null; save(); render();
     }
   });
 
-  // Export
+  // Export — a creature may map to several locations, so values are arrays.
   let fmt = 'ts';
   function buildOutput() {
-    const entries = ENEMIES.filter(e => placement[e.id] && placement[e.id] !== 'unassigned')
-      .map(e => [e.id, placement[e.id]]);
+    const byEnemy = {};
+    instances.forEach(inst => { if (inst.loc !== 'unassigned') (byEnemy[inst.enemyId] = byEnemy[inst.enemyId] || new Set()).add(inst.loc); });
+    const entries = ENEMIES.filter(e => byEnemy[e.id]).map(e => [e.id, [...byEnemy[e.id]]]);
     if (fmt === 'json') {
       return JSON.stringify(Object.fromEntries(entries), null, 2);
     }
-    const lines = entries.map(([id, loc]) => "  " + id + ": '" + loc + "',");
-    return 'export const ENEMY_PLACEMENT: Record<string, string> = {\n' + lines.join('\n') + '\n};';
+    const lines = entries.map(([id, locs]) => "  " + id + ": [" + locs.map(l => "'" + l + "'").join(', ') + "],");
+    return 'export const ENEMY_PLACEMENT: Record<string, string[]> = {\n' + lines.join('\n') + '\n};';
   }
   function openDrawer() { $('#out').value = buildOutput(); $('#scrim').classList.add('open'); $('#drawer').classList.add('open'); $('#drawer').setAttribute('aria-hidden', 'false'); }
   function closeDrawer() { $('#scrim').classList.remove('open'); $('#drawer').classList.remove('open'); $('#drawer').setAttribute('aria-hidden', 'true'); }
@@ -471,7 +531,7 @@
     $('#tab-json').classList.toggle('on', f === 'json');
     $('#drawer-note').innerHTML = f === 'ts'
       ? 'Paste this into <code>src/lib/enemyPlacement.ts</code> — it becomes the live placement.'
-      : 'Raw <code>{ enemyId: locationId }</code> map — omits anything still Unassigned.';
+      : 'Raw <code>{ enemyId: locationId[] }</code> map — omits anything still Unassigned.';
     $('#out').value = buildOutput();
   }
   $('#tab-ts').addEventListener('click', () => setFmt('ts'));
@@ -487,7 +547,7 @@
     a.download = fmt === 'ts' ? 'enemyPlacement.ts' : 'enemy_placement.json';
     a.click(); URL.revokeObjectURL(a.href);
   });
-  document.addEventListener('keydown', ev => { if (ev.key === 'Escape') { closeDrawer(); if (selected) { selected = null; render(); } } });
+  document.addEventListener('keydown', ev => { if (ev.key === 'Escape') { closeDrawer(); if (armed) { armed = null; render(); } } });
 
   render();
 })();
