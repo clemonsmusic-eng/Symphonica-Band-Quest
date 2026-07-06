@@ -18,7 +18,7 @@ import {
 import type { StatusType, StatusEffect } from '../lib/statusEffects';
 import { BATTLE_ITEMS, STARTER_KIT } from '../lib/battleItems';
 import type { BattleItem } from '../lib/battleItems';
-import { ALLY_BATTLE_DEFS, getAllyForInstrument, SUMMON_SCALE } from '../lib/allies';
+import { ALLY_BATTLE_DEFS, getAllyForInstrument } from '../lib/allies';
 import type { AllyId } from '../types/game';
 import ChallengeModal from './ChallengeModal';
 import MaestroPortrait from './MaestroPortrait';
@@ -125,7 +125,7 @@ function reducer(state: BattleState, action: BattleAction): BattleState {
       const minHp = state.simulatorMode ? 1 : 0;
       const party = state.party.map((m, i) => {
         if (i !== action.idx) return m;
-        const reduction = m.defending ? 0.5 : 1.0;
+        const reduction = m.defending ? 0.65 : 1.0; // Defend → −35% damage taken
         const newHp = Math.max(minHp, m.hp - Math.floor(action.amount * reduction));
         return { ...m, hp: newHp, statuses: clearStatus(m.statuses, 'sleep') };
       });
@@ -229,6 +229,30 @@ const TIER_TEXT: Record<AbilityTier, string> = {
   strong: 'text-academy-gold',
 };
 
+// ── Hybrid action model ───────────────────────────────────────────────────────
+// Attacks are the uncapped layer: Light auto-resolves; Medium/Heavy trade a
+// quick mini-game for more power. Base is the actor's POW (no ability multiplier).
+type AttackTier = 'light' | 'medium' | 'heavy';
+const ATTACK_DEFS: Record<AttackTier, {
+  label: string; maxFactor: number; hint: string; challengeType: string | null;
+}> = {
+  light:  { label: 'Light',  maxFactor: 0.6, hint: 'no input · 60% power',       challengeType: null },
+  medium: { label: 'Medium', maxFactor: 1.0, hint: 'timing · up to 100%',        challengeType: 'prepared_performance' },
+  heavy:  { label: 'Heavy',  maxFactor: 1.2, hint: '4-count rhythm · up to 120%', challengeType: 'rhythm_performance' },
+};
+
+// Superior ability performance → fraction of the ability's power (accuracy bands).
+function superiorBand(score: number): number {
+  if (score >= 90) return 1.10; // Superior
+  if (score >= 75) return 0.85; // Excellent
+  if (score >= 65) return 0.70; // Good
+  if (score >= 50) return 0.55; // Fair
+  if (score >= 10) return 0.40; // Poor
+  return 0;                     // <10% = miss
+}
+const BASIC_ABILITY_SUCCESS = 60;   // note-ID score at/above this unlocks a Basic ability
+const PERFORMANCES_PER_ROUND = 2;   // Basic/Superior/Summon uses allowed per player round
+
 const RATING_COLORS: Record<Rating, string> = {
   superior:  'bg-rating-superior/15 text-rating-superior',
   excellent: 'bg-rating-excellent/15 text-rating-excellent',
@@ -247,7 +271,7 @@ interface Props {
   simulatorMode?: boolean;
 }
 
-type MenuState = 'actions' | 'items' | 'summons' | 'target-enemy' | 'target-ally';
+type MenuState = 'actions' | 'attack' | 'ability' | 'items' | 'summons' | 'target-enemy' | 'target-ally';
 
 export default function BattleScreen({ character, enemies, onVictory, onDefeat, simulatorMode = false }: Props) {
   const [state, dispatch] = useReducer(reducer, buildInitialState(character, enemies, simulatorMode));
@@ -264,7 +288,9 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
     name: string; baseDmg: number; challengeType: string; enemyIdx: number; targetIdx: number;
   } | null>(null);
   // Target selection: what we're picking a target for, and the picks themselves.
-  const [pendingTargeted, setPendingTargeted] = useState<{ kind: 'ability'; ability: Ability } | { kind: 'item'; item: BattleItem } | null>(null);
+  const [pendingTargeted, setPendingTargeted] = useState<{ kind: 'ability'; ability: Ability } | { kind: 'item'; item: BattleItem } | { kind: 'attack'; tier: AttackTier } | null>(null);
+  const [pendingAttack, setPendingAttack] = useState<AttackTier | null>(null);
+  const [perfUsed, setPerfUsed] = useState(0); // Basic/Superior/Summon uses this player round
   const targetEnemyRef = useRef(0);
   const targetAllyRef = useRef(0);
   const actorRef = useRef(0);
@@ -568,6 +594,7 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
     // New player round: defending wears off now (after it actually protected).
     roundNoRef.current += 1;
     hasteUsedRef.current.clear();
+    setPerfUsed(0); // new player round — performances refresh
     dispatch({ type: 'CLEAR_ALL_DEFENDING' });
     dispatch({ type: 'SET_TURN', turn: 'player' });
     const first = livingMemberIdxs(stateRef.current)[0];
@@ -617,6 +644,7 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
     setActiveBpm(battleBpm(character.currentZone)); // roll tempo once per action
     setMenu('actions');
     setPendingTargeted(null);
+    setPerfUsed((n) => n + 1); // Basic/Superior both consume a performance slot
     setActiveAbility(ab);
   }
 
@@ -624,6 +652,7 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
     targetEnemyRef.current = idx;
     if (pendingTargeted?.kind === 'ability') startAbility(pendingTargeted.ability);
     else if (pendingTargeted?.kind === 'item') resolveItem(pendingTargeted.item, idx);
+    else if (pendingTargeted?.kind === 'attack') startAttack(pendingTargeted.tier);
   }
 
   function chooseAllyTarget(idx: number) {
@@ -631,20 +660,76 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
     if (pendingTargeted?.kind === 'ability') startAbility(pendingTargeted.ability);
   }
 
-  // score is 0–100 continuous pitch accuracy; 100 triggers the perfect bonus (2×).
-  function computeDamage(ability: Ability, score: number): number {
+  // ── Attacks (uncapped): Light auto-resolves; Medium/Heavy run a quick game ────
+  function requestAttack(tier: AttackTier) {
+    actorRef.current = state.activeIdx;
+    const living = livingEnemyIdxs(stateRef.current);
+    if (living.length > 1) {
+      setPendingTargeted({ kind: 'attack', tier });
+      setMenu('target-enemy');
+      return;
+    }
+    targetEnemyRef.current = living[0] ?? 0;
+    startAttack(tier);
+  }
+
+  function startAttack(tier: AttackTier) {
+    setPendingTargeted(null);
+    if (!ATTACK_DEFS[tier].challengeType) {
+      setMenu('actions');
+      resolveAttack(tier, 100); // Light — no input, full (0.6×) factor
+      return;
+    }
+    setActiveBpm(battleBpm(character.currentZone));
+    setMenu('actions');
+    setPendingAttack(tier);
+  }
+
+  function handleAttackComplete(_rating: Rating, score: number) {
+    const tier = pendingAttack;
+    setPendingAttack(null);
+    if (tier) resolveAttack(tier, score);
+  }
+
+  function resolveAttack(tier: AttackTier, score: number) {
+    const actorIdx = actorRef.current;
+    const actor = stateRef.current.party[actorIdx];
+    const def = ATTACK_DEFS[tier];
+    lungeMember(actorIdx);
+    if (score <= 0) {
+      addLog(`${actor.def.name}'s ${def.label} attack misses!`);
+      afterMemberAction(actorIdx);
+      return;
+    }
+    const factor = def.maxFactor * (score / 100);
+    const tIdx = targetEnemyRef.current;
+    const targetUnit = stateRef.current.enemies[tIdx];
+    const dmg = finalizeDamage(actor.def.stats.power * factor);
+    const applied = dealDamageToEnemy(tIdx, dmg, actorIdx);
+    const pct = def.challengeType ? ` (${score}%)` : '';
+    addLog(`${actor.def.name} — ${def.label} attack: ${applied} dmg to ${targetUnit?.def.name}${pct}`);
+    afterMemberAction(actorIdx);
+  }
+
+  // Apply the shared combat multipliers (weakpoint · manic/calm · class matchup)
+  // to a raw base and round to a floor of 1. Reads actor/target from the refs.
+  function finalizeDamage(base: number): number {
     const s = stateRef.current;
     const actor = s.party[actorRef.current];
     const targetUnit = s.enemies[targetEnemyRef.current];
-    const perfectMult = score === 100 ? 2 : 1;
     const weakpointMult = targetUnit?.weakpointExposed ? 2 : 1;
     const offenseMult = hasStatus(actor.statuses, 'manic') ? MANIC_DEAL_MULT
       : hasStatus(actor.statuses, 'calm') ? CALM_DEAL_MULT : 1;
     // GDD matchup layer: the actor's class counters this enemy's musical nature.
     const matchupMult = targetUnit && targetUnit.def.vulnerableTo.includes(actor.def.instrument)
       ? EFFECTIVENESS_MULT : 1;
-    const base = actor.def.stats.power * ability.damageMultiplier * (score / 100);
-    return Math.max(1, Math.round(base * perfectMult * weakpointMult * offenseMult * matchupMult));
+    return Math.max(1, Math.round(base * weakpointMult * offenseMult * matchupMult));
+  }
+
+  // factor is the effective power fraction (Basic = 1.0, Superior = accuracy band).
+  function computeAbilityDamage(ability: Ability, factor: number): number {
+    const actor = stateRef.current.party[actorRef.current];
+    return finalizeDamage(actor.def.stats.power * ability.damageMultiplier * factor);
   }
 
   async function handleAbilityComplete(rating: Rating, score: number) {
@@ -652,6 +737,7 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
     const ability = activeAbility;
     const actorIdx = actorRef.current;
     const actor = stateRef.current.party[actorIdx];
+    const isBasic = ability.tier === 'basic';
     setActiveAbility(null);
     setLastRating(rating);
     lungeMember(actorIdx);
@@ -673,9 +759,18 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
       return;
     }
 
-    // Miss — no pitch detected during the performance window.
-    if (score === 0) {
-      addLog(`${ability.name} — MISSED! No sound detected.`);
+    // Basic ability — a quick note-ID unlock. Miss the note ⇒ the member defends.
+    if (isBasic && score < BASIC_ABILITY_SUCCESS) {
+      dispatch({ type: 'SET_MEMBER_DEFENDING', idx: actorIdx, value: true });
+      addLog(`${ability.name} — couldn't name the note; ${actor.def.name} defends instead.`);
+      afterMemberAction(actorIdx);
+      return;
+    }
+
+    // Effective power fraction: Basic success = full power; Superior = accuracy band.
+    const factor = isBasic ? 1.0 : superiorBand(score);
+    if (!isBasic && factor === 0) {
+      addLog(`${ability.name} — the performance fell apart. (${score}%)`);
       afterMemberAction(actorIdx);
       return;
     }
@@ -688,15 +783,14 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
       return;
     }
 
-    const isPerfect = score === 100;
-    if (isPerfect) {
+    if (!isBasic && score >= 90) { // top Superior band — flourish only, no extra multiplier
       setPerfectFlash(true);
       setTimeout(() => setPerfectFlash(false), 2000);
     }
 
-    const goodOrBetter = score >= 60; // status application gated on accuracy
+    const goodOrBetter = isBasic || score >= 65; // status application gated on a Good+ band
 
-    // Cleanses fire regardless of score so defensive utility is reliable.
+    // Cleanses fire regardless of band so defensive utility is reliable.
     if (ability.clearsSelfDebuffs) {
       dispatch({ type: 'CLEAR_MEMBER_DEBUFFS', idx: actorIdx });
       addLog(`✨ ${ability.name} — debuffs shaken loose!`);
@@ -716,9 +810,9 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
       const tIdx = targetAllyRef.current;
       const target = stateRef.current.party[tIdx];
       if (target && target.hp <= 0) {
-        const revived = Math.max(1, Math.round(target.maxHp * (score / 100)));
+        const revived = Math.max(1, Math.round(target.maxHp * factor));
         healMember(tIdx, revived);
-        addLog(`${isPerfect ? '✨ PERFECT! ' : ''}${ability.name} — ${target.def.name} returns with ${revived} HP!`);
+        addLog(`${ability.name} — ${target.def.name} returns with ${revived} HP!`);
       } else {
         addLog(`${ability.name} — but there is no one to revive.`);
       }
@@ -729,9 +823,9 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
     if (ability.isHealing) {
       const tIdx = targetAllyRef.current;
       const target = stateRef.current.party[tIdx];
-      const healAmount = Math.round(actor.def.stats.endurance * 3 * (score / 100) * (isPerfect ? 2 : 1));
+      const healAmount = Math.round(actor.def.stats.endurance * 3 * factor);
       healMember(tIdx, healAmount);
-      addLog(`${isPerfect ? '✨ PERFECT! ' : ''}${ability.name} — restored ${healAmount} HP to ${target?.def.name} (${score}%${isPerfect ? ' ×2' : ''})`);
+      addLog(`${ability.name} — restored ${healAmount} HP to ${target?.def.name} (${Math.round(factor * 100)}%)`);
       afterMemberAction(actorIdx);
       return;
     }
@@ -747,9 +841,9 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
     if (ability.damageMultiplier > 0) {
       const targetUnit = stateRef.current.enemies[tIdx];
       const effective = targetUnit?.def.vulnerableTo.includes(actor.def.instrument);
-      const dmg = computeDamage(ability, score);
+      const dmg = computeAbilityDamage(ability, factor);
       const applied = dealDamageToEnemy(tIdx, dmg, actorIdx);
-      addLog(`${isPerfect ? '✨ PERFECT! ' : ''}${ability.name} — ${applied} dmg to ${targetUnit?.def.name} (${score}%${isPerfect ? ' ×2' : ''}${effective ? ' ▲' : ''})`);
+      addLog(`${ability.name} — ${applied} dmg to ${targetUnit?.def.name} (${Math.round(factor * 100)}%${effective ? ' ▲' : ''})`);
       inflictEnemyStatuses();
     } else {
       // Pure-utility ability (no direct damage): apply its statuses and resolve.
@@ -818,13 +912,15 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
       addLog(`Not enough SP to summon ${def.name}. (Need ${def.spCost}, have ${stateRef.current.playerSp})`);
       return;
     }
+    // SP is charged only on a successful call (≥80%); performing still costs a slot.
     actorRef.current = state.activeIdx;
-    dispatch({ type: 'SPEND_SP', amount: def.spCost });
-    spSpentRef.current += def.spCost;
+    setActiveBpm(battleBpm(character.currentZone));
+    setMenu('actions');
+    setPerfUsed((n) => n + 1);
     setPendingSummonAllyId(allyId);
   }
 
-  function handleSummonComplete(rating: Rating, _score: number) {
+  function handleSummonComplete(_rating: Rating, score: number) {
     const allyId = pendingSummonAllyId;
     setPendingSummonAllyId(null);
     if (!allyId) return;
@@ -833,8 +929,17 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
     const s0 = stateRef.current;
     const heroStats = s0.party[actorIdx].def.stats;
     const def = ALLY_BATTLE_DEFS[allyId];
-    const scale = SUMMON_SCALE[rating] ?? 0.2;
-    addLog(`${def.abilityName} — ${def.name} answers the call! (${rating})`);
+
+    // Gate: <80% the maestro declines (no SP spent); ≥95% grants the Superior bonus.
+    if (score < 80) {
+      addLog(`💬 ${def.name}: "My time is too valuable, keep practicing."`);
+      afterMemberAction(actorIdx);
+      return;
+    }
+    dispatch({ type: 'SPEND_SP', amount: def.spCost });
+    spSpentRef.current += def.spCost;
+    const scale = score >= 95 ? 1.2 : 1.0;
+    addLog(`${def.abilityName} — ${def.name} answers the call!${score >= 95 ? ' ✨ SUPERIOR!' : ''}`);
 
     const healTarget = () => lowestHpLivingMember(stateRef.current);
     const debuffTarget = () => firstLivingEnemy(stateRef.current);
@@ -1314,7 +1419,7 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
               <span className="text-academy-cream/40 text-[10px] uppercase tracking-widest font-fantasy">
                 Summon Maestro
               </span>
-              <button onClick={() => setMenu('actions')} className="text-academy-cream/40 hover:text-academy-cream/80 text-[10px] font-fantasy">
+              <button onClick={() => setMenu('ability')} className="text-academy-cream/40 hover:text-academy-cream/80 text-[10px] font-fantasy">
                 ← Back
               </button>
             </div>
@@ -1352,30 +1457,46 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
               ◈ {state.playerSp} SP · Rating on the aural confirmation scales the effect.
             </p>
           </>
-        ) : (
+        ) : menu === 'attack' ? (
           <>
             <div className="flex items-baseline justify-between mb-2">
               <span className="text-[10px] uppercase tracking-widest font-fantasy" style={{ color: activeColor }}>
-                {active.def.name} — Choose Action
+                {active.def.name} — Attack
               </span>
-              <span className="text-academy-cream/30 text-[9px] font-fantasy">
-                ⟡{state.playerRp} {canSummon ? `· ◈${state.playerSp} ` : ''}· ♩{bpmRange[0]}–{bpmRange[1]}
-              </span>
+              <button onClick={() => setMenu('actions')} className="text-academy-cream/40 hover:text-academy-cream/80 text-[10px] font-fantasy">← Back</button>
             </div>
-            {/* FF-style vertical command list */}
+            <div className="flex flex-col mb-1">
+              {(['light', 'medium', 'heavy'] as AttackTier[]).map((tier) => {
+                const d = ATTACK_DEFS[tier];
+                return (
+                  <button key={tier} onClick={() => requestAttack(tier)}
+                    className="ff-cursor w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center gap-2">
+                    <span className="flex-1 text-left text-xs font-fantasy" style={{ color: activeColor }}>{d.label}</span>
+                    <span className="text-[9px] text-[#9a9ac0]">{d.hint}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        ) : menu === 'ability' ? (
+          <>
+            <div className="flex items-baseline justify-between mb-2">
+              <span className="text-[10px] uppercase tracking-widest font-fantasy" style={{ color: activeColor }}>
+                {active.def.name} — Ability
+              </span>
+              <button onClick={() => setMenu('actions')} className="text-academy-cream/40 hover:text-academy-cream/80 text-[10px] font-fantasy">← Back</button>
+            </div>
             <div className="flex flex-col mb-1 max-h-56 overflow-y-auto">
               {abilities.map((ab) => {
                 const beats = battleBeatCount(ab.tier, character.currentZone);
+                const kind = ab.tier === 'basic' ? 'Basic' : 'Superior';
                 return (
-                  <button
-                    key={ab.id}
-                    onClick={() => requestAbility(ab)}
-                    className="ff-cursor w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center gap-2"
-                  >
+                  <button key={ab.id} onClick={() => requestAbility(ab)}
+                    className="ff-cursor w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center gap-2">
                     <span className="flex-1 min-w-0 text-left text-xs font-fantasy truncate" style={{ color: activeColor }}>{ab.name}</span>
                     <span className="flex items-center gap-1.5 flex-shrink-0">
-                      <span className={`text-[9px] font-fantasy uppercase tracking-wide ${TIER_TEXT[ab.tier]}`}>{ab.tier}</span>
-                      <span className="text-[9px] text-[#9a9ac0]">{beats}♩</span>
+                      <span className={`text-[9px] font-fantasy uppercase tracking-wide ${TIER_TEXT[ab.tier]}`}>{kind}</span>
+                      <span className="text-[9px] text-[#9a9ac0]">{ab.tier === 'basic' ? 'note ID' : `${beats}♩`}</span>
                       {ab.inflicts && (
                         <span className="text-[9px]" title={STATUS_DEFS[ab.inflicts].name}>{STATUS_DEFS[ab.inflicts].icon}</span>
                       )}
@@ -1386,13 +1507,58 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
                   </button>
                 );
               })}
+              {canSummon && (
+                <button onClick={() => setMenu('summons')}
+                  className="ff-cursor w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center gap-2">
+                  <span className="flex-1 text-left text-xs font-fantasy text-academy-gold">Maestro Summon</span>
+                  <span className="text-[9px] text-[#9a9ac0]">{ALLY_BATTLE_DEFS[characterAllyId!].name} · {state.playerSp} SP</span>
+                </button>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-baseline justify-between mb-2">
+              <span className="text-[10px] uppercase tracking-widest font-fantasy" style={{ color: activeColor }}>
+                {active.def.name} — Choose Action
+              </span>
+              <span className="text-academy-cream/30 text-[9px] font-fantasy">
+                ⚡{perfUsed}/{PERFORMANCES_PER_ROUND} · ⟡{state.playerRp}{canSummon ? ` · ◈${state.playerSp}` : ''} · ♩{bpmRange[0]}–{bpmRange[1]}
+              </span>
+            </div>
+            {/* FF-style top-level command list */}
+            <div className="flex flex-col mb-1">
+              <button
+                onClick={() => setMenu('attack')}
+                className="ff-cursor w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center gap-2"
+              >
+                <span className="flex-1 text-left text-xs font-fantasy" style={{ color: activeColor }}>Attack</span>
+                <span className="text-[9px] text-[#9a9ac0]">Light · Medium · Heavy</span>
+              </button>
+              {(() => {
+                const abilityLocked = perfUsed >= PERFORMANCES_PER_ROUND;
+                const noAbilities = abilities.length === 0 && !canSummon;
+                const disabled = abilityLocked || noAbilities;
+                return (
+                  <button
+                    onClick={() => { if (!disabled) setMenu('ability'); }}
+                    disabled={disabled}
+                    className={`ff-cursor w-full text-left px-2 py-1.5 rounded transition-colors flex items-center gap-2 ${disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white/10'}`}
+                  >
+                    <span className="flex-1 text-left text-xs font-fantasy" style={{ color: activeColor }}>Ability</span>
+                    <span className="text-[9px] text-[#9a9ac0]">
+                      {abilityLocked ? '2 performances used' : noAbilities ? 'none' : 'Basic · Superior · Summon'}
+                    </span>
+                  </button>
+                );
+              })()}
               <button
                 onClick={handleDefend}
                 disabled={isManic}
                 className={`ff-cursor w-full text-left px-2 py-1.5 rounded transition-colors flex items-center gap-2 ${isManic ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white/10'}`}
               >
                 <span className="flex-1 text-left text-xs font-fantasy text-academy-gold">Defend</span>
-                <span className="text-[9px] text-[#9a9ac0]">{isManic ? 'manic — cannot defend' : 'instant'}</span>
+                <span className="text-[9px] text-[#9a9ac0]">{isManic ? 'manic — cannot defend' : '−35% taken'}</span>
               </button>
               <button
                 onClick={() => setMenu('items')}
@@ -1401,15 +1567,6 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
                 <span className="flex-1 text-left text-xs font-fantasy text-academy-gold">Item</span>
                 <span className="text-[9px] text-[#9a9ac0]">×{Object.values(items).reduce((a, b) => a + b, 0)}</span>
               </button>
-              {canSummon && (
-                <button
-                  onClick={() => setMenu('summons')}
-                  className="ff-cursor w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center gap-2"
-                >
-                  <span className="flex-1 text-left text-xs font-fantasy text-academy-gold">Summon</span>
-                  <span className="text-[9px] text-[#9a9ac0]">{ALLY_BATTLE_DEFS[characterAllyId!].name} · {state.playerSp} SP</span>
-                </button>
-              )}
             </div>
             {isBlinded && (
               <p className="text-rating-fair text-[10px] text-center mt-1">
@@ -1432,8 +1589,11 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
           challenge={{
             id: `battle_${activeAbility.id}`,
             title: `${active.def.name}: ${activeAbility.name}`,
-            type: 'prepared_performance',
-            description: activeAbility.description,
+            // Basic abilities unlock via a quick note-ID; Superior ones perform.
+            type: activeAbility.tier === 'basic' ? 'aural_pitch_spy' : 'prepared_performance',
+            description: activeAbility.tier === 'basic'
+              ? `Name the note to unlock ${activeAbility.name}. Miss it and you defend instead.`
+              : activeAbility.description,
             xpBase: 0,
             beatCount: battleBeatCount(activeAbility.tier, character.currentZone),
             bpm: activeBpm,
@@ -1450,17 +1610,46 @@ export default function BattleScreen({ character, enemies, onVictory, onDefeat, 
         />
       )}
 
-      {/* Summon confirmation challenge */}
+      {/* Attack challenge — Medium (timing) / Heavy (4-count rhythm) */}
+      {pendingAttack && (
+        <ChallengeModal
+          challenge={{
+            id: `attack_${pendingAttack}`,
+            title: `${active.def.name}: ${ATTACK_DEFS[pendingAttack].label} Attack`,
+            type: ATTACK_DEFS[pendingAttack].challengeType ?? 'prepared_performance',
+            description: pendingAttack === 'heavy'
+              ? 'Tap back the 4-count rhythm — rhythmic accuracy sets your damage (up to 120%).'
+              : 'Match the pitch — accuracy sets your damage (up to 100%).',
+            xpBase: 0,
+            beatCount: pendingAttack === 'medium' ? 4 : undefined,
+            bpm: activeBpm,
+          }}
+          character={character}
+          pitchToleranceOverride={effectivePitchTolerance}
+          challengeFlags={{
+            blind:    hasStatus(active.statuses, 'blind'),
+            manic:    hasStatus(active.statuses, 'manic'),
+            confused: hasStatus(active.statuses, 'confusion'),
+          }}
+          onComplete={handleAttackComplete}
+          onClose={() => handleAttackComplete('poor', 0)}
+        />
+      )}
+
+      {/* Maestro Summon — a performance; ≥80% activates, ≥95% Superior bonus */}
       {pendingSummonAllyId && (
         <ChallengeModal
           challenge={{
             id: `summon_${pendingSummonAllyId}`,
             title: `Summon: ${ALLY_BATTLE_DEFS[pendingSummonAllyId].abilityName}`,
-            type: 'aural_pitch_spy',
-            description: `${ALLY_BATTLE_DEFS[pendingSummonAllyId].abilityDescription} Rating scales the effect — Superior is full power.`,
+            type: 'prepared_performance',
+            description: `${ALLY_BATTLE_DEFS[pendingSummonAllyId].abilityDescription} Perform at 80%+ to call the maestro — 95%+ earns the Superior bonus.`,
             xpBase: 0,
+            beatCount: battleBeatCount('medium', character.currentZone),
+            bpm: activeBpm,
           }}
           character={character}
+          pitchToleranceOverride={effectivePitchTolerance}
           onComplete={handleSummonComplete}
           onClose={() => handleSummonComplete('poor', 0)}
         />

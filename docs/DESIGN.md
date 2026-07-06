@@ -172,10 +172,12 @@ FF6/FF7-style party combat. Source: `src/components/BattleScreen.tsx`,
 - **Turn structure:** the party acts, then enemies take a sequential round.
   Strict turn-based is the decided model (§12 Q4) — it protects the performance
   moment from clock pressure.
-- **Acting = performing.** [Q6-DECIDED: hybrid.] **Abilities** are gated behind a
-  short `prepared_performance` (beat count scales by act: zones 1–4 / 5–8 / 9–12);
-  **basic attacks auto-resolve** for pacing. The **Rating** you earn scales the
-  ability: `base damage = POW × ability.damageMultiplier × (score/100)`.
+- **Acting = performing.** [Q6-BUILT: hybrid.] Turn menu is **Attack / Ability /
+  Defend / Item** with a **2-performance-per-round** cap on the Ability branch
+  (§12 Q6). *Light* attacks auto-resolve (0.6×POW); *Medium/Heavy* attacks and
+  all abilities run a mini-game. Ability damage =
+  `POW × ability.damageMultiplier × factor`, where *factor* is 1.0 for a Basic
+  unlock or the Superior accuracy band (0.40–1.10).
 - **Abilities** (`src/lib/abilities.ts`) carry: `levelGate`, `tier`,
   `damageMultiplier`, healing/revive/AoE flags, status infliction
   (`inflicts` / `inflictsMany` on a Good-or-better hit), self-buffs, debuff/buff
@@ -314,10 +316,17 @@ implementation. Add, reorder, and answer these inline.
    learning tool.
 6. Should "acting = performing a mini-challenge" stay for every attack, or only
    for special abilities (basic attacks auto-resolve)? (Pacing question.)
-   → **Decision: hybrid.** Basic attacks auto-resolve; **abilities** trigger the
-   performance mini-challenge. Keeps skill-gating on the meaningful moves and
-   fixes pacing across a 5-member party. (Today every attack is a full
-   `prepared_performance` — this is the pacing change.)
+   → **Decision: hybrid — BUILT** (`BattleScreen.tsx`). Each turn offers
+   **Attack · Ability · Defend · Item**, with a **2-performance-per-round cap**
+   (party-wide, resets each round) on the Ability branch:
+   - **Attack** (uncapped) — *Light* (no input, 60% POW) · *Medium* (timing,
+     ≤100% POW × accuracy) · *Heavy* (4-count rhythm, ≤120% POW × accuracy).
+   - **Ability** (costs a performance slot) — *Basic* (note-ID unlock; miss ⇒ the
+     member Defends) fires at 100%; *Superior* (performance) bands to
+     40/55/70/85/110% by accuracy; *Maestro Summon* (performance) needs ≥80% to
+     call (≥95% = 120%); a failed call spends **no SP** and the maestro quips
+     *"My time is too valuable, keep practicing."*
+   - **Defend** — −35% damage taken. **Item** — unchanged.
 
 **Systems & economy**
 7. Resonance Points: finalize their role/sink (currently accrued, under-used).
