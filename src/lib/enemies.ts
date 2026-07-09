@@ -72,23 +72,6 @@ export const ENEMIES: Record<string, EnemyDef> = {
     vulnerableTo: ['oboe', 'clarinet', 'flute'],
     isBoss: false,
   },
-  double_flat_wretch: {
-    id: 'double_flat_wretch',
-    tier: 1,
-    zone: 3,
-    name: 'Double-Flat Wretch',
-    description: 'Larger Flatling variant, deeper droop, more powerful.',
-    power: 14,
-    maxHp: 90,
-    attackDescription: 'Stacks Accuracy drain; forces a lower note challenge',
-    specialAttackName: 'Deep Sag',
-    specialAttackChallengeType: 'aural_pitch_spy',
-    debuff: 'blind',
-    debuffDuration: 3,
-    vulnerableTo: ['oboe', 'clarinet', 'flute'],
-    isBoss: false,
-  },
-
   // ── Tier 2: Chronotons ────────────────────────────────────────────────────────
   chronoton_scout: {
     id: 'chronoton_scout',
@@ -119,44 +102,7 @@ export const ENEMIES: Record<string, EnemyDef> = {
     isBoss: false,
   },
 
-  shard_phantom: {
-    id: 'shard_phantom',
-    tier: 1,
-    zone: 2,
-    name: 'The Footlight Phantom',
-    description: 'A mischievous theater-sprite that haunts old concert halls, drawn out by the swell of live music. Harmless but maddening — it flits through the hall scattering sheet music and tangling the ensemble\'s carefully built sound.',
-    power: 20,
-    maxHp: 200,
-    attackDescription: 'Page Scatter — jumbles your sense of pitch relationships',
-    specialAttackName: 'Footlight Flicker',
-    specialAttackChallengeType: 'aural_interval_quest',
-    debuff: 'confusion',
-    debuffDuration: 2,
-    vulnerableTo: ['bassoon', 'oboe', 'french_horn'],
-    isBoss: true,
-    phase2Threshold: 0.5,
-    lore: 'No one is sure how long it has nested in the Theory Wing\'s old recital hall. It means no harm — it simply cannot resist a good crescendo.',
-  },
-
   // ── Bosses ─────────────────────────────────────────────────────────────────────
-  enchanted_music_stand: {
-    id: 'enchanted_music_stand',
-    tier: 1,
-    zone: 1,
-    name: 'The Enchanted Music Stand',
-    description: 'A practice room stand possessed by a wandering Flatling. It rattles the music and drains your Accuracy.',
-    power: 18,
-    maxHp: 180,
-    attackDescription: 'Rattles the score — Accuracy drain + rhythm disruption',
-    specialAttackName: 'Score Rattle',
-    specialAttackChallengeType: 'aural_pitch_spy',
-    debuff: 'blind',
-    debuffDuration: 2,
-    vulnerableTo: ['oboe', 'clarinet', 'flute'],
-    isBoss: true,
-    phase2Threshold: 0.5,
-    lore: 'The stand has stood in Practice Room 4 for thirty years. No one remembers who left the Flatling there.',
-  },
   flat_dragon: {
     id: 'flat_dragon',
     tier: 1,
@@ -195,22 +141,6 @@ export const ENEMIES: Record<string, EnemyDef> = {
   },
 
   // ── Act 2 · Zone 5 — The Melodious Meadows ───────────────────────────────────
-  stray_melody: {
-    id: 'stray_melody',
-    tier: 1,
-    zone: 5,
-    name: 'Stray Melody',
-    description: 'A scrap of music torn loose in the Shattering, drifting the meadows with no player left to guide it.',
-    power: 16,
-    maxHp: 120,
-    attackDescription: 'A wandering, off-key phrase that nicks at your focus',
-    specialAttackName: 'Wrong Note',
-    specialAttackChallengeType: 'aural_pitch_spy',
-    debuff: 'blind',
-    debuffDuration: 1,
-    vulnerableTo: ['oboe', 'clarinet', 'flute'],
-    isBoss: false,
-  },
   aria_wraith: {
     id: 'aria_wraith',
     tier: 1,
@@ -232,7 +162,7 @@ export const ENEMIES: Record<string, EnemyDef> = {
   war_horn_berserker: {
     id: 'war_horn_berserker',
     tier: 1,
-    zone: 5,
+    zone: 6,
     name: 'The War Horn Berserker',
     description: 'Maestro Cornelius, your trumpet professor, reduced to a single blaring call to charge. He does not know you — only sounds the attack, again and again.',
     power: 26,
@@ -480,31 +410,7 @@ export const ENEMIES: Record<string, EnemyDef> = {
     lore: 'Free him, and the Symphony is whole again for the first time since the Renewal.',
   },
 
-  // ── Act 3 · Zone 9 — Chromatic Coasts ────────────────────────────────────────
-  wave_walker: {
-    id: 'wave_walker', tier: 3, zone: 9, name: 'Wave Walker',
-    description: 'A translucent thing that flows like a sound wave along the corrupted shore, passing through whatever it pleases.',
-    power: 26, maxHp: 210, attackDescription: 'A phasing surge that slips past your guard',
-    specialAttackName: 'Phase Tide', specialAttackChallengeType: 'aural_chord_oracle',
-    debuff: 'vulnerable', debuffDuration: 2, vulnerableTo: ['trumpet', 'trombone', 'tuba'], isBoss: false,
-  },
-  coastal_dissonance: {
-    id: 'coastal_dissonance', tier: 3, zone: 9, name: 'The Coastal Dissonance',
-    description: 'Where the trail of corruption meets the sea, the surf itself has soured — a standing swell of clashing frequencies guarding the water.',
-    power: 30, maxHp: 430, attackDescription: 'A crashing wall of dissonant sound',
-    specialAttackName: 'Breakwater', specialAttackChallengeType: 'aural_chord_oracle',
-    debuff: 'slow', debuffDuration: 2, vulnerableTo: ['trumpet', 'percussion', 'tuba'], isBoss: true, phase2Threshold: 0.5,
-    lore: 'Clear it, and the way to the Fourth Wind is open.',
-  },
-
   // ── Act 3 · Zone 10 — Syncopated Seas ────────────────────────────────────────
-  rogue_wave: {
-    id: 'rogue_wave', tier: 3, zone: 10, name: 'Rogue Wave',
-    description: 'An off-beat swell that rears up out of nowhere, cresting against the rhythm of the sea.',
-    power: 28, maxHp: 190, attackDescription: 'A syncopated slam that lands when you least expect it',
-    specialAttackName: 'Offbeat Crash', specialAttackChallengeType: 'aural_rhythm_echo',
-    debuff: 'cramped', debuffDuration: 1, vulnerableTo: ['percussion', 'clarinet', 'alto_sax'], isBoss: false,
-  },
   the_maelstrom: {
     id: 'the_maelstrom', tier: 3, zone: 10, name: 'The Maelstrom',
     description: 'A vast rogue whirlpool that grows louder and wider with every passing moment. It must be broken quickly — or not at all.',
@@ -515,13 +421,6 @@ export const ENEMIES: Record<string, EnemyDef> = {
   },
 
   // ── Act 3 · Zone 11 — Dissonant Dunes ────────────────────────────────────────
-  cacophony_soldier: {
-    id: 'cacophony_soldier', tier: 5, zone: 11, name: 'Cacophony Soldier',
-    description: 'A made soldier of the Discordian Guard, far stronger when its fellows fight at its side.',
-    power: 30, maxHp: 240, attackDescription: 'A drilled formation strike',
-    specialAttackName: 'Close Ranks', specialAttackChallengeType: 'aural_rhythm_echo',
-    debuff: 'blind', debuffDuration: 1, vulnerableTo: ['oboe', 'clarinet', 'alto_sax'], isBoss: false,
-  },
   piano_commander: {
     id: 'piano_commander', tier: 6, zone: 11, name: 'Ebony',
     description: 'A Vexian knight-commander cut from the black keys — all sharps and flats, striking from between the notes. One half of the pair that holds the dunes.',
@@ -827,16 +726,16 @@ export const BATTLES: Record<BattleId, BattleConfig> = {
   },
   z1_mini_boss: {
     id: 'z1_mini_boss',
-    name: 'The Enchanted Music Stand',
-    enemies: ['enchanted_music_stand'],
+    name: 'The Rest Wraith',
+    enemies: ['rest_wraith'],
     zoneId: 1,
     isBoss: false,
     isMiniBuffer: true,
     rewardXp: 600,
     rewardCoins: 15,
     rewardGearId: 'iron_stand',
-    victoryNarrative: 'The Flatling\'s grip on the stand shatters. It tips over harmlessly, an ordinary object once more.',
-    defeatNarrative: 'The stand\'s rattling overwhelms your focus. You retreat to the practice hall.',
+    victoryNarrative: 'The hush breaks and sound rushes back into the room. The Rest Wraith unravels into an ordinary silence — the kind that simply ends when you play.',
+    defeatNarrative: 'The Rest Wraith\'s dead air swallows your entrance whole. You retreat to the practice hall.',
   },
   z1_boss: {
     id: 'z1_boss',

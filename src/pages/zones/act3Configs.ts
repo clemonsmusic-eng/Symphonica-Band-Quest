@@ -18,9 +18,9 @@ export const ZONE9_CONFIG: AssaultConfig = {
     { id: 'z9_aural_progressions', title: 'Aural: I–ii–IV–V Progressions', type: 'aural_chord_oracle', uilStandard: 'UIL Zone 9 · Aural', description: 'Hear a progression and identify the I–ii–IV–V functions by ear.', required: true, xpBase: 100 },
     { id: 'z9_mode_id', title: 'Aural: Mode Identification', type: 'aural_melody_mapper', uilStandard: 'UIL Zone 9 · Aural', description: 'Hear a short passage and tell major from minor.', required: false, xpBase: 100 },
   ],
-  skirmish: { enemyKeys: ['wave_walker'], doneKey: 'z9_wave_walker', icon: '🌊', name: 'Wave Walker', desc: 'A translucent sound-wave thing that slips along the corrupted shore.' },
+  skirmish: { enemyKeys: ['therrormin'], doneKey: 'z9_wave_walker', icon: '🌊', name: 'Coastal Skirmish', desc: 'Corrupted things drift along the draining shore. Cut through them.' },
   bosses: [
-    { enemyKeys: ['coastal_dissonance'], doneKey: 'z9_coast_cleared', icon: '🌊', name: 'The Coastal Dissonance', desc: 'A standing swell of clashing frequencies guarding the water. Break it to board the ship.' },
+    { enemyKeys: ['fermoctopus'], doneKey: 'z9_coast_cleared', icon: '🐙', name: 'The Fermoctopus', desc: 'A vast meadow-pond octopus washed to the coast and soured by the corruption — its great fermata-eye holds you fast while its arms drag you under. Break it to board the ship.' },
   ],
   advanceTitle: 'The Fourth Wind sails', advanceLabel: 'Set sail →',
   advanceFlavor: 'The coast is clear and the tide is turning. Time to cross the Syncopated Seas.',
@@ -44,7 +44,7 @@ export const ZONE10_CONFIG: AssaultConfig = {
     { id: 'z10_aural_extended_chords', title: 'Aural: dim · aug · dom7', type: 'aural_chord_oracle', uilStandard: 'UIL Zone 10 · Aural', description: 'Hear a chord and name its quality — diminished, augmented, or dominant 7th.', required: true, xpBase: 100 },
     { id: 'z10_harmonic_analysis', title: 'Aural: Harmonic Progression Analysis', type: 'aural_chord_oracle', uilStandard: 'UIL Zone 10 · Aural', description: 'Hear a longer progression and trace its harmonic function.', required: false, xpBase: 100 },
   ],
-  skirmish: { enemyKeys: ['rogue_wave'], doneKey: 'z10_rogue_wave', icon: '🌀', name: 'Rogue Wave', desc: 'An off-beat swell that rears up out of the dark and crashes against your rhythm.' },
+  skirmish: { enemyKeys: ['crotentacle'], doneKey: 'z10_rogue_wave', icon: '🌀', name: 'Rogue Swell', desc: 'The syncopated sea throws up whatever the corruption has twisted. Hold your rhythm and break it.' },
   bosses: [
     { enemyKeys: ['the_maelstrom'], doneKey: 'z10_maelstrom', icon: '🌀', name: 'The Maelstrom', desc: 'A vast whirlpool that grows louder and wider every turn. Break it fast — or it breaks the ship.' },
   ],
@@ -69,7 +69,7 @@ export const ZONE11_CONFIG: AssaultConfig = {
     { id: 'z11_aural_complex', title: 'Aural: Complex Harmonic Progressions', type: 'aural_chord_oracle', uilStandard: 'UIL Zone 11 · Aural', description: 'Hear a complex progression and trace every function.', required: true, xpBase: 125 },
     { id: 'z11_aural_dictation', title: 'Aural: Advanced Melodic Dictation', type: 'aural_melody_mapper', uilStandard: 'UIL Zone 11 · Aural', description: 'Hear an extended phrase and pick out its exact notation.', required: false, xpBase: 125 },
   ],
-  skirmish: { enemyKeys: ['cacophony_soldier', 'cacophony_soldier'], doneKey: 'z11_guard', icon: '⚔️', name: 'Cacophony Soldier', desc: 'A made soldier of the Discordian Guard — far stronger when its fellows fight beside it.' },
+  skirmish: { enemyKeys: ['chastanet', 'chastanet'], doneKey: 'z11_guard', icon: '⚔️', name: 'Discordian Guard', desc: 'Vexus\'s made guardians patrol the dunes — far stronger when they fight in a pack.' },
   bosses: [
     { enemyKeys: ['piano_commander'], doneKey: 'z11_piano', icon: '⬛', name: 'Ebony', desc: 'The black-key knight-commander — all sharps and flats, striking from between the notes.' },
     { enemyKeys: ['forte_commander'], doneKey: 'z11_forte', icon: '⬜', name: 'Ivory', desc: 'The white-key knight-commander — relentless, running the naturals end to end. Both must fall.' },

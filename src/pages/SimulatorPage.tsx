@@ -271,11 +271,9 @@ function getEnemyEmoji(id: string): string {
     flatling: '😞',
     sharp_creature: '🔺',
     natural_creature: '⬜',
-    double_flat_wretch: '😔',
     double_sharp_bristle: '🔸',
     chronoton_scout: '🤖',
     chronoton_shifter: '⏱️',
-    enchanted_music_stand: '🎼',
     flat_dragon: '🐉',
     interval_imp: '😈',
   };

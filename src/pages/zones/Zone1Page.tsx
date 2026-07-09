@@ -177,7 +177,7 @@ export default function Zone1Page() {
     return (
       <BattleScreen
         character={character}
-        enemies={[ENEMIES.enchanted_music_stand]}
+        enemies={[ENEMIES.rest_wraith]}
         simulatorMode
         onVictory={handleBattleVictory}
         onDefeat={() => setActiveBattle(null)}
@@ -285,10 +285,10 @@ export default function Zone1Page() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="text-academy-cream/80 text-sm font-semibold mb-1">
-                🎼 The Enchanted Music Stand
+                😶 The Rest Wraith
               </div>
               <div className="text-academy-cream/50 text-xs">
-                A practice room stand possessed by a wandering Flatling. Drains your Accuracy.
+                A pocket of unnatural silence haunting the practice rooms — it swallows sound and lulls you into missing your entrance.
                 {!miniBossUnlocked && <span className="text-academy-gold/50"> (Complete 4 required challenges)</span>}
               </div>
             </div>
