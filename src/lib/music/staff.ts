@@ -116,3 +116,14 @@ export function midiToFreq(midi: number): number {
 export function freqToMidi(freq: number): number {
   return 69 + 12 * Math.log2(freq / 440);
 }
+
+const LETTER_PC_PUB: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+
+/** Scientific pitch string ("Bb4", "F#3", "C4") → MIDI (60 = C4), or null. */
+export function pitchStringToMidi(pitch: string): number | null {
+  const m = pitch.trim().match(/^([A-Ga-g])([#b]?)(-?\d+)$/);
+  if (!m) return null;
+  const base = LETTER_PC_PUB[m[1].toUpperCase()];
+  const acc = m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0;
+  return (parseInt(m[3], 10) + 1) * 12 + base + acc;
+}

@@ -29,6 +29,7 @@ import PartyPage from './pages/PartyPage';
 import SideQuestsPage from './pages/SideQuestsPage';
 import LoadingScreen from './components/LoadingScreen';
 import TunerWidget from './components/music/TunerWidget';
+import ComposerPage from './pages/ComposerPage';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
@@ -153,6 +154,11 @@ export default function App() {
       {/* Battle Simulator */}
       <Route path="/simulator" element={
         <RequireCharacter><SimulatorPage /></RequireCharacter>
+      } />
+
+      {/* Selection Composer — author / import performance excerpts */}
+      <Route path="/compose" element={
+        <RequireCharacter><ComposerPage /></RequireCharacter>
       } />
 
       {/* Skill Tree — RP ability upgrades */}

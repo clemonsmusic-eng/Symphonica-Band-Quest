@@ -38,6 +38,11 @@
            backdrop-blur-sm shadow-xl;
   }
 
+  .composer-input {
+    @apply w-full bg-black/30 border border-academy-gold/20 rounded px-2 py-1
+           text-academy-cream/80 text-xs focus:border-academy-gold/50 outline-none;
+  }
+
   .stat-bar {
     @apply h-2 rounded-full bg-black/40 overflow-hidden;
   }

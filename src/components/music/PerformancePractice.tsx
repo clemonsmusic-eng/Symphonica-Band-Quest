@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Character } from '../../types/game';
-import { EXCERPTS } from '../../lib/music/excerpts';
+import { allExcerpts } from '../../lib/music/customExcerpts';
 import type { Excerpt, ExcerptChallengeType } from '../../lib/music/types';
 import { excerptBeats } from '../../lib/music/types';
 import { seatExcerpt } from '../../lib/music/transposition';
@@ -21,20 +22,25 @@ const TYPE_LABELS: Record<ExcerptChallengeType, string> = {
 };
 
 export default function PerformancePractice({ character }: { character: Character }) {
+  const navigate = useNavigate();
   const [selected, setSelected] = useState<Excerpt | null>(null);
+  const excerpts = useMemo(() => allExcerpts(), []);
   if (selected) return <PracticeRun key={selected.id} excerpt={selected} character={character} onBack={() => setSelected(null)} />;
 
-  const byType = EXCERPTS.reduce<Record<string, Excerpt[]>>((acc, e) => {
+  const byType = excerpts.reduce<Record<string, Excerpt[]>>((acc, e) => {
     (acc[e.challengeType] ??= []).push(e);
     return acc;
   }, {});
 
   return (
     <div>
-      <p className="text-academy-cream/50 text-sm mb-6">
-        Practice any selection with a metronome and demonstration, at your own tempo. Get pitch &amp;
-        rhythm accuracy feedback with a colour overlay showing exactly where you drifted.
-      </p>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-academy-cream/50 text-sm pr-3">
+          Practice any selection with a metronome and demonstration, at your own tempo, with pitch &amp;
+          rhythm accuracy feedback and a colour overlay.
+        </p>
+        <button onClick={() => navigate('/compose')} className="btn-secondary text-xs whitespace-nowrap flex-shrink-0">＋ Compose / Import</button>
+      </div>
       {(Object.keys(byType) as ExcerptChallengeType[]).map((type) => (
         <div key={type} className="mb-6">
           <h2 className="fantasy-title text-xs text-academy-gold/60 uppercase tracking-widest mb-3">{TYPE_LABELS[type]}</h2>
