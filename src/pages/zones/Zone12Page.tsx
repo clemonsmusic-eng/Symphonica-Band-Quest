@@ -196,7 +196,7 @@ export default function Zone12Page() {
         {trioDone && (
           <Stage label="The Stage · Vexus" active={!complete} done={complete}>
             {!vexusP1Done ? (
-              <Foe icon="🎻" name="Vexus, the Conductor"
+              <Foe icon="🪄" name="Vexus, the Conductor"
                 desc="Phase 1 — the Atonal Assault. Beat back his phantom orchestra of player-less instruments."
                 cleared={false} onFight={() => setActiveBattle('vexus')} fightLabel="Battle" />
             ) : !complete ? (
