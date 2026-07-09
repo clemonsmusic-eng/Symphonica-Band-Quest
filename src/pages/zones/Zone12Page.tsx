@@ -183,11 +183,11 @@ export default function Zone12Page() {
             )}
             <Foe icon="🎵" name="Lieutenant Kije (piccolo)" desc="The shrill high voice of the Trio."
               cleared={kijeDone} onFight={() => setActiveBattle('kije')} fightLabel="Battle" />
-            <Foe icon="🎵" name="Commander Mesto (English horn)" desc="The mournful inner voice."
+            <Foe icon="🎵" name="Commander Coren Glais (English horn)" desc="The mournful inner voice."
               locked={!kijeDone} lockedNote="(Silence Kije first)"
               cleared={mestoDone} onFight={() => setActiveBattle('mesto')} fightLabel="Battle" />
             <Foe icon="🎵" name="General Grave (contrabassoon)" desc="The crushing low voice — Vexus's second, and the Trio's leader."
-              locked={!mestoDone} lockedNote="(Silence Mesto first)"
+              locked={!mestoDone} lockedNote="(Silence Coren Glais first)"
               cleared={graveDone} onFight={() => setActiveBattle('grave')} fightLabel="Battle" />
           </Stage>
         )}
@@ -202,7 +202,7 @@ export default function Zone12Page() {
             ) : !complete ? (
               <>
               {hautboisFreed && (
-                <HautboisNote text={'Before the last performance Hautbois steps forward — the one thing she will still do. She lifts her oboe, not to fight, but to sound a single clear, ringing A that fills the ruined Hall. "Tune to me. Whatever he conducts, begin in tune — and the Score will remember itself." The ensemble takes her pitch. For the first time since the forest, she almost smiles.'} />
+                <HautboisNote text={'Before the last performance Hautbois steps forward — the one thing he will still do. He lifts his oboe, not to fight, but to sound a single clear, ringing A that fills the ruined Hall. "Tune to me. Whatever he conducts, begin in tune — and the Score will remember itself." The ensemble takes his pitch. For the first time since the forest, he almost smiles.'} />
               )}
               <div className="card-panel border-academy-gold/50">
                 <div className="text-xs text-academy-gold uppercase tracking-widest font-fantasy mb-2">Phase 2 — The Reclamation</div>

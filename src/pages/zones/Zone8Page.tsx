@@ -28,8 +28,8 @@ const SCENES: Record<'waldhorn' | 'hautbois' | 'fagotto', Scene> = {
   hautbois: {
     ally: 'hautbois', key: 'z8_hautbois_freed', doneLabel: 'Walk on →',
     beats: [
-      { emoji: '🎵', text: "The Double-Reed Specter's saw goes still. Maestra Hautbois — your oboe professor — comes back to herself amid the felled trees… and goes very quiet at the sight of them." },
-      { emoji: '🌲', image: MAESTRO_PORTRAITS.hautbois, text: "\"I did this. With my own hands.\" She will not pick the reed back up. \"I'll come with you. I'll help any way I can. But I won't fight again — not after this.\" Hautbois joins you as a guide." },
+      { emoji: '🎵', text: "The Double-Reed Specter's saw goes still. Maestro Hautbois — your oboe professor — comes back to himself amid the felled trees… and goes very quiet at the sight of them." },
+      { emoji: '🌲', image: MAESTRO_PORTRAITS.hautbois, text: "\"I did this. With my own hands.\" He will not pick the reed back up. \"I'll come with you. I'll help any way I can. But I won't fight again — not after this.\" Hautbois joins you as a guide." },
     ],
   },
   fagotto: {
@@ -211,7 +211,7 @@ export default function Zone8Page() {
             <div className="flex-1">
               <div className="text-academy-cream/80 text-sm font-semibold mb-1">🎵 The Double-Reed Specter</div>
               <div className="text-academy-cream/50 text-xs">
-                Your oboe professor, Maestra Hautbois — felling the ancient forest for cane, over and over.
+                Your oboe professor, Maestro Hautbois — felling the ancient forest for cane, over and over.
                 {!waldhornFreed && <span className="text-academy-gold/50"> (Quiet the horn-calls and lift the fog first)</span>}
               </div>
               {hautboisFreed && (<div className="text-rating-good text-xs mt-1.5 italic">Freed. Hautbois travels with you as a guide — she will not fight again.</div>)}

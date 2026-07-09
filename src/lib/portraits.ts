@@ -43,10 +43,10 @@ export const ENEMY_PORTRAITS: Record<string, string> = {
   lieutenant_contra: '/portraits/lieutenant_contra.png', // Lieutenant Contra (Z7)
   lieutenant_kije: '/portraits/lieutenant_kije.png',     // Lieutenant Kije (Z12)
   general_grave: '/portraits/general_grave.png',         // General Grave (Z12)
-  commander_mesto: '/portraits/commander_mesto.png',     // Commander Mesto (Z12)
+  commander_mesto: '/portraits/commander_mesto.png',     // Commander Coren Glais (Z12)
   ostinato_usher: '/portraits/ostinato_usher.png',       // Ostinato, the Usher (Z12)
-  piano_commander: '/portraits/piano_commander.png',     // Piano (Z11)
-  forte_commander: '/portraits/forte_commander.png',     // Forte (Z11)
+  piano_commander: '/portraits/piano_commander.png',     // Ebony (Z11)
+  forte_commander: '/portraits/forte_commander.png',     // Ivory (Z11)
   // Instrument-inspired roster (zones 5–12)
   pixielo: '/portraits/pixielo.png',           // Z5
   fiferfly: '/portraits/fiferfly.png',             // Z5
