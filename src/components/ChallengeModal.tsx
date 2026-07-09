@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { Character, Rating } from '../types/game';
-import { pitchToleranceCents } from '../lib/instruments';
+import { pitchToleranceCents, rhythmToleranceMs } from '../lib/instruments';
 import { useUiStore } from '../store/uiStore';
 import MicrophoneListener from './MicrophoneListener';
 import PerformanceStaff from './music/PerformanceStaff';
@@ -8,6 +8,8 @@ import { seatExcerpt } from '../lib/music/transposition';
 import { excerptBeats, type Excerpt } from '../lib/music/types';
 import { defaultExcerpt, EXCERPTS } from '../lib/music/excerpts';
 import { Metronome, getAudioCtx } from '../lib/music/audio';
+import { assessPerformance, assessTaps, overlayColors, type AssessmentResult, type PitchSample } from '../lib/music/assessment';
+import { accuracyColor } from '../lib/music/accuracyColor';
 
 // Resolve a stable excerpt for a challenge (same challenge → same piece).
 function pickExcerpt(challenge: Challenge): Excerpt | undefined {
@@ -210,8 +212,6 @@ function ActiveChallenge({ challenge, character, onRating, onClose, pitchToleran
 
 // ── Performance Challenge (real sheet music + count-in metronome + playhead) ──
 
-export interface PitchSample { beat: number; cents: number; freq: number }
-
 function PerformanceChallenge({
   challenge, character, onRating, onClose, pitchTolerance, challengeFlags, noMic,
 }: {
@@ -232,10 +232,12 @@ function PerformanceChallenge({
   const totalBeats = excerptBeats(excerpt);
   const bpm = challenge.bpm ?? excerpt.bpm;
   const beatsPerBar = excerpt.timeSig[0];
+  const rhythmTol = rhythmToleranceMs(character.stats.technique);
 
   const [phase, setPhase] = useState<'ready' | 'countin' | 'playing' | 'done'>('ready');
   const [playhead, setPlayhead] = useState<number | null>(null);
   const [countLabel, setCountLabel] = useState(beatsPerBar);
+  const [result, setResult] = useState<AssessmentResult | null>(null);
   const samplesRef = useRef<PitchSample[]>([]);
   const tapsRef = useRef<number[]>([]);
   const metroRef = useRef<Metronome | null>(null);
@@ -247,20 +249,12 @@ function PerformanceChallenge({
     doneRef.current = true;
     metroRef.current?.stop();
     cancelAnimationFrame(rafRef.current);
+    setPlayhead(null);
+    const opts = { bpm, pitchToleranceCents: pitchTolerance, rhythmToleranceMs: rhythmTol };
+    const res = noMic ? assessTaps(tapsRef.current, seated, opts) : assessPerformance(samplesRef.current, seated, opts);
+    setResult(res);
     setPhase('done');
-    setPlayhead(totalBeats);
-    let score: number;
-    if (noMic) {
-      const onsets = seated.notes.filter((n) => !n.rest).map((n) => n.startBeat);
-      score = onsets.length ? scoreOnsets(tapsRef.current, onsets) : 0;
-    } else {
-      const s = samplesRef.current;
-      if (s.length === 0) { onRating('poor', 0); return; }
-      const avg = s.reduce((a, x) => a + Math.max(0, 100 - (Math.abs(x.cents) / pitchTolerance) * 100), 0) / s.length;
-      score = Math.max(25, Math.round(avg));
-    }
-    onRating(scoreToRating(score), Math.round(score));
-  }, [noMic, seated, pitchTolerance, totalBeats, onRating]);
+  }, [noMic, seated, pitchTolerance, rhythmTol, bpm]);
 
   async function start() {
     doneRef.current = false;
@@ -326,9 +320,13 @@ function PerformanceChallenge({
         {excerpt.composer && ` · ${excerpt.composer}`}
       </div>
 
-      {/* Sheet music with sweeping playhead (blurred by BLIND) */}
-      <div className="mb-3" style={{ filter: isBlind ? 'blur(3px)' : undefined }}>
-        <PerformanceStaff seated={seated} timeSig={excerpt.timeSig} totalBeats={totalBeats} playheadBeat={running ? playhead : null} />
+      {/* Sheet music — sweeping playhead while playing, accuracy overlay when done */}
+      <div className="mb-3" style={{ filter: isBlind && phase !== 'done' ? 'blur(3px)' : undefined }}>
+        <PerformanceStaff
+          seated={seated} timeSig={excerpt.timeSig} totalBeats={totalBeats}
+          playheadBeat={running ? playhead : null}
+          noteColors={phase === 'done' && result ? overlayColors(result) : undefined}
+        />
       </div>
 
       {(isBlind || isManic || isConfused) && (
@@ -366,26 +364,34 @@ function PerformanceChallenge({
       {running && (
         <button onClick={finalize} className="btn-secondary w-full mt-3">Submit Early</button>
       )}
-      {phase === 'done' && <div className="text-rating-good font-fantasy text-center animate-pulse py-2">Scoring…</div>}
+
+      {phase === 'done' && result && (
+        <div>
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            <StatPct label="Pitch" pct={result.pitchPct} />
+            <StatPct label="Rhythm" pct={result.rhythmPct} />
+            <StatPct label="Overall" pct={result.overallPct} highlight />
+          </div>
+          <p className="text-academy-cream/40 text-[11px] mb-3 text-center leading-relaxed">
+            Note colour is your accuracy — <span style={{ color: 'rgb(34,139,34)' }}>green</span> is on the money,
+            <span style={{ color: 'rgb(200,40,30)' }}> red</span> is off.
+            {noMic && ' Tap mode scores rhythm only.'}
+          </p>
+          <button onClick={() => onRating(result.rating, result.overallPct)} className="btn-primary w-full">Continue</button>
+        </div>
+      )}
     </div>
   );
 }
 
-// Score tap onsets (in beats) against expected note onsets (in beats).
-function scoreOnsets(taps: number[], onsets: number[]): number {
-  if (taps.length === 0) return 0;
-  const used = new Set<number>();
-  let total = 0;
-  for (const target of onsets) {
-    let best = Infinity, bestI = -1;
-    for (let i = 0; i < taps.length; i++) {
-      if (used.has(i)) continue;
-      const d = Math.abs(taps[i] - target);
-      if (d < best) { best = d; bestI = i; }
-    }
-    if (bestI >= 0) { used.add(bestI); total += Math.max(0, 100 - best * 200); }
-  }
-  return total / onsets.length;
+function StatPct({ label, pct, highlight }: { label: string; pct: number | null; highlight?: boolean }) {
+  const color = pct === null ? '#6b7280' : accuracyColor(pct / 100);
+  return (
+    <div className={`rounded-lg border p-2 text-center ${highlight ? 'border-academy-gold/40 bg-academy-gold/5' : 'border-academy-gold/15'}`}>
+      <div className="text-academy-cream/40 text-[9px] uppercase tracking-widest mb-0.5">{label}</div>
+      <div className="font-fantasy text-xl" style={{ color }}>{pct === null ? '—' : `${pct}%`}</div>
+    </div>
+  );
 }
 
 // ── Pitch Spy Challenge ───────────────────────────────────────────────────────
