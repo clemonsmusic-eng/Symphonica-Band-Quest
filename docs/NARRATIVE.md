@@ -251,7 +251,9 @@ Grand Artificer).
   The map confirms a Maestro in the Zone 8 Forest, so he **travels with the caravan** (Z5–8). Finding and freeing him resolves his arc; only then does he convert to a summon.
 - **Hautbois (the guide who won't fight).** Freed in Zone 8 and unable to forgive what her
   corruption did to the forest, she lays down her instrument and travels with the party through
-  Act 3 offering **guidance only.**
+  Act 3 offering **guidance only.** *(Implemented: a guide beat on each Act 3 leg (Zones 9–11)
+  and two in the Hall (Zone 12) — naming the Tritone Trio, then sounding the tuning **A** before
+  the final performance, her arc's payoff.)*
 
 ---
 

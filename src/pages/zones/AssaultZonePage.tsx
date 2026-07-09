@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/gameStore';
 import ChallengeModal from '../../components/ChallengeModal';
 import BattleScreen from '../../components/BattleScreen';
+import MaestroPortrait from '../../components/MaestroPortrait';
 import { ENEMIES, randomSkirmish } from '../../lib/enemies';
+import { MAESTRO_PORTRAITS } from '../../lib/portraits';
 import type { Rating, ZoneId } from '../../types/game';
 
 // ── Config types ────────────────────────────────────────────────────────────────
@@ -17,6 +19,7 @@ export interface EncounterDef {
 export interface AssaultConfig {
   zoneId: number; advanceTo: ZoneId; act: number; quarter: number;
   title: string; intro: string; story: string; headerClass: string;
+  guide?: string; // Hautbois's non-combat guidance for this leg (shown once she's freed)
   challenges: ZoneChallenge[];
   skirmish?: EncounterDef;
   bossHeading: string; bossSub: string;
@@ -107,6 +110,16 @@ export default function AssaultZonePage({ cfg }: { cfg: AssaultConfig }) {
           <div className="text-xs text-academy-gold/60 uppercase tracking-widest font-fantasy mb-2">Story</div>
           <p className="text-academy-cream/70 text-sm leading-relaxed italic">{cfg.story}</p>
         </div>
+
+        {cfg.guide && character.freedAllies.includes('hautbois') && (
+          <div className="card-panel mb-6 border-academy-gold/20 bg-slate-900/10 flex gap-3 items-start">
+            <MaestroPortrait src={MAESTRO_PORTRAITS.hautbois} emoji="🎗️" size={44} />
+            <div>
+              <div className="text-xs text-academy-cream/50 uppercase tracking-widest font-fantasy mb-1">Hautbois · your guide</div>
+              <p className="text-academy-cream/70 text-sm leading-relaxed italic">{cfg.guide}</p>
+            </div>
+          </div>
+        )}
 
         {lastRating && (<div className="card-panel mb-4 text-center"><RatingBadge rating={lastRating.rating} /></div>)}
 

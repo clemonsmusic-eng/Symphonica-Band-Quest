@@ -4,7 +4,9 @@ import { useGameStore } from '../../store/gameStore';
 import ChallengeModal from '../../components/ChallengeModal';
 import BattleScreen from '../../components/BattleScreen';
 import LiberationScene, { type LibBeat } from '../../components/LiberationScene';
+import MaestroPortrait from '../../components/MaestroPortrait';
 import { ENEMIES, randomSkirmish } from '../../lib/enemies';
+import { MAESTRO_PORTRAITS } from '../../lib/portraits';
 import type { Rating } from '../../types/game';
 
 interface Room { id: string; title: string; type: string; description: string; xpBase: number; }
@@ -74,6 +76,7 @@ export default function Zone12Page() {
   const trioDone = kijeDone && mestoDone && graveDone;
   const vexusP1Done = has('z12_vexus_phase1');
   const complete = has('z12_complete');
+  const hautboisFreed = character.freedAllies.includes('hautbois');
 
   async function handleVictory(_rp: number, spDelta: number) {
     if (spDelta !== 0) await addSummonPoints(spDelta);
@@ -175,6 +178,9 @@ export default function Zone12Page() {
         {basementClear && (
           <Stage label="The Rehearsal Studio · The Tritone Trio" active={!trioDone} done={trioDone}>
             <p className="text-academy-cream/45 text-xs mb-3">Three player-less automatons forming a tritone — Vexus's elite. Break them apart, lowest voice last.</p>
+            {hautboisFreed && !trioDone && (
+              <HautboisNote text={'"These three are the auxiliary winds — piccolo, English horn, contrabassoon. The far edges of flute, oboe, and bassoon." Hautbois\'s voice tightens. "My own instrument\'s shadow stands among them. He built them out of what he threw away — and made them guard each other. Break that, and they are only noise."'} />
+            )}
             <Foe icon="🎵" name="Lieutenant Kije (piccolo)" desc="The shrill high voice of the Trio."
               cleared={kijeDone} onFight={() => setActiveBattle('kije')} fightLabel="Battle" />
             <Foe icon="🎵" name="Commander Mesto (English horn)" desc="The mournful inner voice."
@@ -194,6 +200,10 @@ export default function Zone12Page() {
                 desc="Phase 1 — the Atonal Assault. Beat back his phantom orchestra of player-less instruments."
                 cleared={false} onFight={() => setActiveBattle('vexus')} fightLabel="Battle" />
             ) : !complete ? (
+              <>
+              {hautboisFreed && (
+                <HautboisNote text={'Before the last performance Hautbois steps forward — the one thing she will still do. She lifts her oboe, not to fight, but to sound a single clear, ringing A that fills the ruined Hall. "Tune to me. Whatever he conducts, begin in tune — and the Score will remember itself." The ensemble takes her pitch. For the first time since the forest, she almost smiles.'} />
+              )}
               <div className="card-panel border-academy-gold/50">
                 <div className="text-xs text-academy-gold uppercase tracking-widest font-fantasy mb-2">Phase 2 — The Reclamation</div>
                 <div className="flex items-start justify-between gap-4">
@@ -208,6 +218,7 @@ export default function Zone12Page() {
                   <button onClick={() => { setFinalFailed(false); setFinalOpen(true); }} className="btn-primary text-xs py-2 px-3 flex-shrink-0">Perform</button>
                 </div>
               </div>
+              </>
             ) : (
               <div className="card-panel border-rating-superior/40 text-center py-6">
                 <div className="text-4xl mb-2">🎼</div>
@@ -225,6 +236,18 @@ export default function Zone12Page() {
       {finalOpen && (
         <ChallengeModal challenge={SACRED_SCORE} character={character} onComplete={handleFinalComplete} onClose={() => setFinalOpen(false)} />
       )}
+    </div>
+  );
+}
+
+function HautboisNote({ text }: { text: string }) {
+  return (
+    <div className="card-panel mb-3 border-academy-gold/20 bg-slate-900/10 flex gap-3 items-start">
+      <MaestroPortrait src={MAESTRO_PORTRAITS.hautbois} emoji="🎗️" size={44} />
+      <div>
+        <div className="text-xs text-academy-cream/50 uppercase tracking-widest font-fantasy mb-1">Hautbois · your guide</div>
+        <p className="text-academy-cream/70 text-sm leading-relaxed italic">{text}</p>
+      </div>
     </div>
   );
 }
