@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/gameStore';
 import BattleScreen from '../components/BattleScreen';
+import PerformancePractice from '../components/music/PerformancePractice';
 import { ENEMIES } from '../lib/enemies';
 import type { EnemyDef } from '../lib/enemies';
 import { enemyMinZone } from '../lib/enemyPlacement';
@@ -56,6 +57,7 @@ function outcomeRating(rpEarned: number, maxRp: number): Rating {
 export default function SimulatorPage() {
   const { character, awardChallenge } = useGameStore();
   const navigate = useNavigate();
+  const [mode, setMode] = useState<'enemies' | 'practice'>('enemies');
   const [selectedEnemy, setSelectedEnemy] = useState<EnemyDef | null>(null);
   const [battleResult, setBattleResult] = useState<{ won: boolean; rpEarned: number; rating: Rating } | null>(null);
 
@@ -205,7 +207,16 @@ export default function SimulatorPage() {
   return (
     <div className="min-h-screen pb-24">
       <div className="sticky top-0 z-20 bg-academy-dark/95 backdrop-blur-sm border-b border-academy-gold/10 px-4 py-3 flex items-center justify-between">
-        <div className="fantasy-title text-lg text-academy-gold">Battle Simulator</div>
+        <div className="flex items-center gap-1">
+          <button onClick={() => setMode('enemies')}
+            className={`text-xs uppercase tracking-widest font-fantasy px-2.5 py-1 rounded ${mode === 'enemies' ? 'text-academy-gold bg-academy-gold/10' : 'text-academy-cream/40 hover:text-academy-cream/70'}`}>
+            Enemies
+          </button>
+          <button onClick={() => setMode('practice')}
+            className={`text-xs uppercase tracking-widest font-fantasy px-2.5 py-1 rounded ${mode === 'practice' ? 'text-academy-gold bg-academy-gold/10' : 'text-academy-cream/40 hover:text-academy-cream/70'}`}>
+            Performance
+          </button>
+        </div>
         <button
           onClick={() => navigate('/hub')}
           className="text-academy-cream/40 hover:text-academy-cream/80 text-xs transition-colors"
@@ -215,6 +226,9 @@ export default function SimulatorPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 pt-6">
+        {mode === 'practice' && <PerformancePractice character={char} />}
+
+        {mode === 'enemies' && <>
         <p className="text-academy-cream/50 text-sm mb-6">
           Practice against any unlocked enemy with no HP depletion. XP earned at 50% rate.
         </p>
@@ -261,6 +275,7 @@ export default function SimulatorPage() {
             </div>
           </div>
         ))}
+        </>}
       </div>
     </div>
   );

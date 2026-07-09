@@ -8,8 +8,9 @@ import { seatExcerpt } from '../lib/music/transposition';
 import { excerptBeats, type Excerpt } from '../lib/music/types';
 import { defaultExcerpt, EXCERPTS } from '../lib/music/excerpts';
 import { Metronome, getAudioCtx } from '../lib/music/audio';
-import { assessPerformance, assessTaps, overlayColors, type AssessmentResult, type PitchSample } from '../lib/music/assessment';
+import { overlayColors } from '../lib/music/assessment';
 import { accuracyColor } from '../lib/music/accuracyColor';
+import { usePerformanceRun } from '../lib/music/usePerformanceRun';
 
 // Resolve a stable excerpt for a challenge (same challenge → same piece).
 function pickExcerpt(challenge: Challenge): Excerpt | undefined {
@@ -234,79 +235,10 @@ function PerformanceChallenge({
   const beatsPerBar = excerpt.timeSig[0];
   const rhythmTol = rhythmToleranceMs(character.stats.technique);
 
-  const [phase, setPhase] = useState<'ready' | 'countin' | 'playing' | 'done'>('ready');
-  const [playhead, setPlayhead] = useState<number | null>(null);
-  const [countLabel, setCountLabel] = useState(beatsPerBar);
-  const [result, setResult] = useState<AssessmentResult | null>(null);
-  const samplesRef = useRef<PitchSample[]>([]);
-  const tapsRef = useRef<number[]>([]);
-  const metroRef = useRef<Metronome | null>(null);
-  const rafRef = useRef(0);
-  const doneRef = useRef(false);
-
-  const finalize = useCallback(() => {
-    if (doneRef.current) return;
-    doneRef.current = true;
-    metroRef.current?.stop();
-    cancelAnimationFrame(rafRef.current);
-    setPlayhead(null);
-    const opts = { bpm, pitchToleranceCents: pitchTolerance, rhythmToleranceMs: rhythmTol };
-    const res = noMic ? assessTaps(tapsRef.current, seated, opts) : assessPerformance(samplesRef.current, seated, opts);
-    setResult(res);
-    setPhase('done');
-  }, [noMic, seated, pitchTolerance, rhythmTol, bpm]);
-
-  async function start() {
-    doneRef.current = false;
-    samplesRef.current = [];
-    tapsRef.current = [];
-    const ac = await getAudioCtx();
-    const m = new Metronome(ac);
-    metroRef.current = m;
-    m.start({ bpm, beatsPerBar, countInBeats: beatsPerBar, totalBeats });
-    setPhase('countin');
-    const loop = () => {
-      const b = m.beatsElapsed();
-      if (b < -0.001) {
-        setCountLabel(beatsPerBar + Math.floor(b) + 1); // counts down to 1
-        setPlayhead(null);
-      } else if (b < totalBeats) {
-        setPhase('playing');
-        setPlayhead(b);
-      } else {
-        finalize();
-        return;
-      }
-      rafRef.current = requestAnimationFrame(loop);
-    };
-    rafRef.current = requestAnimationFrame(loop);
-  }
-
-  function handlePitch(freq: number, cents: number) {
-    const m = metroRef.current;
-    if (doneRef.current || !m) return;
-    const beat = m.beatsElapsed();
-    if (beat < 0 || beat > totalBeats) return;
-    samplesRef.current.push({ beat, cents, freq });
-  }
-
-  const tap = useCallback(() => {
-    const m = metroRef.current;
-    if (doneRef.current || !m) return;
-    const beat = m.beatsElapsed();
-    if (beat < 0 || beat > totalBeats + 0.5) return;
-    tapsRef.current.push(beat);
-  }, [totalBeats]);
-
-  useEffect(() => {
-    if (!noMic) return;
-    const onKey = (e: KeyboardEvent) => { if (e.code === 'Space') { e.preventDefault(); tap(); } };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [noMic, tap]);
-
-  useEffect(() => () => { metroRef.current?.stop(); cancelAnimationFrame(rafRef.current); }, []);
-
+  const { phase, playhead, countLabel, tapCount, result, start, finalize, handlePitch, tap } = usePerformanceRun({
+    seated, bpm, beatsPerBar, totalBeats, noMic,
+    pitchToleranceCents: pitchTolerance, rhythmToleranceMs: rhythmTol,
+  });
   const running = phase === 'countin' || phase === 'playing';
 
   return (
@@ -354,7 +286,7 @@ function PerformanceChallenge({
         noMic ? (
           <button onPointerDown={tap} className="btn-primary w-full h-20 text-xl active:scale-95 transition-transform">
             TAP each note
-            <div className="text-xs mt-1 opacity-60">{tapsRef.current.length} taps · or press Space</div>
+            <div className="text-xs mt-1 opacity-60">{tapCount} taps · or press Space</div>
           </button>
         ) : (
           <MicrophoneListener mode="pitch" onPitchDetected={handlePitch} active />
