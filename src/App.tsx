@@ -28,6 +28,7 @@ import FingeringChartPage from './pages/FingeringChartPage';
 import PartyPage from './pages/PartyPage';
 import SideQuestsPage from './pages/SideQuestsPage';
 import LoadingScreen from './components/LoadingScreen';
+import TunerWidget from './components/music/TunerWidget';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
@@ -100,6 +101,8 @@ export default function App() {
   }, [setSession, loadProfile, setLoading, loadCharacter, loadGuestCharacter]);
 
   return (
+    <>
+    <TunerWidget />
     <Routes>
       {/* Public */}
       <Route path="/" element={<LandingPage />} />
@@ -194,5 +197,6 @@ export default function App() {
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }

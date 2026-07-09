@@ -1,8 +1,23 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { Character, Rating } from '../types/game';
-import { pitchToleranceCents, rhythmToleranceMs } from '../lib/instruments';
+import { pitchToleranceCents } from '../lib/instruments';
 import { useUiStore } from '../store/uiStore';
 import MicrophoneListener from './MicrophoneListener';
+import PerformanceStaff from './music/PerformanceStaff';
+import { seatExcerpt } from '../lib/music/transposition';
+import { excerptBeats, type Excerpt } from '../lib/music/types';
+import { defaultExcerpt, EXCERPTS } from '../lib/music/excerpts';
+import { Metronome, getAudioCtx } from '../lib/music/audio';
+
+// Resolve a stable excerpt for a challenge (same challenge → same piece).
+function pickExcerpt(challenge: Challenge): Excerpt | undefined {
+  const type = challenge.type as Excerpt['challengeType'];
+  const pool = EXCERPTS.filter((e) => e.challengeType === type);
+  if (pool.length === 0) return defaultExcerpt('technique_scale');
+  let h = 0;
+  for (let i = 0; i < challenge.id.length; i++) h = (h * 31 + challenge.id.charCodeAt(i)) >>> 0;
+  return pool[h % pool.length];
+}
 
 interface Challenge {
   id: string;
@@ -158,7 +173,6 @@ function ActiveChallenge({ challenge, character, onRating, onClose, pitchToleran
 }) {
   const demoMode = useUiStore((s) => s.demoMode);
   const pitchTolerance = pitchToleranceOverride ?? pitchToleranceCents(character.stats.accuracy);
-  const rhythmTolerance = rhythmToleranceMs(character.stats.technique);
 
   // Route to appropriate challenge UI
   if (challenge.type === 'aural_pitch_spy') {
@@ -177,207 +191,201 @@ function ActiveChallenge({ challenge, character, onRating, onClose, pitchToleran
     return <ChordOracleChallenge onRating={onRating} />;
   }
   if (challenge.type === 'rhythm_performance') {
-    return <RhythmTapChallenge onRating={onRating} tolerance={rhythmTolerance} />;
+    return <RhythmTapChallenge onRating={onRating} />;
   }
-  // Demo Mode: replace the microphone performance with a silent tap-timing
-  // mini-game, so the game is fully playable without any audible input.
-  if (demoMode) {
-    return <DemoPerformanceChallenge onRating={onRating} />;
-  }
-  // Default: microphone-based performance challenge
+  // Performance: render the real excerpt with a count-in metronome + sweeping
+  // playhead. Demo Mode (no mic) swaps the microphone for a tap-along.
   return (
     <PerformanceChallenge
       challenge={challenge}
+      character={character}
       onRating={onRating}
       onClose={onClose}
       pitchTolerance={pitchTolerance}
-      beatCount={challenge.beatCount}
-      bpm={challenge.bpm}
       challengeFlags={challengeFlags}
+      noMic={demoMode}
     />
   );
 }
 
-// ── Performance Challenge (microphone) ──────────────────────────────────────
+// ── Performance Challenge (real sheet music + count-in metronome + playhead) ──
+
+export interface PitchSample { beat: number; cents: number; freq: number }
 
 function PerformanceChallenge({
-  challenge, onRating, onClose, pitchTolerance,
-  beatCount = 8, bpm = 72, challengeFlags,
+  challenge, character, onRating, onClose, pitchTolerance, challengeFlags, noMic,
 }: {
   challenge: Challenge;
+  character: Character;
   onRating: (r: Rating, s: number) => void;
   onClose: () => void;
   pitchTolerance: number;
-  beatCount?: number;
-  bpm?: number;
   challengeFlags?: ChallengeFlags;
+  noMic?: boolean;
 }) {
   const isBlind    = challengeFlags?.blind    ?? false;
   const isManic    = challengeFlags?.manic    ?? false;
   const isConfused = challengeFlags?.confused ?? false;
-  const beatMs = (60 / bpm) * 1000;
-  const bars = Math.ceil(beatCount / 4);
-  const durationSecs = Math.round((beatMs * beatCount) / 1000);
-  const showDots = beatCount <= 16;
 
-  const [firedBeats, setFiredBeats] = useState(0);
-  const [beatPulse, setBeatPulse] = useState(false);
-  const [pitchScores, setPitchScores] = useState<number[]>([]);
-  const [listening, setListening] = useState(false);
-  const [done, setDone] = useState(false);
-  const pitchScoresRef = useRef<number[]>([]);
-  const beatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const excerpt = useMemo(() => pickExcerpt(challenge)!, [challenge]);
+  const seated = useMemo(() => seatExcerpt(excerpt, character.instrument), [excerpt, character.instrument]);
+  const totalBeats = excerptBeats(excerpt);
+  const bpm = challenge.bpm ?? excerpt.bpm;
+  const beatsPerBar = excerpt.timeSig[0];
+
+  const [phase, setPhase] = useState<'ready' | 'countin' | 'playing' | 'done'>('ready');
+  const [playhead, setPlayhead] = useState<number | null>(null);
+  const [countLabel, setCountLabel] = useState(beatsPerBar);
+  const samplesRef = useRef<PitchSample[]>([]);
+  const tapsRef = useRef<number[]>([]);
+  const metroRef = useRef<Metronome | null>(null);
+  const rafRef = useRef(0);
+  const doneRef = useRef(false);
+
+  const finalize = useCallback(() => {
+    if (doneRef.current) return;
+    doneRef.current = true;
+    metroRef.current?.stop();
+    cancelAnimationFrame(rafRef.current);
+    setPhase('done');
+    setPlayhead(totalBeats);
+    let score: number;
+    if (noMic) {
+      const onsets = seated.notes.filter((n) => !n.rest).map((n) => n.startBeat);
+      score = onsets.length ? scoreOnsets(tapsRef.current, onsets) : 0;
+    } else {
+      const s = samplesRef.current;
+      if (s.length === 0) { onRating('poor', 0); return; }
+      const avg = s.reduce((a, x) => a + Math.max(0, 100 - (Math.abs(x.cents) / pitchTolerance) * 100), 0) / s.length;
+      score = Math.max(25, Math.round(avg));
+    }
+    onRating(scoreToRating(score), Math.round(score));
+  }, [noMic, seated, pitchTolerance, totalBeats, onRating]);
+
+  async function start() {
+    doneRef.current = false;
+    samplesRef.current = [];
+    tapsRef.current = [];
+    const ac = await getAudioCtx();
+    const m = new Metronome(ac);
+    metroRef.current = m;
+    m.start({ bpm, beatsPerBar, countInBeats: beatsPerBar, totalBeats });
+    setPhase('countin');
+    const loop = () => {
+      const b = m.beatsElapsed();
+      if (b < -0.001) {
+        setCountLabel(beatsPerBar + Math.floor(b) + 1); // counts down to 1
+        setPlayhead(null);
+      } else if (b < totalBeats) {
+        setPhase('playing');
+        setPlayhead(b);
+      } else {
+        finalize();
+        return;
+      }
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    rafRef.current = requestAnimationFrame(loop);
+  }
+
+  function handlePitch(freq: number, cents: number) {
+    const m = metroRef.current;
+    if (doneRef.current || !m) return;
+    const beat = m.beatsElapsed();
+    if (beat < 0 || beat > totalBeats) return;
+    samplesRef.current.push({ beat, cents, freq });
+  }
+
+  const tap = useCallback(() => {
+    const m = metroRef.current;
+    if (doneRef.current || !m) return;
+    const beat = m.beatsElapsed();
+    if (beat < 0 || beat > totalBeats + 0.5) return;
+    tapsRef.current.push(beat);
+  }, [totalBeats]);
 
   useEffect(() => {
-    if (!listening || done) return;
+    if (!noMic) return;
+    const onKey = (e: KeyboardEvent) => { if (e.code === 'Space') { e.preventDefault(); tap(); } };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [noMic, tap]);
 
-    let beat = 0;
-    beatIntervalRef.current = setInterval(() => {
-      beat++;
-      setFiredBeats(beat);
-      setBeatPulse(true);
-      setTimeout(() => setBeatPulse(false), Math.min(120, beatMs * 0.25));
-      if (beat >= beatCount) {
-        clearInterval(beatIntervalRef.current!);
-        finalize(pitchScoresRef.current);
-      }
-    }, beatMs);
+  useEffect(() => () => { metroRef.current?.stop(); cancelAnimationFrame(rafRef.current); }, []);
 
-    return () => { if (beatIntervalRef.current) clearInterval(beatIntervalRef.current); };
-  }, [listening]);
-
-  function handlePitch(_freq: number, cents: number, _note: string) {
-    if (done) return;
-    const accuracy = Math.max(0, 100 - (Math.abs(cents) / pitchTolerance) * 100);
-    pitchScoresRef.current = [...pitchScoresRef.current, accuracy];
-    setPitchScores((prev) => [...prev, accuracy]);
-  }
-
-  function finalize(scores: number[] = pitchScoresRef.current) {
-    if (done) return;
-    setDone(true);
-    if (beatIntervalRef.current) clearInterval(beatIntervalRef.current);
-    if (scores.length === 0) { onRating('poor', 0); return; }
-    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-    // Floor at 25 when sound was detected — reserve 0 for a true miss (no sound).
-    const score = Math.max(25, Math.round(avg));
-    onRating(scoreToRating(score), score);
-  }
-
-  const avgScore = pitchScores.length > 0
-    ? pitchScores.reduce((a, b) => a + b, 0) / pitchScores.length
-    : 0;
+  const running = phase === 'countin' || phase === 'playing';
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="fantasy-title text-lg">{challenge.title}</h3>
+      <div className="flex items-center justify-between mb-1">
+        <h3 className="fantasy-title text-lg">{excerpt.title}</h3>
         <button onClick={onClose} className="text-academy-cream/40 hover:text-academy-cream/80">✕</button>
       </div>
-
-      {/* Notation display — visual difficulty effects from battle statuses */}
-      <div className="notation-display min-h-20 flex items-center justify-center mb-3 relative overflow-hidden">
-        {/* Real notation content — blurred when blind, scrolling when manic */}
-        <div
-          className="text-center text-academy-cream/40"
-          style={{
-            filter: isBlind ? 'blur(2.5px)' : undefined,
-            animation: isManic ? 'notation-scroll 1.4s linear infinite alternate' : undefined,
-          }}
-        >
-          <div className="text-4xl mb-1">𝄞</div>
-          <p className="text-xs">{bars} {bars === 1 ? 'bar' : 'bars'} · ♩= {bpm} · ~{durationSecs}s</p>
-        </div>
-        {/* Confusion — wrong notes / rests overlaid in discordant colours */}
-        {isConfused && (
-          <div className="absolute inset-0 pointer-events-none select-none" aria-hidden>
-            <span className="absolute text-fuchsia-400/70 text-2xl" style={{ top: '18%', left: '10%' }}>♩</span>
-            <span className="absolute text-red-400/60 text-xl"     style={{ top: '55%', right: '14%' }}>𝄽</span>
-            <span className="absolute text-fuchsia-300/55 text-3xl" style={{ top: '28%', right: '22%' }}>♪</span>
-            <span className="absolute text-orange-400/50 text-lg"   style={{ bottom: '18%', left: '28%' }}>♫</span>
-            <span className="absolute text-red-500/45 text-2xl"    style={{ top: '12%', right: '8%' }}>𝄾</span>
-          </div>
-        )}
+      <div className="text-academy-cream/40 text-xs mb-3">
+        {character.instrument.replace('_', ' ')} · ♩= {bpm} · {excerpt.timeSig[0]}/{excerpt.timeSig[1]}
+        {excerpt.composer && ` · ${excerpt.composer}`}
       </div>
-      {/* Status effect notices below the notation */}
+
+      {/* Sheet music with sweeping playhead (blurred by BLIND) */}
+      <div className="mb-3" style={{ filter: isBlind ? 'blur(3px)' : undefined }}>
+        <PerformanceStaff seated={seated} timeSig={excerpt.timeSig} totalBeats={totalBeats} playheadBeat={running ? playhead : null} />
+      </div>
+
       {(isBlind || isManic || isConfused) && (
         <div className="flex flex-wrap gap-1.5 mb-2">
           {isBlind    && <span className="text-[9px] font-fantasy px-1.5 py-0.5 rounded text-rating-fair bg-rating-fair/10">🌫️ BLIND — notation blurred</span>}
-          {isManic    && <span className="text-[9px] font-fantasy px-1.5 py-0.5 rounded text-orange-400 bg-orange-400/10">🔥 MANIC — notation scrolling · pitch window narrowed</span>}
-          {isConfused && <span className="text-[9px] font-fantasy px-1.5 py-0.5 rounded text-fuchsia-300 bg-fuchsia-300/10">💫 CONFUSED — wrong notes overlaid</span>}
+          {isManic    && <span className="text-[9px] font-fantasy px-1.5 py-0.5 rounded text-orange-400 bg-orange-400/10">🔥 MANIC — pitch window narrowed</span>}
+          {isConfused && <span className="text-[9px] font-fantasy px-1.5 py-0.5 rounded text-fuchsia-300 bg-fuchsia-300/10">💫 CONFUSED</span>}
         </div>
       )}
 
-      {!listening ? (
-        <button onClick={() => setListening(true)} className="btn-primary w-full">
-          Start Performance
+      {phase === 'ready' && (
+        <button onClick={start} className="btn-primary w-full">
+          {noMic ? 'Start — Tap Along' : 'Start Performance'}
         </button>
-      ) : (
-        <div>
-          {/* Beat display */}
-          {showDots ? (
-            <div className="flex flex-wrap gap-2 justify-center mb-4 px-2">
-              {Array.from({ length: beatCount }, (_, i) => (
-                <div
-                  key={i}
-                  className="w-4 h-4 rounded-full transition-all duration-75"
-                  style={{
-                    background: i + 1 === firedBeats && beatPulse
-                      ? '#FFD700'
-                      : i < firedBeats
-                      ? 'rgba(255,215,0,0.55)'
-                      : 'rgba(255,255,255,0.12)',
-                    transform: i + 1 === firedBeats && beatPulse ? 'scale(1.35)' : 'scale(1)',
-                    boxShadow: i + 1 === firedBeats && beatPulse ? '0 0 8px #FFD700' : 'none',
-                  }}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-xs mb-1.5">
-                <span className="text-academy-cream/50 font-fantasy">
-                  Beat {Math.min(firedBeats + 1, beatCount)} / {beatCount}
-                </span>
-                <div
-                  className="w-3 h-3 rounded-full transition-all duration-75"
-                  style={{
-                    background: beatPulse ? '#FFD700' : 'rgba(255,255,255,0.15)',
-                    transform: beatPulse ? 'scale(1.4)' : 'scale(1)',
-                    boxShadow: beatPulse ? '0 0 6px #FFD700' : 'none',
-                  }}
-                />
-              </div>
-              <div className="stat-bar">
-                <div
-                  className="stat-bar-fill transition-all duration-100"
-                  style={{ width: `${(firedBeats / beatCount) * 100}%`, backgroundColor: '#FFD700' }}
-                />
-              </div>
-            </div>
-          )}
+      )}
 
-          {/* Score + mic */}
-          <div className="flex items-center justify-between mb-2 text-sm">
-            <span className="text-academy-cream/50">
-              Score: <span className="text-academy-gold font-fantasy">{Math.round(avgScore)}%</span>
-            </span>
-            <span className="text-academy-cream/30 text-xs">{pitchScores.length} samples</span>
-          </div>
-
-          <MicrophoneListener
-            mode="pitch"
-            onPitchDetected={handlePitch}
-            active={listening && !done}
-          />
-
-          <button onClick={() => finalize()} className="btn-secondary w-full mt-3">
-            Submit Early
-          </button>
+      {phase === 'countin' && (
+        <div className="text-center py-4">
+          <div className="text-academy-gold/60 text-xs uppercase tracking-widest font-fantasy mb-1">Count-in</div>
+          <div className="font-fantasy text-4xl text-academy-gold">{Math.max(1, countLabel)}</div>
         </div>
       )}
+
+      {phase === 'playing' && (
+        noMic ? (
+          <button onPointerDown={tap} className="btn-primary w-full h-20 text-xl active:scale-95 transition-transform">
+            TAP each note
+            <div className="text-xs mt-1 opacity-60">{tapsRef.current.length} taps · or press Space</div>
+          </button>
+        ) : (
+          <MicrophoneListener mode="pitch" onPitchDetected={handlePitch} active />
+        )
+      )}
+
+      {running && (
+        <button onClick={finalize} className="btn-secondary w-full mt-3">Submit Early</button>
+      )}
+      {phase === 'done' && <div className="text-rating-good font-fantasy text-center animate-pulse py-2">Scoring…</div>}
     </div>
   );
+}
+
+// Score tap onsets (in beats) against expected note onsets (in beats).
+function scoreOnsets(taps: number[], onsets: number[]): number {
+  if (taps.length === 0) return 0;
+  const used = new Set<number>();
+  let total = 0;
+  for (const target of onsets) {
+    let best = Infinity, bestI = -1;
+    for (let i = 0; i < taps.length; i++) {
+      if (used.has(i)) continue;
+      const d = Math.abs(taps[i] - target);
+      if (d < best) { best = d; bestI = i; }
+    }
+    if (bestI >= 0) { used.add(bestI); total += Math.max(0, 100 - best * 200); }
+  }
+  return total / onsets.length;
 }
 
 // ── Pitch Spy Challenge ───────────────────────────────────────────────────────
@@ -511,58 +519,83 @@ function RhythmEchoChallenge({ onRating }: { onRating: (r: Rating, s: number) =>
 
 // ── Rhythm Tap Challenge ───────────────────────────────────────────────────────
 
-function RhythmTapChallenge({ onRating, tolerance: _tolerance }: {
-  onRating: (r: Rating, s: number) => void;
-  tolerance: number;
-}) {
-  const [phase, setPhase] = useState<'intro' | 'tapping' | 'done'>('intro');
-  const [taps, setTaps] = useState<number[]>([]);
-  const startTime = useRef<number>(0);
+function RhythmTapChallenge({ onRating }: { onRating: (r: Rating, s: number) => void }) {
   const BPM = 80;
-  const beatMs = (60 / BPM) * 1000;
+  const BPB = 4;
   const targetBeats = [0, 1, 2, 3, 4, 5, 6, 7]; // 2 bars of quarter notes
+  const totalBeats = 8;
+  const [phase, setPhase] = useState<'intro' | 'countin' | 'tapping' | 'done'>('intro');
+  const [tapCount, setTapCount] = useState(0);
+  const [countLabel, setCountLabel] = useState(BPB);
+  const tapsRef = useRef<number[]>([]);
+  const metroRef = useRef<Metronome | null>(null);
+  const rafRef = useRef(0);
+  const doneRef = useRef(false);
+
+  const finish = useCallback(() => {
+    if (doneRef.current) return;
+    doneRef.current = true;
+    metroRef.current?.stop();
+    cancelAnimationFrame(rafRef.current);
+    setPhase('done');
+    scoreTaps(tapsRef.current, targetBeats, 0, onRating);
+  }, [onRating]);
+
+  async function start() {
+    doneRef.current = false;
+    tapsRef.current = [];
+    setTapCount(0);
+    const ac = await getAudioCtx();
+    const m = new Metronome(ac);
+    metroRef.current = m;
+    m.start({ bpm: BPM, beatsPerBar: BPB, countInBeats: BPB, totalBeats });
+    setPhase('countin');
+    const loop = () => {
+      const b = m.beatsElapsed();
+      if (b < -0.001) setCountLabel(BPB + Math.floor(b) + 1);
+      else if (b < totalBeats + 1) setPhase('tapping');
+      if (b >= totalBeats + 1) { finish(); return; }
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    rafRef.current = requestAnimationFrame(loop);
+  }
+
+  const tap = useCallback(() => {
+    const m = metroRef.current;
+    if (doneRef.current || !m) return;
+    const b = m.beatsElapsed();
+    if (b < -0.5) return;
+    tapsRef.current.push(b);
+    setTapCount(tapsRef.current.length);
+  }, []);
 
   useEffect(() => {
-    if (phase === 'tapping') {
-      const timeout = setTimeout(() => {
-        setPhase('done');
-        scoreTaps(taps, targetBeats, beatMs, onRating);
-      }, beatMs * (targetBeats[targetBeats.length - 1] + 1.5));
-      return () => clearTimeout(timeout);
-    }
-  }, [phase]);
-
-  function tap() {
-    if (phase !== 'tapping') return;
-    setTaps((prev) => [...prev, (Date.now() - startTime.current) / beatMs]);
-  }
+    const onKey = (e: KeyboardEvent) => { if (e.code === 'Space') { e.preventDefault(); tap(); } };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [tap]);
+  useEffect(() => () => { metroRef.current?.stop(); cancelAnimationFrame(rafRef.current); }, []);
 
   return (
     <div className="text-center">
       <h3 className="fantasy-title text-lg mb-2">Rhythm Performance</h3>
       <p className="text-academy-cream/60 text-sm mb-4">
-        Tap 8 steady quarter notes in 4/4 time. BPM: {BPM}
+        Tap 8 steady quarter notes in 4/4 with the metronome. ♩= {BPM}
       </p>
-      {phase === 'intro' && (
-        <button
-          onClick={() => { setPhase('tapping'); startTime.current = Date.now(); }}
-          className="btn-primary w-full"
-        >
-          Start
-        </button>
+      {phase === 'intro' && <button onClick={start} className="btn-primary w-full">Start</button>}
+      {phase === 'countin' && (
+        <div className="py-4">
+          <div className="text-academy-gold/60 text-xs uppercase tracking-widest font-fantasy mb-1">Count-in</div>
+          <div className="font-fantasy text-4xl text-academy-gold">{Math.max(1, countLabel)}</div>
+        </div>
       )}
       {phase === 'tapping' && (
-        <button
-          onPointerDown={tap}
-          className="btn-primary w-full h-24 text-2xl active:scale-95 transition-transform"
-        >
+        <button onPointerDown={tap} className="btn-primary w-full h-24 text-2xl active:scale-95 transition-transform">
           TAP
-          <div className="text-sm mt-1 opacity-60">{taps.length} / {targetBeats.length}</div>
+          <div className="text-sm mt-1 opacity-60">{tapCount} / {targetBeats.length} · or press Space</div>
         </button>
       )}
-      {phase === 'done' && (
-        <div className="text-rating-good font-fantasy animate-pulse">Scoring…</div>
-      )}
+      {phase === 'done' && <div className="text-rating-good font-fantasy animate-pulse">Scoring…</div>}
     </div>
   );
 }
@@ -843,100 +876,6 @@ function buildChoices(target: string, pool: string[], count: number): string[] {
     choices.push(others.pop()!);
   }
   return choices.sort(() => Math.random() - 0.5);
-}
-
-// Silent tap-timing mini-game used in Demo Mode in place of the microphone
-// performance. A marker sweeps a track; tap (Space / click) when it crosses the
-// target zone. Five taps; average timing accuracy → rating. No audio in or out.
-function DemoPerformanceChallenge({ onRating }: { onRating: (rating: Rating, score: number) => void }) {
-  const NEEDED = 5;
-  const TARGET = 50;
-  const markerRef = useRef<HTMLDivElement | null>(null);
-  const posRef = useRef(0);
-  const dirRef = useRef(1);
-  const doneRef = useRef(false);
-  const tapsRef = useRef<number[]>([]);
-  const [count, setCount] = useState(0);
-  const [flash, setFlash] = useState<{ label: string; color: string } | null>(null);
-
-  useEffect(() => {
-    let raf = 0;
-    let last = performance.now();
-    const SPEED = 95; // % of track per second (one sweep ≈ 1.05s)
-    const loop = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now;
-      let p = posRef.current + dirRef.current * SPEED * dt;
-      if (p >= 100) { p = 100; dirRef.current = -1; }
-      else if (p <= 0) { p = 0; dirRef.current = 1; }
-      posRef.current = p;
-      if (markerRef.current) markerRef.current.style.left = `${p}%`;
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  const tap = useCallback(() => {
-    if (doneRef.current) return;
-    const err = Math.abs(posRef.current - TARGET);
-    const acc = Math.max(0, Math.round(100 - err * 2.2));
-    tapsRef.current.push(acc);
-    const n = tapsRef.current.length;
-    setCount(n);
-    setFlash(
-      acc >= 85 ? { label: 'PERFECT', color: '#FFD700' }
-      : acc >= 60 ? { label: 'GREAT', color: '#4ADE80' }
-      : acc >= 35 ? { label: 'OK', color: '#60A5FA' }
-      : { label: 'MISS', color: '#F87171' },
-    );
-    if (n >= NEEDED) {
-      doneRef.current = true;
-      const avg = Math.round(tapsRef.current.reduce((a, b) => a + b, 0) / n);
-      setTimeout(() => onRating(scoreToRating(avg), avg), 500);
-    }
-  }, [onRating]);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.code === 'Space' || e.key === ' ') { e.preventDefault(); tap(); }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [tap]);
-
-  return (
-    <div className="text-center">
-      <div className="text-academy-gold/60 text-xs uppercase tracking-widest font-fantasy mb-1">Demo Mode · No Microphone</div>
-      <h3 className="fantasy-title text-lg mb-1">Tap in Time</h3>
-      <p className="text-academy-cream/50 text-xs mb-6">
-        Press <span className="text-academy-cream/80 font-fantasy">Space</span> or tap the button when the
-        marker crosses the gold zone. Five times.
-      </p>
-
-      {/* Track */}
-      <div className="relative h-12 mx-2 mb-6 rounded-lg bg-black/40 border border-academy-gold/20 overflow-hidden">
-        {/* target zone */}
-        <div className="absolute top-0 bottom-0" style={{ left: 'calc(50% - 9%)', width: '18%', background: 'rgba(212,160,23,0.18)', borderLeft: '1px solid rgba(212,160,23,0.5)', borderRight: '1px solid rgba(212,160,23,0.5)' }} />
-        {/* center line */}
-        <div className="absolute top-0 bottom-0" style={{ left: '50%', width: 2, background: 'rgba(212,160,23,0.7)' }} />
-        {/* marker */}
-        <div ref={markerRef} className="absolute top-1 bottom-1" style={{ left: '0%', width: 4, marginLeft: -2, background: '#FCA5A5', borderRadius: 2, boxShadow: '0 0 8px #FCA5A5' }} />
-      </div>
-
-      {/* flash + progress */}
-      <div className="h-6 mb-3 font-fantasy tracking-widest text-sm" style={{ color: flash?.color ?? 'transparent' }}>
-        {flash?.label ?? '·'}
-      </div>
-      <div className="flex items-center justify-center gap-2 mb-6">
-        {Array.from({ length: NEEDED }).map((_, i) => (
-          <span key={i} className={`h-2 w-2 rounded-full ${i < count ? 'bg-academy-gold' : 'bg-academy-cream/20'}`} />
-        ))}
-      </div>
-
-      <button onClick={tap} className="btn-primary w-full text-lg py-4">TAP</button>
-    </div>
-  );
 }
 
 function scoreToRating(score: number): Rating {
