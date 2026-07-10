@@ -4,6 +4,7 @@ import type { Character, Classroom, AllyId, ZoneId, GearItem, Appearance } from 
 import type { Rating } from '../types/game';
 import { RATING_XP_MULTIPLIERS, RATING_RP_AWARD } from '../types/game';
 import { xpToNextLevel, INSTRUMENTS } from '../lib/instruments';
+import { getAbilityById, abilityUpgradeCost, ABILITY_MAX_RANK } from '../lib/abilities';
 import { normalizeAppearance, randomAppearance } from '../lib/appearance';
 import { getBossGearDrop, normalizeGear, getStartingGear } from '../lib/gear';
 import { useUiStore } from './uiStore';
@@ -36,6 +37,8 @@ interface GameState {
   equipGear: (item: GearItem) => Promise<void>;
   freeAlly: (allyId: AllyId) => Promise<void>;
   spendResonancePoints: (amount: number) => void;
+  // Rank up an unlocked ability with RP. Returns true if the upgrade applied.
+  upgradeAbility: (abilityId: string) => Promise<boolean>;
   spendCoins: (amount: number) => Promise<boolean>;
   awardBossGear: (bossId: string) => Promise<GearItem | null>;
   completeBootCampStep: (stepId: string) => Promise<void>;
@@ -279,6 +282,25 @@ export const useGameStore = create<GameState>((set, get) => ({
     else supabase.from('characters').update({ resonance_points: newRp }).eq('id', character.id);
   },
 
+  // Spend RP to rank up an already-unlocked ability (rank 1 → 2 → 3).
+  upgradeAbility: async (abilityId) => {
+    const { character } = get();
+    if (!character) return false;
+    const ab = getAbilityById(abilityId);
+    if (!ab || ab.levelGate > character.level) return false;       // not unlocked yet
+    const current = character.abilityRanks[abilityId] ?? 1;
+    if (current >= ABILITY_MAX_RANK) return false;                  // maxed
+    const targetRank = current + 1;
+    const cost = abilityUpgradeCost(ab.tier, targetRank);
+    if (character.resonancePoints < cost) return false;            // can't afford
+    const abilityRanks = { ...character.abilityRanks, [abilityId]: targetRank };
+    const resonancePoints = character.resonancePoints - cost;
+    const updated = { ...character, abilityRanks, resonancePoints };
+    set({ character: updated });
+    await persistChar(updated, { ability_ranks: abilityRanks, resonance_points: resonancePoints });
+    return true;
+  },
+
   spendCoins: async (amount) => {
     const { character } = get();
     if (!character || character.resonanceCoins < amount) return false;
@@ -412,7 +434,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       stats, hp: maxHp, maxHp,
       resonancePoints: 0, resonanceCoins: 0, summonPoints: 0,
       gear: normalizeGear(getStartingGear(instrument), instrument),
-      freedAllies: [], completedChallenges: [], completedQuests: [],
+      freedAllies: [], abilityRanks: {}, completedChallenges: [], completedQuests: [],
       bootCampComplete: true, // guests skip boot camp and start in the world
       totalAttempts: 0, weeklyXp: 0, suspended: false,
       appearance: randomAppearance('guest'),
@@ -465,6 +487,7 @@ function dbRowToCharacter(row: Record<string, unknown>): Character {
     summonPoints: (row.summon_points as number) ?? 0,
     gear: normalizeGear((row.gear as Partial<Record<string, GearItem>>) ?? {}, row.instrument as Character['instrument']),
     freedAllies: ((row.freed_allies as string[]) ?? []) as AllyId[],
+    abilityRanks: (row.ability_ranks as Record<string, number>) ?? {},
     completedChallenges: (row.completed_challenges as string[]) ?? [],
     completedQuests: (row.completed_quests as string[]) ?? [],
     bootCampComplete: row.boot_camp_complete as boolean,

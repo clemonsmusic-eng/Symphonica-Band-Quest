@@ -5,7 +5,7 @@ import ChallengeModal from '../../components/ChallengeModal';
 import BattleScreen from '../../components/BattleScreen';
 import LiberationScene, { type LibBeat } from '../../components/LiberationScene';
 import { MAESTRO_PORTRAITS } from '../../lib/portraits';
-import { ENEMIES } from '../../lib/enemies';
+import { ENEMIES, randomSkirmish } from '../../lib/enemies';
 import type { Rating } from '../../types/game';
 
 const LIBERATION_BEATS: Record<'bassetta' | 'caucophonus', LibBeat[]> = {
@@ -181,8 +181,8 @@ export default function Zone6Page() {
 
   if (activeBattle) {
     const battleEnemies =
-      activeBattle === 'phantom_low'  ? [ENEMIES.chalumeau_phantom, ENEMIES.chalumeau_phantom] :
-      activeBattle === 'phantom_high' ? [ENEMIES.clarion_phantom, ENEMIES.clarion_phantom] :
+      activeBattle === 'phantom_low'  ? [ENEMIES.chalumeau_phantom, ...randomSkirmish(6, 1)] :
+      activeBattle === 'phantom_high' ? [ENEMIES.clarion_phantom, ...randomSkirmish(6, 1)] :
       activeBattle === 'bassetta'     ? [ENEMIES.bassetta] :
                                         [ENEMIES.caucophonus];
     return (

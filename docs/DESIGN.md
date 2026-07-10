@@ -54,9 +54,10 @@ are deliberately engine-agnostic so they survive the switch.
 - **Menus stay menus.** Party select, gear, quest log, fingering charts, the
   library — these remain UI screens even in the animated version.
 
-Engine decision is [OPEN] (§12): a 2D tile engine (Phaser/PixiJS) vs. staying in
-React with a sprite/canvas layer. This is decided at the vertical-slice step of
-the roadmap (§13), not now.
+Engine decision is [PARKED] (§12 Q1): a 2D tile engine (Phaser/PixiJS) vs.
+staying in React with a sprite/canvas layer. Decided at the vertical-slice step
+of the roadmap (§13), not now; the current leaning is React + canvas/sprite for
+the slice, escalating only if it can't hit the FF6 feel.
 
 ---
 
@@ -131,8 +132,10 @@ zone-boss 1500 · side-quest (short) 500 · side-quest (long) 1000.
 (mini-boss +15, zone-boss +40).
 
 - **XP** → levels → stat growth.
-- **Resonance Points (RP)** → [OPEN] currently accrued; intended sink/role to be
-  finalized (§12).
+- **Resonance Points (RP)** → [Q7-BUILT] fund the **ability skill tree**
+  (`AbilitiesPage.tsx`). Abilities unlock by level; RP ranks them up 1→3
+  (×1.00/1.15/1.30 output) via `gameStore.upgradeAbility`, stored on
+  `Character.abilityRanks`.
 - **Coins** → the **Gear Shop** (`src/pages/ShopPage.tsx`), unlocked at Zone 3 /
   Concerta.
 - **Summon Points (SP)** → spent to call freed maestros in battle (§8).
@@ -168,10 +171,14 @@ FF6/FF7-style party combat. Source: `src/components/BattleScreen.tsx`,
 - **Party:** up to **5** user-controlled members (§9) vs. **multiple** enemy
   units. Each member and enemy has its own HP bar and target picker.
 - **Turn structure:** the party acts, then enemies take a sequential round.
-  (ATB vs. strict turns is [OPEN] for the animated version — today it's turn-based.)
-- **Acting = performing.** A member's attack is a short `prepared_performance`
-  (beat count scales by act: zones 1–4 / 5–8 / 9–12). The **Rating** you earn
-  scales the ability: `base damage = POW × ability.damageMultiplier × (score/100)`.
+  Strict turn-based is the decided model (§12 Q4) — it protects the performance
+  moment from clock pressure.
+- **Acting = performing.** [Q6-BUILT: hybrid.] Turn menu is **Attack / Ability /
+  Defend / Item** with a **2-performance-per-round** cap on the Ability branch
+  (§12 Q6). *Light* attacks auto-resolve (0.6×POW); *Medium/Heavy* attacks and
+  all abilities run a mini-game. Ability damage =
+  `POW × ability.damageMultiplier × factor`, where *factor* is 1.0 for a Basic
+  unlock or the Superior accuracy band (0.40–1.10).
 - **Abilities** (`src/lib/abilities.ts`) carry: `levelGate`, `tier`,
   `damageMultiplier`, healing/revive/AoE flags, status infliction
   (`inflicts` / `inflictsMany` on a Good-or-better hit), self-buffs, debuff/buff
@@ -274,30 +281,83 @@ production so we don't redo art.
 The collaboration surface — decisions to make together, most driving real
 implementation. Add, reorder, and answer these inline.
 
+> **Working decisions (2026-07-05).** The resolutions below are proposed and
+> being developed against; each is a reversible design call, not a locked
+> constraint. Override any of them and the doc/code follow. Items tied to the
+> engine choice stay **[PARKED]** until the vertical-slice step (§13), per §2.
+
 **Presentation & engine**
 1. Engine for the animated version: 2D tile engine (Phaser/PixiJS) vs. React +
    canvas/sprite layer?
+   → **[PARKED to the vertical slice, §13].** *Leaning:* React + a canvas/sprite
+   layer for the slice — lowest risk, reuses every existing UI screen and the
+   Zustand stores. Escalate to Phaser/Pixi only if the slice proves React can't
+   hit the FF6 feel.
 2. Do zones become one contiguous overworld, or separate town/dungeon maps
    reached from a map screen (current model)?
+   → **Decision: separate maps reached from the World Map.** Matches the
+   12-zone/3-act data in `zones.ts` and the FF6 "world map → enter location"
+   rhythm; a contiguous overworld is a large art/eng cost with little
+   pedagogical payoff.
 3. How do challenges trigger in a walkable map — talk to an NPC, step on a
    music stand, enter a room?
+   → **Direction set; tile specifics [PARKED with Q1].** Challenges are objects
+   you walk up to: **music stands → performance**, **NPCs → aural/quest**,
+   **room thresholds → boss/story**. Concrete interaction mechanics land with
+   the engine.
 
 **Combat**
 4. ATB (FF6 real-time gauge) vs. strict turn-based (current)?
+   → **Decision: strict turn-based.** Performing a mini-challenge *is* the
+   action; a gauge ticking while a student sight-reads punishes the deliberate
+   practice the game exists to reward. Turn-based protects the pedagogy.
 5. Encounters: fixed/visible on the map vs. random?
+   → **Decision: fixed / visible.** No grind-farming, predictable pacing, and
+   encounters can be authored as deliberate difficulty beats — right for a
+   learning tool.
 6. Should "acting = performing a mini-challenge" stay for every attack, or only
    for special abilities (basic attacks auto-resolve)? (Pacing question.)
+   → **Decision: hybrid — BUILT** (`BattleScreen.tsx`). Each turn offers
+   **Attack · Ability · Defend · Item**, with a **2-performance-per-round cap**
+   (party-wide, resets each round) on the Ability branch:
+   - **Attack** (uncapped) — *Light* (no input, 60% POW) · *Medium* (timing,
+     ≤100% POW × accuracy) · *Heavy* (4-count rhythm, ≤120% POW × accuracy).
+   - **Ability** (costs a performance slot) — *Basic* (note-ID unlock; miss ⇒ the
+     member Defends) fires at 100%; *Superior* (performance) bands to
+     40/55/70/85/110% by accuracy; *Maestro Summon* (performance) needs ≥80% to
+     call (≥95% = 120%); a failed call spends **no SP** and the maestro quips
+     *"My time is too valuable, keep practicing."*
+   - **Defend** — −35% damage taken. **Item** — unchanged.
 
 **Systems & economy**
 7. Resonance Points: finalize their role/sink (currently accrued, under-used).
+   → **Decision: RP fund an ability skill tree — BUILT** (`AbilitiesPage.tsx`,
+   `gameStore.upgradeAbility`). **Leveling up unlocks abilities** (free, by
+   `levelGate`); **RP ranks them up** 1→3, each rank scaling damage/heal
+   (×1.00 / ×1.15 / ×1.30). Upgrade cost by tier: basic 40/70 · medium 80/140 ·
+   strong 150/260 RP. Persisted on `Character.abilityRanks` (jsonb
+   `ability_ranks`, migration 006; guests via localStorage). Clean four-currency
+   split: **XP → levels/stats · Coins → gear · SP → summons · RP → skill tree.**
 8. Difficulty curve & mic-vs-Demo default for a first-time player.
+   → **Decision: default Demo Mode ON** for first-timers (guaranteed-playable,
+   no mic-permission wall) with a prominent "Enable microphone" upsell.
+   Difficulty rides the existing ACC/TEC-driven rating windows rather than a
+   global slider.
 9. Co-op: when/how live multiplayer sessions plug into `realPlayerInstruments`.
+   → **Decision: defer past the vertical slice.** The `buildParty` hook is
+   already in place; live net/lobby work shouldn't block single-player animation.
 
 **Content**
 10. Extend side quests / NPCs into Act 3 (Zones 9–12)?
+    → **Decision: yes, lightweight.** Act 3 is the assault climax — a few
+    unlock-gated errands, not a full board.
 11. Surface quest-giver NPCs *in* the zone maps (once walkable) vs. the central
     board.
+    → **Decision: both, [in-map half PARKED with Q1].** NPCs appear in-zone and
+    the central board mirrors them as a log.
 12. Student portrait art for the remaining classmates (same pipeline).
+    → **Decision: yes.** Run `scripts/make_character_portraits.py` for the
+    classmates still on emoji fallback. Pure content, no design risk.
 
 ---
 

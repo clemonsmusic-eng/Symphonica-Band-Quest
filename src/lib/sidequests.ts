@@ -175,7 +175,7 @@ export const SIDE_QUESTS: SideQuest[] = [
   {
     id: 'sq_z5_grey_meadow',
     zone: 5, source: 'npc',
-    giver: 'Bassetto', giverEmoji: '🎻', giverRole: 'Elder of Legato',
+    giver: 'Cantabile', giverEmoji: '👴', giverRole: 'Elder of Legato',
     title: 'The Grey Meadow',
     hook: "\"Since the Shattering our meadow's gone grey and tuneless — the very grass forgot its key. The old songs might wake it, but my hands shake too badly to lead. Play the village its scale, traveler. Loud and true.\"",
     objective: {
@@ -184,7 +184,7 @@ export const SIDE_QUESTS: SideQuest[] = [
       description: 'Play the village scale strong and steady to stir the colour back into Legato.',
     },
     reward: 'side_quest_long',
-    turnIn: "Green ripples out from where you stand, the grass swaying into time. Bassetto weeps openly. \"It remembers. WE remember. Bless you, child — take an elder's thanks and a hero's share.\"",
+    turnIn: "Green ripples out from where you stand, the grass swaying into time. Cantabile weeps openly. \"It remembers. WE remember. Bless you, child — take an elder's thanks and a hero's share.\"",
   },
   {
     id: 'sq_z5_shepherd_lullaby',

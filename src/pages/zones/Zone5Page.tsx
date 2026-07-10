@@ -7,7 +7,7 @@ import LiberationScene, { type LibBeat } from '../../components/LiberationScene'
 import { useClassmateRecruitment } from '../../components/ClassmateRecruitment';
 import { useNpcQuestOffers } from '../../components/NpcQuestOffer';
 import { MAESTRO_PORTRAITS } from '../../lib/portraits';
-import { ENEMIES } from '../../lib/enemies';
+import { ENEMIES, randomSkirmish } from '../../lib/enemies';
 import type { Rating } from '../../types/game';
 
 const LIBERATION_BEATS: Record<'flaura' | 'buccina', LibBeat[]> = {
@@ -188,7 +188,7 @@ export default function Zone5Page() {
 
   if (activeBattle) {
     const battleEnemies =
-      activeBattle === 'skirmish' ? [ENEMIES.stray_melody, ENEMIES.stray_melody] :
+      activeBattle === 'skirmish' ? randomSkirmish(5) :
       activeBattle === 'flaura'   ? [ENEMIES.aria_wraith] :
                                     [ENEMIES.war_horn_berserker];
     return (

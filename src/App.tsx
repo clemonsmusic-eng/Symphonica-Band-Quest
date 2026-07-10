@@ -13,6 +13,7 @@ import ClassSelectPage from './pages/ClassSelectPage';
 import InstrumentSelectPage from './pages/InstrumentSelectPage';
 import BootCampPage from './pages/BootCampPage';
 import HubPage from './pages/HubPage';
+import AbilitiesPage from './pages/AbilitiesPage';
 import ZonePage from './pages/ZonePage';
 import TeacherDashboardPage from './pages/TeacherDashboardPage';
 import LeaderboardPage from './pages/LeaderboardPage';
@@ -27,6 +28,8 @@ import FingeringChartPage from './pages/FingeringChartPage';
 import PartyPage from './pages/PartyPage';
 import SideQuestsPage from './pages/SideQuestsPage';
 import LoadingScreen from './components/LoadingScreen';
+import TunerWidget from './components/music/TunerWidget';
+import ComposerPage from './pages/ComposerPage';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
@@ -99,6 +102,8 @@ export default function App() {
   }, [setSession, loadProfile, setLoading, loadCharacter, loadGuestCharacter]);
 
   return (
+    <>
+    <TunerWidget />
     <Routes>
       {/* Public */}
       <Route path="/" element={<LandingPage />} />
@@ -151,6 +156,16 @@ export default function App() {
         <RequireCharacter><SimulatorPage /></RequireCharacter>
       } />
 
+      {/* Selection Composer — author / import performance excerpts */}
+      <Route path="/compose" element={
+        <RequireCharacter><ComposerPage /></RequireCharacter>
+      } />
+
+      {/* Skill Tree — RP ability upgrades */}
+      <Route path="/abilities" element={
+        <RequireCharacter><AbilitiesPage /></RequireCharacter>
+      } />
+
       {/* Equipment / Gear */}
       <Route path="/party" element={
         <RequireCharacter><PartyPage /></RequireCharacter>
@@ -188,5 +203,6 @@ export default function App() {
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }

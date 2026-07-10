@@ -119,6 +119,7 @@ export default function InstrumentSelectPage() {
       summonPoints: 0,
       gear: startingGear,
       freedAllies: [],
+      abilityRanks: {},
       completedChallenges: [],
       completedQuests: [],
       bootCampComplete: false,

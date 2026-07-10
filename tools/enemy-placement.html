@@ -1,0 +1,554 @@
+<title>Bestiary Placement · Band Quest</title>
+<style>
+  :root {
+    --ground: #EFE6D2;
+    --panel: #F6EFDE;
+    --panel-2: #EFE4CC;
+    --ink: #2B2117;
+    --muted: #6E6252;
+    --hair: #D8C8A6;
+    --hair-strong: #C7B283;
+    --accent: #9C6F1E;
+    --accent-soft: #B8862B;
+    --act1: #A9761F;
+    --act2: #5E7A3E;
+    --act3: #6C5AA6;
+    --discord: #A6412B;
+    --on-accent: #FBF5E8;
+    --shadow: 0 1px 2px rgba(43,33,23,.12), 0 6px 18px rgba(43,33,23,.10);
+    --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+    --ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #15121F;
+      --panel: #1E1A2C;
+      --panel-2: #262138;
+      --ink: #EAE4F2;
+      --muted: #9A93AC;
+      --hair: #322B47;
+      --hair-strong: #423963;
+      --accent: #E3B44A;
+      --accent-soft: #C79A38;
+      --act1: #C79A38;
+      --act2: #86A55C;
+      --act3: #9384CC;
+      --discord: #D06044;
+      --on-accent: #1A1206;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #EFE6D2; --panel: #F6EFDE; --panel-2: #EFE4CC; --ink: #2B2117;
+    --muted: #6E6252; --hair: #D8C8A6; --hair-strong: #C7B283; --accent: #9C6F1E;
+    --accent-soft: #B8862B; --act1: #A9761F; --act2: #5E7A3E; --act3: #6C5AA6;
+    --discord: #A6412B; --on-accent: #FBF5E8; --shadow: 0 1px 2px rgba(43,33,23,.12), 0 6px 18px rgba(43,33,23,.10);
+  }
+  :root[data-theme="dark"] {
+    --ground: #15121F; --panel: #1E1A2C; --panel-2: #262138; --ink: #EAE4F2;
+    --muted: #9A93AC; --hair: #322B47; --hair-strong: #423963; --accent: #E3B44A;
+    --accent-soft: #C79A38; --act1: #C79A38; --act2: #86A55C; --act3: #9384CC;
+    --discord: #D06044; --on-accent: #1A1206; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--ui); line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 0 20px 80px; }
+
+  /* ── Command bar ─────────────────────────────────────────── */
+  .bar {
+    position: sticky; top: 0; z-index: 30;
+    background: color-mix(in srgb, var(--ground) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--hair);
+    padding: 14px 20px; margin-bottom: 22px;
+  }
+  .bar-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: 16px 20px; flex-wrap: wrap; }
+  .brand { display: flex; flex-direction: column; gap: 1px; margin-right: 4px; }
+  .brand .eyebrow {
+    font-family: var(--serif); font-size: 11px; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600;
+  }
+  .brand h1 {
+    font-family: var(--serif); font-weight: 600; font-size: 20px; margin: 0;
+    letter-spacing: .01em; text-wrap: balance;
+  }
+  .spacer { flex: 1 1 40px; }
+  .tally {
+    font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tally b { color: var(--ink); font-size: 15px; }
+  .meter { width: 120px; height: 6px; border-radius: 99px; background: var(--hair); overflow: hidden; }
+  .meter > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .25s ease; }
+
+  input.search {
+    font: inherit; font-size: 13px; color: var(--ink);
+    background: var(--panel); border: 1px solid var(--hair-strong);
+    border-radius: 8px; padding: 8px 12px; width: 190px; outline: none;
+  }
+  input.search::placeholder { color: var(--muted); }
+  input.search:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+
+  button {
+    font: inherit; font-size: 13px; cursor: pointer; border-radius: 8px;
+    padding: 8px 13px; border: 1px solid var(--hair-strong);
+    background: var(--panel); color: var(--ink); transition: background .15s, border-color .15s, transform .05s;
+  }
+  button:hover { border-color: var(--accent); }
+  button:active { transform: translateY(1px); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
+  button.ghost { background: transparent; }
+
+  /* ── Selection hint ──────────────────────────────────────── */
+  .hint {
+    max-width: 1400px; margin: -8px auto 18px; padding: 8px 14px;
+    font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px;
+  }
+  .hint .pin { color: var(--accent); font-weight: 600; }
+  .hint.armed { color: var(--ink); }
+
+  /* ── Sections ────────────────────────────────────────────── */
+  .tray, .act { margin-bottom: 26px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; margin: 0 0 12px; }
+  .sec-head .kicker {
+    font-family: var(--serif); text-transform: uppercase; letter-spacing: .2em;
+    font-size: 12px; font-weight: 600;
+  }
+  .sec-head .sub { font-size: 12px; color: var(--muted); }
+  .act1 .kicker { color: var(--act1); }
+  .act2 .kicker { color: var(--act2); }
+  .act3 .kicker { color: var(--act3); }
+
+  .cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+  .tray .cols { grid-template-columns: 1fr; }
+
+  /* ── Location column ─────────────────────────────────────── */
+  .col {
+    background: var(--panel); border: 1px solid var(--hair);
+    border-radius: 12px; padding: 10px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 8px; min-height: 92px;
+    border-top: 3px solid var(--rail, var(--hair-strong));
+    transition: border-color .15s, background .15s;
+  }
+  .col.drop-target { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
+  .col.placeable { cursor: pointer; }
+  .col.placeable:hover { border-color: var(--accent); }
+  .col-head { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
+  .col-name { font-family: var(--serif); font-weight: 600; font-size: 14px; letter-spacing: .01em; }
+  .col-zone { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .col-count { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .col-body { display: flex; flex-direction: column; gap: 6px; }
+  .col-empty { font-size: 11px; color: var(--muted); font-style: italic; padding: 4px 2px; opacity: .8; }
+
+  .act1 .col { --rail: var(--act1); }
+  .act2 .col { --rail: var(--act2); }
+  .act3 .col { --rail: var(--act3); }
+  #col-hall_of_discord { --rail: var(--discord); }
+  .tray .col { --rail: var(--hair-strong); }
+
+  /* ── Enemy card ──────────────────────────────────────────── */
+  .card {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--panel-2); border: 1px solid var(--hair);
+    border-radius: 9px; padding: 6px 8px; cursor: grab; user-select: none;
+    transition: border-color .12s, box-shadow .12s, transform .06s, opacity .12s;
+  }
+  .card:hover { border-color: var(--accent-soft); }
+  .card:active { cursor: grabbing; }
+  .card.dragging { opacity: .4; }
+  .card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent); }
+  .card.dimmed { opacity: .22; filter: saturate(.4); }
+  .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .card .emoji { font-size: 19px; line-height: 1; width: 24px; text-align: center; flex-shrink: 0; }
+  .card .nm { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card .tier { font-size: 9.5px; font-variant-numeric: tabular-nums; color: var(--muted); border: 1px solid var(--hair-strong); border-radius: 5px; padding: 1px 4px; flex-shrink: 0; }
+  .card .crown { font-size: 11px; color: var(--discord); flex-shrink: 0; }
+  .card.dup-source { outline: 1px dashed var(--accent); outline-offset: 1px; }
+  .card .mini {
+    border: none; background: transparent; color: var(--muted); font-size: 12px;
+    line-height: 1; padding: 3px 4px; border-radius: 5px; cursor: pointer;
+    opacity: .5; flex-shrink: 0; transition: opacity .12s, background .12s, color .12s;
+  }
+  .card .mini:hover { opacity: 1; color: var(--ink); background: color-mix(in srgb, var(--accent) 20%, transparent); }
+  .card .mini.rm:hover { color: var(--discord); background: color-mix(in srgb, var(--discord) 16%, transparent); }
+  .card .mini:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; opacity: 1; }
+  .tray .col-body { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
+
+  /* ── Export drawer ───────────────────────────────────────── */
+  .scrim { position: fixed; inset: 0; background: rgba(10,8,16,.5); z-index: 50; display: none; }
+  .scrim.open { display: block; }
+  .drawer {
+    position: fixed; top: 0; right: 0; height: 100%; width: min(520px, 92vw);
+    background: var(--ground); border-left: 1px solid var(--hair-strong);
+    z-index: 60; transform: translateX(100%); transition: transform .22s ease;
+    display: flex; flex-direction: column; padding: 22px; gap: 14px;
+  }
+  .drawer.open { transform: none; }
+  .drawer h2 { font-family: var(--serif); font-size: 18px; margin: 0; }
+  .drawer .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .seg { display: inline-flex; border: 1px solid var(--hair-strong); border-radius: 8px; overflow: hidden; }
+  .seg button { border: none; border-radius: 0; background: var(--panel); }
+  .seg button.on { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+  textarea.out {
+    flex: 1; width: 100%; resize: none; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12px; line-height: 1.5; color: var(--ink); background: var(--panel);
+    border: 1px solid var(--hair); border-radius: 10px; padding: 12px; outline: none;
+  }
+  .drawer .note { font-size: 12px; color: var(--muted); }
+  .close-x { position: absolute; top: 16px; right: 16px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  @media (max-width: 560px) {
+    .brand h1 { font-size: 17px; }
+    input.search { width: 130px; }
+  }
+</style>
+
+<div class="bar">
+  <div class="bar-inner">
+    <div class="brand">
+      <span class="eyebrow">Band Quest · Symphonica</span>
+      <h1>Bestiary Placement</h1>
+    </div>
+    <div class="spacer"></div>
+    <div class="tally">
+      <div class="meter"><i id="meter"></i></div>
+      <span><b id="placed">0</b> / 59 placed</span>
+    </div>
+    <input class="search" id="search" type="search" placeholder="Find an enemy…" aria-label="Filter enemies by name" />
+    <button class="ghost" id="reset" title="Seed every enemy back into its current campaign zone">Reset to zones</button>
+    <button class="ghost" id="clear" title="Send every enemy back to the Unassigned tray">Clear</button>
+    <button class="primary" id="export">Export</button>
+  </div>
+</div>
+
+<div class="hint" id="hint">
+  <span>Drag a creature onto a location — or <span class="pin">click a creature</span>, then click a location to place it.</span>
+</div>
+
+<div class="wrap">
+  <section class="tray" id="tray-section">
+    <div class="sec-head">
+      <span class="kicker" style="color:var(--muted)">Unassigned</span>
+      <span class="sub" id="tray-sub">the holding pen — nothing here appears in the world yet</span>
+    </div>
+    <div class="cols">
+      <div class="col placeable" id="col-unassigned" data-loc="unassigned">
+        <div class="col-body" id="body-unassigned"></div>
+      </div>
+    </div>
+  </section>
+
+  <div id="acts"></div>
+
+  <p class="note" style="color:var(--muted); font-size:12px; max-width:65ch; margin-top:8px">
+    Locations roll up to campaign zones, which is what actually decides encounters.
+    Only non-boss creatures feed a zone's random skirmishes; a
+    <span style="color:var(--discord)">♛ boss</span> placement just affects where it
+    shows in the Battle Simulator. Your arrangement autosaves in this browser.
+  </p>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Export placement" aria-hidden="true">
+  <button class="ghost close-x" id="close">✕ Close</button>
+  <h2>Export placement</h2>
+  <div class="row">
+    <div class="seg" role="tablist">
+      <button id="tab-ts" class="on">TypeScript</button>
+      <button id="tab-json">JSON</button>
+    </div>
+    <span class="spacer"></span>
+    <button id="copy">Copy</button>
+    <button id="download">Download</button>
+  </div>
+  <p class="note" id="drawer-note">Paste this into <code>src/lib/enemyPlacement.ts</code> — it becomes the live placement.</p>
+  <textarea class="out" id="out" readonly spellcheck="false"></textarea>
+</aside>
+
+<script>
+(function () {
+  "use strict";
+
+  const ENEMIES = [{"id": "flatling", "name": "Flatling", "emoji": "😞", "tier": 1, "zone": 1, "boss": false}, {"id": "sharp_creature", "name": "Sharpie", "emoji": "🦇", "tier": 1, "zone": 1, "boss": false}, {"id": "natural_creature", "name": "Natural", "emoji": "⬜", "tier": 1, "zone": 1, "boss": false}, {"id": "double_flat_wretch", "name": "Double-Flat Wretch", "emoji": "😔", "tier": 1, "zone": 3, "boss": false}, {"id": "chronoton_scout", "name": "Chronoton Scout", "emoji": "🤖", "tier": 2, "zone": 3, "boss": false}, {"id": "chronoton_shifter", "name": "Chronoton Shifter", "emoji": "⏱️", "tier": 2, "zone": 3, "boss": false}, {"id": "shard_phantom", "name": "The Footlight Phantom", "emoji": "👻", "tier": 1, "zone": 2, "boss": true}, {"id": "enchanted_music_stand", "name": "The Enchanted Music Stand", "emoji": "🎼", "tier": 1, "zone": 1, "boss": true}, {"id": "flat_dragon", "name": "The Flat Dragon", "emoji": "🐉", "tier": 1, "zone": 1, "boss": true}, {"id": "interval_imp", "name": "The Interval Imp", "emoji": "😈", "tier": 2, "zone": 2, "boss": true}, {"id": "stray_melody", "name": "Stray Melody", "emoji": "🎶", "tier": 1, "zone": 5, "boss": false}, {"id": "aria_wraith", "name": "The Aria Wraith", "emoji": "🌬️", "tier": 1, "zone": 5, "boss": true}, {"id": "war_horn_berserker", "name": "The War Horn Berserker", "emoji": "🎺", "tier": 1, "zone": 5, "boss": true}, {"id": "chalumeau_phantom", "name": "Chalumeau Phantom", "emoji": "🕳️", "tier": 1, "zone": 6, "boss": false}, {"id": "clarion_phantom", "name": "Clarion Phantom", "emoji": "📢", "tier": 1, "zone": 6, "boss": false}, {"id": "bassetta", "name": "Bassetto", "emoji": "🎭", "tier": 1, "zone": 6, "boss": true}, {"id": "caucophonus", "name": "Caucophonus", "emoji": "🥁", "tier": 2, "zone": 6, "boss": true}, {"id": "discordian_sentry", "name": "Discordian Sentry", "emoji": "🛡️", "tier": 5, "zone": 7, "boss": false}, {"id": "sound_shadow", "name": "The Sound Shadow", "emoji": "🎷", "tier": 1, "zone": 7, "boss": true}, {"id": "lieutenant_contra", "name": "Lieutenant Contra", "emoji": "🗡️", "tier": 6, "zone": 7, "boss": true}, {"id": "sliding_chaos_knight", "name": "The Sliding Chaos Knight", "emoji": "📯", "tier": 1, "zone": 7, "boss": true}, {"id": "stone_colossus", "name": "The Stone Colossus", "emoji": "🗿", "tier": 1, "zone": 7, "boss": true}, {"id": "echoing_wisp", "name": "Echoing Wisp", "emoji": "🌫️", "tier": 3, "zone": 8, "boss": false}, {"id": "forest_flogger", "name": "The Forest Flogger", "emoji": "🍃", "tier": 1, "zone": 8, "boss": true}, {"id": "double_reed_specter", "name": "The Double-Reed Specter", "emoji": "🥀", "tier": 4, "zone": 8, "boss": true}, {"id": "ancient_revenant", "name": "The Ancient Revenant", "emoji": "📜", "tier": 4, "zone": 8, "boss": true}, {"id": "wave_walker", "name": "Wave Walker", "emoji": "💧", "tier": 3, "zone": 9, "boss": false}, {"id": "coastal_dissonance", "name": "The Coastal Dissonance", "emoji": "🌊", "tier": 3, "zone": 9, "boss": true}, {"id": "rogue_wave", "name": "Rogue Wave", "emoji": "🌊", "tier": 3, "zone": 10, "boss": false}, {"id": "the_maelstrom", "name": "The Maelstrom", "emoji": "🌀", "tier": 3, "zone": 10, "boss": true}, {"id": "cacophony_soldier", "name": "Cacophony Soldier", "emoji": "⚔️", "tier": 5, "zone": 11, "boss": false}, {"id": "piano_commander", "name": "Piano", "emoji": "🤫", "tier": 6, "zone": 11, "boss": true}, {"id": "forte_commander", "name": "Forte", "emoji": "💥", "tier": 6, "zone": 11, "boss": true}, {"id": "vexian_knight", "name": "Vexian Knight", "emoji": "⚜️", "tier": 6, "zone": 12, "boss": false}, {"id": "ostinato_usher", "name": "Ostinato, the Usher", "emoji": "⚙️", "tier": 6, "zone": 12, "boss": true}, {"id": "lieutenant_kije", "name": "Lieutenant Kije", "emoji": "🐦", "tier": 6, "zone": 12, "boss": true}, {"id": "commander_mesto", "name": "Commander Mesto", "emoji": "🦢", "tier": 6, "zone": 12, "boss": true}, {"id": "general_grave", "name": "General Grave", "emoji": "🐘", "tier": 6, "zone": 12, "boss": true}, {"id": "vexus", "name": "Vexus, the Conductor", "emoji": "🪄", "tier": 6, "zone": 12, "boss": true}, {"id": "pixielo", "name": "Pixielo", "emoji": "🧚", "tier": 3, "zone": 5, "boss": false}, {"id": "fiferfly", "name": "Fiferfly", "emoji": "🎏", "tier": 3, "zone": 5, "boss": false}, {"id": "ghoulgenspiel", "name": "Ghoulgenspiel", "emoji": "🗿", "tier": 4, "zone": 7, "boss": false}, {"id": "bagpipe_banshee", "name": "Bagpipe Banshee", "emoji": "🌲", "tier": 4, "zone": 8, "boss": false}, {"id": "flugel_fiend", "name": "Flugel Fiend", "emoji": "🐚", "tier": 5, "zone": 9, "boss": false}, {"id": "therrormin", "name": "Therrormin", "emoji": "🌊", "tier": 5, "zone": 10, "boss": false}, {"id": "vibrawraith", "name": "Vibrawraith", "emoji": "👻", "tier": 5, "zone": 10, "boss": false}, {"id": "chastanet", "name": "Chastanet", "emoji": "👏", "tier": 6, "zone": 11, "boss": false}, {"id": "crotentacle", "name": "Crotentacle", "emoji": "🔔", "tier": 6, "zone": 11, "boss": false}, {"id": "timptanic", "name": "Timptanic", "emoji": "🥁", "tier": 6, "zone": 12, "boss": false}, {"id": "gongolem", "name": "Gongolem", "emoji": "🛕", "tier": 6, "zone": 12, "boss": false}, {"id": "rest_wraith", "name": "Rest Wraith", "emoji": "😶", "tier": 1, "zone": 1, "boss": false}, {"id": "frat", "name": "Frat", "emoji": "🐀", "tier": 1, "zone": 1, "boss": false}, {"id": "stage_phantom", "name": "Stage Phantom", "emoji": "😰", "tier": 2, "zone": 4, "boss": false}, {"id": "fermoctopus", "name": "Fermoctopus", "emoji": "🐙", "tier": 3, "zone": 5, "boss": false}, {"id": "saxerpent", "name": "Saxerpent", "emoji": "🐍", "tier": 3, "zone": 6, "boss": false}, {"id": "glissanghost", "name": "Glissanghost", "emoji": "💨", "tier": 4, "zone": 7, "boss": false}, {"id": "stingcatto", "name": "Stingcatto", "emoji": "🐝", "tier": 5, "zone": 9, "boss": false}, {"id": "dissonaut", "name": "Dissonaut", "emoji": "👹", "tier": 6, "zone": 11, "boss": false}, {"id": "tacetus", "name": "Tacetus", "emoji": "🤐", "tier": 6, "zone": 12, "boss": false}];
+
+  const LOCATIONS = [
+    { id: 'rehearsal_halls',  name: 'The Rehearsal Halls', zone: 1,  act: 1 },
+    { id: 'practice_rooms',   name: 'Practice Rooms',      zone: 1,  act: 1 },
+    { id: 'theory_wing',      name: 'The Theory Wing',     zone: 2,  act: 1 },
+    { id: 'concerta',         name: 'Concerta',            zone: 3,  act: 1 },
+    { id: 'crotchet',         name: 'Crotchet',            zone: 3,  act: 1 },
+    { id: 'grand_auditorium', name: 'The Grand Auditorium',zone: 4,  act: 1 },
+    { id: 'legato',            name: 'Legato',             zone: 5,  act: 2 },
+    { id: 'melodious_meadows', name: 'Melodious Meadows',  zone: 5,  act: 2 },
+    { id: 'trioasis',          name: 'Trioasis',           zone: 6,  act: 2 },
+    { id: 'caesura_crossing',  name: 'Caesura Crossing',   zone: 6,  act: 2 },
+    { id: 'chaconne_caves',    name: 'Chaconne Caves',     zone: 6,  act: 2 },
+    { id: 'clef_cliffs',       name: 'Clef Cliffs',        zone: 7,  act: 2 },
+    { id: 'crescendo_keep',    name: 'Crescendo Keep',     zone: 7,  act: 2 },
+    { id: 'presto_pass',       name: 'Presto Pass',        zone: 7,  act: 2 },
+    { id: 'forgotten_forest',  name: 'Forgotten Forest',   zone: 8,  act: 2 },
+    { id: 'adagio',            name: 'Adagio',             zone: 8,  act: 2 },
+    { id: 'coda_cove',         name: 'Coda Cove',          zone: 9,  act: 3 },
+    { id: 'chromatic_coasts',  name: 'Chromatic Coasts',   zone: 9,  act: 3 },
+    { id: 'syncopated_sea',    name: 'Syncopated Sea',     zone: 10, act: 3 },
+    { id: 'the_maelstrom',     name: 'The Maelstrom',      zone: 10, act: 3 },
+    { id: 'dissonant_dunes',   name: 'Dissonant Dunes',    zone: 11, act: 3 },
+    { id: 'hall_of_discord',   name: 'Hall of Discord',    zone: 12, act: 3 },
+  ];
+  const ACT_NAMES = { 1: 'Act I · The Academy', 2: 'Act II · Into the World', 3: 'Act III · The Assault' };
+  const LOC_BY_ID = Object.fromEntries(LOCATIONS.map(l => [l.id, l]));
+  const zonePrimary = {};
+  LOCATIONS.forEach(l => { if (zonePrimary[l.zone] === undefined) zonePrimary[l.zone] = l.id; });
+
+  const LS_KEY = 'bq_enemy_placement_tool_v2';
+  const OLD_KEY = 'bq_enemy_placement_tool_v1';
+  const ENEMY_BY_ID = Object.fromEntries(ENEMIES.map(e => [e.id, e]));
+  let iidSeq = 0;
+  const newIid = () => 'x' + (++iidSeq);
+  const validLoc = (l) => l === 'unassigned' || !!LOC_BY_ID[l];
+
+  // A creature may live in many places, so state is a flat list of instances:
+  //   { iid, enemyId, loc }   (loc = a location id, or 'unassigned')
+  const seedInstances = () => ENEMIES.map(e => ({ iid: newIid(), enemyId: e.id, loc: zonePrimary[e.zone] || 'unassigned' }));
+
+  function loadInstances() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(LS_KEY));
+      if (Array.isArray(raw)) {
+        const out = raw.filter(i => i && ENEMY_BY_ID[i.enemyId])
+          .map(i => ({ iid: newIid(), enemyId: i.enemyId, loc: validLoc(i.loc) ? i.loc : 'unassigned' }));
+        const have = new Set(out.map(i => i.enemyId));
+        ENEMIES.forEach(e => { if (!have.has(e.id)) out.push({ iid: newIid(), enemyId: e.id, loc: 'unassigned' }); });
+        return out;
+      }
+    } catch (e) {}
+    // Migrate a v1 single-location map, if present.
+    try {
+      const old = JSON.parse(localStorage.getItem(OLD_KEY));
+      if (old && typeof old === 'object') {
+        return ENEMIES.map(e => ({ iid: newIid(), enemyId: e.id, loc: validLoc(old[e.id]) ? old[e.id] : (zonePrimary[e.zone] || 'unassigned') }));
+      }
+    } catch (e) {}
+    return seedInstances();
+  }
+
+  let instances = loadInstances();
+  let armed = null;   // { mode:'move', iid } | { mode:'dup', enemyId }
+  let query = '';
+
+  const $ = s => document.querySelector(s);
+  const save = () => { try { localStorage.setItem(LS_KEY, JSON.stringify(instances.map(i => ({ enemyId: i.enemyId, loc: i.loc })))); } catch (e) {} };
+
+  // Build the Act bands + location columns once.
+  const actsEl = $('#acts');
+  [1, 2, 3].forEach(act => {
+    const sec = document.createElement('section');
+    sec.className = 'act act' + act;
+    sec.innerHTML = '<div class="sec-head"><span class="kicker">' + ACT_NAMES[act] +
+      '</span><span class="sub">' + (act === 1 ? 'the heartland — warm and whole' : act === 2 ? 'the shattered frontier' : 'the corrupted west, toward Discordia') + '</span></div>';
+    const cols = document.createElement('div');
+    cols.className = 'cols';
+    LOCATIONS.filter(l => l.act === act).forEach(l => {
+      const col = document.createElement('div');
+      col.className = 'col placeable';
+      col.id = 'col-' + l.id;
+      col.dataset.loc = l.id;
+      col.innerHTML =
+        '<div class="col-head"><span class="col-name">' + l.name + '</span>' +
+        '<span class="col-zone">Zone ' + l.zone + '</span></div>' +
+        '<div class="col-count" id="count-' + l.id + '"></div>' +
+        '<div class="col-body" id="body-' + l.id + '"></div>';
+      cols.appendChild(col);
+    });
+    sec.appendChild(cols);
+    actsEl.appendChild(sec);
+  });
+
+  function makeCard(inst) {
+    const e = ENEMY_BY_ID[inst.enemyId];
+    const where = inst.loc === 'unassigned' ? 'unassigned' : LOC_BY_ID[inst.loc].name;
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.draggable = true;
+    card.dataset.iid = inst.iid;
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', e.name + (e.boss ? ' (boss)' : '') + ', tier ' + e.tier + ', in ' + where);
+    card.innerHTML = '<span class="emoji">' + e.emoji + '</span>' +
+      '<span class="nm">' + e.name + '</span>' +
+      (e.boss ? '<span class="crown" title="Boss">♛</span>' : '') +
+      '<span class="tier" title="Tier">T' + e.tier + '</span>' +
+      '<button class="mini dup" tabindex="-1" title="Duplicate — place a copy in another location" aria-label="Duplicate ' + e.name + '">⧉</button>' +
+      '<button class="mini rm" tabindex="-1" title="Remove from this location" aria-label="Remove ' + e.name + ' from ' + where + '">✕</button>';
+    card.addEventListener('dragstart', ev => {
+      ev.dataTransfer.setData('text/plain', inst.iid);
+      ev.dataTransfer.effectAllowed = 'move';
+      card.classList.add('dragging');
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    card.addEventListener('click', ev => {
+      ev.stopPropagation();
+      if (armed) resolveArmedAt(inst.loc);
+      else armMove(inst.iid);
+    });
+    card.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); if (armed) resolveArmedAt(inst.loc); else armMove(inst.iid); }
+    });
+    const dupBtn = card.querySelector('.dup');
+    const rmBtn = card.querySelector('.rm');
+    [dupBtn, rmBtn].forEach(b => { b.draggable = false; b.addEventListener('mousedown', ev => ev.stopPropagation()); });
+    dupBtn.addEventListener('click', ev => { ev.stopPropagation(); armDuplicate(inst.enemyId); });
+    rmBtn.addEventListener('click', ev => { ev.stopPropagation(); removeInstance(inst.iid); });
+    return card;
+  }
+
+  function armMove(iid) {
+    armed = (armed && armed.mode === 'move' && armed.iid === iid) ? null : { mode: 'move', iid };
+    render();
+  }
+  function armDuplicate(enemyId) { armed = { mode: 'dup', enemyId }; render(); }
+
+  // Drop the armed card (move that instance, or add a duplicate) at a location.
+  function resolveArmedAt(loc) {
+    if (!armed) return;
+    if (armed.mode === 'move') { const inst = instances.find(i => i.iid === armed.iid); if (inst) inst.loc = loc; }
+    else if (armed.mode === 'dup') { instances.push({ iid: newIid(), enemyId: armed.enemyId, loc }); }
+    armed = null; save(); render();
+  }
+  function moveInstanceTo(iid, loc) { const inst = instances.find(i => i.iid === iid); if (inst) { inst.loc = loc; save(); render(); } }
+  function removeInstance(iid) {
+    const inst = instances.find(i => i.iid === iid);
+    if (!inst) return;
+    const enemyId = inst.enemyId;
+    instances = instances.filter(i => i.iid !== iid);
+    // Never lose a creature entirely — its last card falls back to Unassigned.
+    if (!instances.some(i => i.enemyId === enemyId)) instances.push({ iid: newIid(), enemyId, loc: 'unassigned' });
+    if (armed && armed.mode === 'move' && armed.iid === iid) armed = null;
+    save(); render();
+  }
+
+  // Drop targets
+  document.querySelectorAll('.col').forEach(col => {
+    const locId = col.dataset.loc;
+    col.addEventListener('dragover', ev => { ev.preventDefault(); col.classList.add('drop-target'); });
+    col.addEventListener('dragleave', () => col.classList.remove('drop-target'));
+    col.addEventListener('drop', ev => {
+      ev.preventDefault(); col.classList.remove('drop-target');
+      const iid = ev.dataTransfer.getData('text/plain');
+      if (iid) moveInstanceTo(iid, locId);
+    });
+    col.addEventListener('click', () => { if (armed) resolveArmedAt(locId); });
+  });
+
+  function render() {
+    document.querySelectorAll('.col-body').forEach(b => (b.innerHTML = ''));
+    const counts = {};
+    LOCATIONS.forEach(l => (counts[l.id] = 0));
+    const placedEnemies = new Set();
+
+    instances.forEach(inst => {
+      const body = document.getElementById('body-' + inst.loc);
+      if (!body) return;
+      const e = ENEMY_BY_ID[inst.enemyId];
+      const card = makeCard(inst);
+      if (armed && armed.mode === 'move' && armed.iid === inst.iid) card.classList.add('selected');
+      if (armed && armed.mode === 'dup' && armed.enemyId === inst.enemyId) card.classList.add('dup-source');
+      if (query && !e.name.toLowerCase().includes(query)) card.classList.add('dimmed');
+      body.appendChild(card);
+      if (inst.loc !== 'unassigned') { counts[inst.loc]++; placedEnemies.add(inst.enemyId); }
+    });
+
+    LOCATIONS.forEach(l => {
+      const c = document.getElementById('count-' + l.id);
+      if (c) c.textContent = counts[l.id] === 0 ? 'empty' : counts[l.id] + (counts[l.id] === 1 ? ' creature' : ' creatures');
+      const body = document.getElementById('body-' + l.id);
+      if (body && counts[l.id] === 0) { const d = document.createElement('div'); d.className = 'col-empty'; d.textContent = 'drop here'; body.appendChild(d); }
+    });
+
+    const placed = placedEnemies.size;
+    $('#placed').textContent = placed;
+    $('#meter').style.width = Math.round((placed / ENEMIES.length) * 100) + '%';
+    const trayN = instances.filter(i => i.loc === 'unassigned').length;
+    $('#tray-sub').textContent = trayN === 0 ? 'empty — every creature is placed' : trayN + ' in the pen · nothing here appears in the world yet';
+
+    const hint = $('#hint');
+    const span = hint.querySelector('span');
+    if (armed && armed.mode === 'move') {
+      const inst = instances.find(i => i.iid === armed.iid);
+      hint.classList.add('armed');
+      span.innerHTML = 'Moving <span class="pin">' + (inst ? ENEMY_BY_ID[inst.enemyId].name : '') + '</span> — click a location to drop it (or the card again to cancel).';
+    } else if (armed && armed.mode === 'dup') {
+      hint.classList.add('armed');
+      span.innerHTML = 'Duplicating <span class="pin">' + ENEMY_BY_ID[armed.enemyId].name + '</span> — click a location to add a copy there.';
+    } else {
+      hint.classList.remove('armed');
+      span.innerHTML = 'Drag to move · <span class="pin">⧉</span> duplicates into another location · <span class="pin">✕</span> removes it from one.';
+    }
+  }
+
+  // Search
+  $('#search').addEventListener('input', ev => { query = ev.target.value.trim().toLowerCase(); render(); });
+
+  // Reset / clear — each rebuilds one instance per creature (no duplicates).
+  $('#reset').addEventListener('click', () => {
+    if (confirm('Reset to one card per creature in its current campaign zone? This discards duplicates and your arrangement.')) {
+      instances = seedInstances(); armed = null; save(); render();
+    }
+  });
+  $('#clear').addEventListener('click', () => {
+    if (confirm('Send every creature back to the Unassigned pen (one card each)?')) {
+      instances = ENEMIES.map(e => ({ iid: newIid(), enemyId: e.id, loc: 'unassigned' })); armed = null; save(); render();
+    }
+  });
+
+  // Export — a creature may map to several locations, so values are arrays.
+  let fmt = 'ts';
+  function buildOutput() {
+    const byEnemy = {};
+    instances.forEach(inst => { if (inst.loc !== 'unassigned') (byEnemy[inst.enemyId] = byEnemy[inst.enemyId] || new Set()).add(inst.loc); });
+    const entries = ENEMIES.filter(e => byEnemy[e.id]).map(e => [e.id, [...byEnemy[e.id]]]);
+    if (fmt === 'json') {
+      return JSON.stringify(Object.fromEntries(entries), null, 2);
+    }
+    const lines = entries.map(([id, locs]) => "  " + id + ": [" + locs.map(l => "'" + l + "'").join(', ') + "],");
+    return 'export const ENEMY_PLACEMENT: Record<string, string[]> = {\n' + lines.join('\n') + '\n};';
+  }
+  function openDrawer() { $('#out').value = buildOutput(); $('#scrim').classList.add('open'); $('#drawer').classList.add('open'); $('#drawer').setAttribute('aria-hidden', 'false'); }
+  function closeDrawer() { $('#scrim').classList.remove('open'); $('#drawer').classList.remove('open'); $('#drawer').setAttribute('aria-hidden', 'true'); }
+  $('#export').addEventListener('click', openDrawer);
+  $('#close').addEventListener('click', closeDrawer);
+  $('#scrim').addEventListener('click', closeDrawer);
+  function setFmt(f) {
+    fmt = f;
+    $('#tab-ts').classList.toggle('on', f === 'ts');
+    $('#tab-json').classList.toggle('on', f === 'json');
+    $('#drawer-note').innerHTML = f === 'ts'
+      ? 'Paste this into <code>src/lib/enemyPlacement.ts</code> — it becomes the live placement.'
+      : 'Raw <code>{ enemyId: locationId[] }</code> map — omits anything still Unassigned.';
+    $('#out').value = buildOutput();
+  }
+  $('#tab-ts').addEventListener('click', () => setFmt('ts'));
+  $('#tab-json').addEventListener('click', () => setFmt('json'));
+  $('#copy').addEventListener('click', () => {
+    const ta = $('#out'); ta.select();
+    navigator.clipboard.writeText(ta.value).then(() => { $('#copy').textContent = 'Copied ✓'; setTimeout(() => ($('#copy').textContent = 'Copy'), 1400); }).catch(() => { document.execCommand('copy'); });
+  });
+  $('#download').addEventListener('click', () => {
+    const blob = new Blob([buildOutput()], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fmt === 'ts' ? 'enemyPlacement.ts' : 'enemy_placement.json';
+    a.click(); URL.revokeObjectURL(a.href);
+  });
+  document.addEventListener('keydown', ev => { if (ev.key === 'Escape') { closeDrawer(); if (armed) { armed = null; render(); } } });
+
+  render();
+})();
+</script>

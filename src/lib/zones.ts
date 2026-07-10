@@ -82,7 +82,7 @@ export const ZONES: ZoneMeta[] = [
     id: 11, name: 'Dissonant Dunes', act: 3, quarter: 11,
     emoji: '🌑',
     flavor: "Landfall in Discordia — grey dunes between the shore and the Hall, patrolled by Vexus's elite guard.",
-    boss: 'Piano & Forte',
+    boss: 'Ebony & Ivory',
   },
   {
     id: 12, name: 'The Hall of Discord', act: 3, quarter: 12,

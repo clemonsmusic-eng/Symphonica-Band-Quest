@@ -184,11 +184,12 @@ biographies that unlock as lore. These are the real-musician homages: **Galwayni
   Tragic, blind, vindication-driven, stopped.
 - **Lieutenant Contra** — a **contrabass clarinet** automaton commanding the Discordian Outpost
   (Zone 7).
-- **Piano** & **Forte** — two Vexian knight-commander automatons patrolling the Dissonant Dunes
-  (Zone 11).
+- **Ebony** & **Ivory** — two Vexian knight-commander automatons patrolling the Dissonant Dunes
+  (Zone 11); the black keys and the white of a sundered keyboard, one all sharps and flats, the
+  other all naturals.
 - **Ostinato, the Usher** — a gearwork automaton that ejects unwelcome guests from the Hall.
 - **The Tritone Trio** — **General Grave** (contrabassoon, leader and Vexus's second),
-  **Commander Mesto** (English horn), **Lieutenant Kije** (piccolo): player-less automatons
+  **Commander Coren Glais** (English horn), **Lieutenant Kije** (piccolo): player-less automatons
   forming a tritone. *(Rank runs deepest-voice-highest.)* The Trio's instruments are the
   auxiliary extensions of flute, oboe, and bassoon — dark, soulless reflections of three of
   the very Maestros Vexus cast aside (Flaura, Hautbois, Fagotto).
@@ -207,8 +208,8 @@ own mentors.
 **Freeing a Maestro resets them.** When the shard is drawn out, the function-corruption falls
 away and their **true personality and perspective return** — as if waking from a long, fevered
 dream. They remember the corrupted period the way one remembers a dream: present, but distanced.
-Most step back into themselves clear-eyed; **Hautbois is the exception** — she grasps too sharply
-what her hands did to the forest, and the reset can't mend that.
+Most step back into themselves clear-eyed; **Hautbois is the exception** — he grasps too sharply
+what his hands did to the forest, and the reset can't mend that.
 
 | # | Maestro → Corrupted Form | Instrument | Zone · Location | Map? | Post-freeing role |
 |---|--------------------------|-----------|------------------|------|-------------------|
@@ -249,9 +250,11 @@ Grand Artificer).
 - **Cornelius & Waldhorn (brothers).** Both professors before the Shattering. Freed in Zone 5,
   Cornelius searches for his **brother Waldhorn — scattered and lost when the Score shattered.**
   The map confirms a Maestro in the Zone 8 Forest, so he **travels with the caravan** (Z5–8). Finding and freeing him resolves his arc; only then does he convert to a summon.
-- **Hautbois (the guide who won't fight).** Freed in Zone 8 and unable to forgive what her
-  corruption did to the forest, she lays down her instrument and travels with the party through
-  Act 3 offering **guidance only.**
+- **Hautbois (the guide who won't fight).** Freed in Zone 8 and unable to forgive what his
+  corruption did to the forest, he lays down his instrument and travels with the party through
+  Act 3 offering **guidance only.** *(Implemented: a guide beat on each Act 3 leg (Zones 9–11)
+  and two in the Hall (Zone 12) — naming the Tritone Trio, then sounding the tuning **A** before
+  the final performance, her arc's payoff.)*
 
 ---
 
@@ -333,7 +336,7 @@ tritones**.
    and he converts to a summon.
 2. **The double-reed loggers** — **Hautbois → The Double-Reed Specter** *(Oboe, confirmed)* and
    **Fagotto → The Ancient Revenant** *(Bassoon)*, felling the forest for cane. **Hautbois**, freed
-   and shattered by what she did, **lays down her instrument** and becomes a non-combat guide.
+   and shattered by what he did, **lays down his instrument** and becomes a non-combat guide.
    **Fagotto**, freed last as the **Act 2 finale**, recovers the Composer's earliest manuscripts,
    reads the trail of corruption to the coast, and retires into the **Library**.
 
@@ -359,7 +362,7 @@ against the chop. Boss: **The Maelstrom**, a rogue swell that grows each turn.
 
 ### Zone 11 — Dissonant Dunes
 Landfall in **Discordia**. Grey dunes between shore and hall, patrolled by the Elite Discordian
-Guard under **Piano** and **Forte**. Both must fall before the Hall's doors open.
+Guard under **Ebony** and **Ivory**. Both must fall before the Hall's doors open.
 
 ### Zone 12 — The Hall of Discord
 *Dark, imposing, operatic.* A four-stage dungeon:
@@ -369,7 +372,7 @@ Guard under **Piano** and **Forte**. Both must fall before the Hall's doors open
    practice rooms and rehearsal halls.**
 3. **The Practice Rooms** — a gauntlet of rooms, each a different challenge type, winding to the
    **large practice studio.**
-4. **The Tritone Trio** — **General Grave** (contrabassoon, leader), **Commander Mesto** (English
+4. **The Tritone Trio** — **General Grave** (contrabassoon, leader), **Commander Coren Glais** (English
    horn), **Lieutenant Kije** (piccolo): player-less automatons that protect one another and must be
    broken apart.
 5. **Vexus** — the final battle: the heroes and the restored Maestros perform the true Grand

@@ -180,7 +180,7 @@ export default function Zone2Page() {
   }
 
   if (activeBattle) {
-    const battleEnemies = activeBattle === 'mini_boss' ? [ENEMIES.interval_imp] : [ENEMIES.shard_phantom];
+    const battleEnemies = activeBattle === 'mini_boss' ? [ENEMIES.interval_imp] : [ENEMIES.frat];
     return (
       <BattleScreen
         character={character}
@@ -308,11 +308,12 @@ export default function Zone2Page() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="text-academy-cream/80 text-sm font-semibold mb-1">
-                    👻 The Footlight Phantom crashes the concert
+                    🐀 A Frat crashes the concert
                   </div>
                   <div className="text-academy-cream/50 text-xs">
-                    A mischievous theater-sprite, drawn out of the old hall by the swell of live
-                    music, scatters the sheet music. Shoo it off before the concert can continue.
+                    A grey flat-sign rodent, flushed out of the wings by the swell of live music,
+                    scurries across the stage gnawing the sheet music a half-step flat. Shoo it off
+                    before the concert can continue.
                   </div>
                 </div>
                 {!phantomDefeated && !concertDone ? (
