@@ -2,7 +2,7 @@ import { LOCATIONS, type GameLocation } from '../locations';
 
 // Zones that use the new location-based world. Grows each migration phase;
 // unlisted zones keep their legacy bespoke page.
-export const LOCATION_BASED_ZONES = new Set<number>([1]);
+export const LOCATION_BASED_ZONES = new Set<number>([1, 2]);
 
 export function isLocationBasedZone(zoneId: number): boolean {
   return LOCATION_BASED_ZONES.has(zoneId);
@@ -26,6 +26,16 @@ export const MAP_NODES: Record<string, MapNode> = {
   practice_rooms: {
     x: 68, y: 64,
     blurb: 'A warren of small rooms down the east wing. Reeds soak in cups, metronomes tick out of sync, and a strange hush pools in the corners.',
+  },
+
+  // ── Zone 2 · The Theory Wing ──
+  theory_wing: {
+    x: 30, y: 38, entry: true,
+    blurb: 'The Academy\'s ancient inner wing — walls of faded pre-Shattering scores, the air thick with old parchment and chalk. This is where the class first sounds like an ensemble.',
+  },
+  theory_stacks: {
+    x: 70, y: 60,
+    blurb: 'Deep in the library stacks, shelves lean with crossed-out references to a "forbidden interval." Something mis-played once still echoes down the aisles.',
   },
 };
 

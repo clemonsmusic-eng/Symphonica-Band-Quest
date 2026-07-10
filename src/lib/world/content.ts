@@ -14,7 +14,7 @@ export interface ChallengeSpec {
 
 export type Activity =
   | { kind: 'challenge'; challenge: ChallengeSpec }
-  | { kind: 'battle'; id: string; name: string; desc: string; icon: string; enemyKeys: string[]; doneKey: string; awardType: 'mini_boss' | 'zone_boss'; unlock?: (c: Character) => boolean }
+  | { kind: 'battle'; id: string; name: string; desc: string; icon: string; enemyKeys: string[]; doneKey: string; awardType: 'mini_boss' | 'zone_boss'; unlock?: (c: Character) => boolean; lockedNote?: string; hideUntilReady?: boolean }
   | { kind: 'gate'; challenge: ChallengeSpec; advanceTo: number; label: string; unlock: (c: Character) => boolean };
 
 const done = (c: Character, id: string) => c.completedChallenges.includes(id);
@@ -57,11 +57,52 @@ const ZONE1: Record<string, Activity[]> = {
       kind: 'battle', id: 'z1_mini_boss', name: 'The Rest Wraith', icon: '😶',
       desc: 'A pocket of unnatural silence in the east-wing practice rooms — it swallows sound and lulls you into missing your entrance.',
       enemyKeys: ['rest_wraith'], doneKey: 'z1_mini_boss_defeated', awardType: 'mini_boss', unlock: z1MiniBossReady,
+      lockedNote: 'Complete 4 required challenges',
     },
   ],
 };
 
-const ZONE_CONTENT: Record<number, Record<string, Activity[]>> = { 1: ZONE1 };
+// ── Zone 2 · The Theory Wing ────────────────────────────────────────────────
+const Z2_REQUIRED = ['z2_f_scale', 'z2_eighth_notes', 'z2_three_four', 'z2_dynamics_pf', 'z2_aural_stepwise', 'z2_aural_rhythm_eighth'];
+const z2MiniBossReady = (c: Character) => countDone(c, Z2_REQUIRED) >= 3;
+const z2ConcertReady = (c: Character) => Z2_REQUIRED.every((id) => done(c, id)) && done(c, 'z2_mini_boss_defeated');
+const z2PhantomDone = (c: Character) => done(c, 'z2_shard_phantom_defeated');
+
+const ZONE2: Record<string, Activity[]> = {
+  theory_wing: [
+    CH('z2_f_scale', 'Concert F Major Scale', 'technique_scale', 'UIL Zone 2 · Scales', 'Play the Concert F major scale, one octave, at a steady quarter-note tempo.', 150),
+    CH('z2_eighth_notes', 'Rhythm: Eighth Notes in 4/4', 'rhythm_performance', 'UIL Zone 2 · Rhythm', 'Tap the given pattern using eighth notes and quarter notes in 4/4.', 150),
+    CH('z2_three_four', 'Rhythm: 3/4 Time', 'rhythm_performance', 'UIL Zone 2 · Rhythm', 'Tap a 3/4 rhythm — three beats per measure. Feel the waltz.', 150),
+    CH('z2_dynamics_pf', 'Dynamics: p and f', 'prepared_performance', 'UIL Zone 2 · Dynamics', 'Perform the phrase at piano (p), then forte (f) — a clear dynamic difference is required.', 150),
+    CH('z2_cresc_decresc', 'Crescendo and Decrescendo', 'prepared_performance', 'UIL Zone 2 · Dynamics', 'Perform a 4-bar phrase that grows louder, then softer.', 150, false),
+    {
+      kind: 'battle', id: 'z2_concert_crash', name: 'A Frat crashes the concert', icon: '🐀',
+      desc: 'A grey flat-sign rodent, flushed out of the wings by the swell of live music, scurries across the stage gnawing the sheet music a half-step flat. Shoo it off.',
+      enemyKeys: ['frat'], doneKey: 'z2_shard_phantom_defeated', awardType: 'mini_boss', unlock: z2ConcertReady, hideUntilReady: true,
+    },
+    {
+      kind: 'gate', advanceTo: 3, label: 'Perform', unlock: z2PhantomDone,
+      challenge: {
+        id: 'z2_winter_concert', title: 'The Winter Concert', type: 'prepared_performance',
+        uilStandard: 'Zone 2 · Quarter End', xpBase: 1500,
+        description: 'The hall is silent, the pest gone. Perform your best — the first time your class sounds like an ensemble. Good or better advances to Concerta.',
+      },
+    },
+  ],
+  theory_stacks: [
+    CH('z2_aural_stepwise', 'Melody Mapper: Stepwise Melodies', 'aural_melody_mapper', 'UIL Zone 2 · Aural', 'Hear a short stepwise melody and pick the correct notation.', 75),
+    CH('z2_aural_rhythm_eighth', 'Rhythm Echo: Eighth-Note Patterns', 'aural_rhythm_echo', 'UIL Zone 2 · Aural', 'Hear a rhythm using eighth notes and tap it back.', 75),
+    CH('z2_two_octave_intro', 'Two-Octave Scale Introduction', 'technique_scale', 'UIL Zone 2 · Scales', 'Extend the Concert B♭ scale to two octaves for the first time. Slowly.', 150, false),
+    {
+      kind: 'battle', id: 'z2_mini_boss', name: 'The Interval Imp', icon: '😈',
+      desc: 'Born from a mis-played tritone deep in the stacks — it scrambles your timing.',
+      enemyKeys: ['interval_imp'], doneKey: 'z2_mini_boss_defeated', awardType: 'mini_boss', unlock: z2MiniBossReady,
+      lockedNote: 'Complete 3 required challenges',
+    },
+  ],
+};
+
+const ZONE_CONTENT: Record<number, Record<string, Activity[]>> = { 1: ZONE1, 2: ZONE2 };
 
 /** Activities available at a location (unlock gates still apply in the UI). */
 export function locationActivities(zoneId: number, locationId: string): Activity[] {
@@ -70,6 +111,6 @@ export function locationActivities(zoneId: number, locationId: string): Activity
 
 /** Required-challenge progress for a zone's header bar. */
 export function zoneRequired(zoneId: number): string[] {
-  return zoneId === 1 ? Z1_REQUIRED : [];
+  return zoneId === 1 ? Z1_REQUIRED : zoneId === 2 ? Z2_REQUIRED : [];
 }
 export { countDone };

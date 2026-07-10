@@ -5,14 +5,13 @@ import { getZone } from '../lib/zones';
 import { getLocation } from '../lib/locations';
 import { ENEMIES } from '../lib/enemies';
 import { getBossGearDrop } from '../lib/gear';
-import { SIDE_QUEST_BY_ID, npcOfferKey } from '../lib/sidequests';
 import type { Rating, GearItem } from '../types/game';
 import ChallengeModal from '../components/ChallengeModal';
 import BattleScreen from '../components/BattleScreen';
-import LiberationScene, { type LibBeat } from '../components/LiberationScene';
+import LiberationScene from '../components/LiberationScene';
 import { MAP_NODES, zoneLocations, entryLocation, isLocationBasedZone } from '../lib/world/worldMap';
 import { getCurrentLocation, setCurrentLocation } from '../lib/world/state';
-import { npcsAt, type NpcDef } from '../lib/world/npcs';
+import { npcsAt, type PresentNpc } from '../lib/world/npcs';
 import { locationActivities, zoneRequired, countDone, type Activity, type ChallengeSpec } from '../lib/world/content';
 
 const ACT_COLOR: Record<number, string> = { 1: '#D4A017', 2: '#60A5FA', 3: '#F87171' };
@@ -29,7 +28,7 @@ export default function ExplorePage() {
   const [challenge, setChallenge] = useState<ChallengeSpec | null>(null);
   const [gate, setGate] = useState<Extract<Activity, { kind: 'gate' }> | null>(null);
   const [battle, setBattle] = useState<Extract<Activity, { kind: 'battle' }> | null>(null);
-  const [talk, setTalk] = useState<NpcDef | null>(null);
+  const [talk, setTalk] = useState<PresentNpc | null>(null);
   const [lastRating, setLastRating] = useState<Rating | null>(null);
   const [gateFailed, setGateFailed] = useState(false);
   const [gearDrop, setGearDrop] = useState<GearItem | null>(null);
@@ -90,16 +89,10 @@ export default function ExplorePage() {
     );
   }
   if (talk) {
-    const beats = talkBeats(talk, char);
+    const res = talk.talk(char);
     return (
-      <LiberationScene title={talk.name} beats={beats} doneLabel="Done"
-        onDone={() => {
-          const keys = (talk.offerQuests ?? [])
-            .filter((qid) => !char.completedQuests.includes(qid) && !char.completedChallenges.includes(npcOfferKey(qid)))
-            .map((qid) => npcOfferKey(qid));
-          if (keys.length) recordStoryKeys(keys);
-          setTalk(null);
-        }} />
+      <LiberationScene title={res.title} beats={res.beats} doneLabel="Done"
+        onDone={() => { if (res.doneKeys.length) recordStoryKeys(res.doneKeys); setTalk(null); }} />
     );
   }
 
@@ -181,7 +174,7 @@ export default function ExplorePage() {
                       <span className="block text-academy-cream/85 text-xs font-fantasy">{n.name}</span>
                       {n.role && <span className="block text-academy-cream/35 text-[9px]">{n.role}</span>}
                     </span>
-                    {questReady(n, char) && <span className="text-academy-gold text-xs ml-0.5">❗</span>}
+                    {n.hasAction && <span className="text-academy-gold text-xs ml-0.5">❗</span>}
                   </button>
                 ))}
               </div>
@@ -208,26 +201,6 @@ export default function ExplorePage() {
       {gate && <ChallengeModal challenge={gate.challenge} character={character} onComplete={onGateDone} onClose={() => setGate(null)} />}
     </div>
   );
-}
-
-// ── talk beats: flavor line + hooks for not-yet-offered quests ──
-function talkBeats(npc: NpcDef, char: { completedQuests: string[]; completedChallenges: string[] }): LibBeat[] {
-  const beats: LibBeat[] = [];
-  if (npc.flavor) beats.push({ emoji: npc.emoji, text: npc.flavor });
-  for (const qid of npc.offerQuests ?? []) {
-    const q = SIDE_QUEST_BY_ID[qid]; if (!q) continue;
-    const doneAlready = char.completedQuests.includes(qid);
-    const offered = char.completedChallenges.includes(npcOfferKey(qid));
-    if (doneAlready) beats.push({ emoji: npc.emoji, text: `"${q.turnIn}"` });
-    else if (offered) beats.push({ emoji: npc.emoji, text: `"Still on that ${q.title.toLowerCase()}? Check your Quest Board."` });
-    else beats.push({ emoji: npc.emoji, text: `${q.hook}\n\n"${q.title}" has been added to your Quest Board.` });
-  }
-  if (beats.length === 0) beats.push({ emoji: npc.emoji, text: `${npc.name} nods at you and returns to their work.` });
-  return beats;
-}
-
-function questReady(npc: NpcDef, char: { completedQuests: string[]; completedChallenges: string[] }): boolean {
-  return (npc.offerQuests ?? []).some((qid) => !char.completedQuests.includes(qid) && !char.completedChallenges.includes(npcOfferKey(qid)));
 }
 
 function activityKey(a: Activity): string {
@@ -267,12 +240,13 @@ function ActivityRow({ activity: a, character: c, onChallenge, onGate, onBattle,
   if (a.kind === 'battle') {
     const d = done(a.doneKey);
     const ready = a.unlock ? a.unlock(c as never) : true;
+    if (!ready && !d && a.hideUntilReady) return null;
     return (
       <div className={`w-full rounded-lg border py-2.5 px-3 flex items-center gap-3 ${ready ? 'border-discord-crimson/40' : 'border-academy-gold/15 opacity-60'}`}>
         <span className="text-lg">{a.icon}</span>
         <span className="flex-1 min-w-0">
           <span className="block text-academy-cream/85 text-sm">{a.name}</span>
-          <span className="block text-academy-cream/40 text-[10px]">{a.desc}{!ready && ' (complete 4 required challenges)'}</span>
+          <span className="block text-academy-cream/40 text-[10px]">{a.desc}{!ready && a.lockedNote ? ` (${a.lockedNote})` : ''}</span>
         </span>
         {d ? <span className="text-rating-superior text-sm">✓</span> :
           ready ? <button onClick={() => onBattle(a)} className="btn-danger text-xs py-1.5 px-3 flex-shrink-0">Fight</button> : null}
