@@ -15,6 +15,7 @@ export const LOCATIONS: GameLocation[] = [
   { id: 'rehearsal_halls',  name: 'The Rehearsal Halls', zoneId: 1,  act: 1 },
   { id: 'practice_rooms',   name: 'Practice Rooms',      zoneId: 1,  act: 1 },
   { id: 'theory_wing',      name: 'The Theory Wing',     zoneId: 2,  act: 1 },
+  { id: 'theory_stacks',    name: 'The Library Stacks',  zoneId: 2,  act: 1 },
   { id: 'concerta',         name: 'Concerta',            zoneId: 3,  act: 1 },
   { id: 'crotchet',         name: 'Crotchet',            zoneId: 3,  act: 1 },
   { id: 'grand_auditorium', name: 'The Grand Auditorium',zoneId: 4,  act: 1 },

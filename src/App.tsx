@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 import { useAuthStore } from './store/authStore';
 import { useGameStore } from './store/gameStore';
@@ -30,6 +30,8 @@ import SideQuestsPage from './pages/SideQuestsPage';
 import LoadingScreen from './components/LoadingScreen';
 import TunerWidget from './components/music/TunerWidget';
 import ComposerPage from './pages/ComposerPage';
+import ExplorePage from './pages/ExplorePage';
+import IntroSequence from './components/world/IntroSequence';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
@@ -65,6 +67,12 @@ function SuspendedScreen() {
       <button onClick={signOut} className="btn-secondary text-sm">Sign out</button>
     </div>
   );
+}
+
+// Replay the intro from the Hub ("Story so far").
+function IntroReplay() {
+  const navigate = useNavigate();
+  return <IntroSequence onDone={() => navigate('/hub')} />;
 }
 
 export default function App() {
@@ -129,6 +137,12 @@ export default function App() {
       } />
       <Route path="/zone/:zoneId" element={
         <RequireCharacter><ZonePage /></RequireCharacter>
+      } />
+      <Route path="/explore/:zoneId" element={
+        <RequireCharacter><ExplorePage /></RequireCharacter>
+      } />
+      <Route path="/intro" element={
+        <RequireCharacter><IntroReplay /></RequireCharacter>
       } />
 
       {/* Teacher */}

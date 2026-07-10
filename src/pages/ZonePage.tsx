@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/gameStore';
 import { getZone, quarterLabelShort } from '../lib/zones';
+import { isLocationBasedZone } from '../lib/world/worldMap';
 import Zone1Page from './zones/Zone1Page';
 import Zone2Page from './zones/Zone2Page';
 import Zone3Page from './zones/Zone3Page';
@@ -24,6 +25,12 @@ export default function ZonePage() {
 
   if (id > character.currentZone) {
     navigate('/hub');
+    return null;
+  }
+
+  // Migrated zones use the location-based world instead of a bespoke page.
+  if (isLocationBasedZone(id)) {
+    navigate(`/explore/${id}`, { replace: true });
     return null;
   }
 
