@@ -148,6 +148,7 @@ export default function HubPage() {
             <NavCard icon="⚙️" label="Equipment" sublabel="Gear & effective stats" onClick={() => navigate('/gear')} />
             <NavCard icon="🪙" label="Gear Shop" sublabel={`${character.resonanceCoins} coins`} onClick={() => navigate('/shop')} />
             <NavCard icon="🎨" label="Customize Avatar" sublabel="Your look & colors" onClick={() => navigate('/customize')} />
+            <NavCard icon="📖" label="Story so far" sublabel="Replay the intro" onClick={() => navigate('/intro')} />
           </div>
         </div>
 

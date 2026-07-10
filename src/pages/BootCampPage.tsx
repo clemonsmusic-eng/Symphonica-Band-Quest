@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase';
 import { useGameStore } from '../store/gameStore';
 import { INSTRUMENTS } from '../lib/instruments';
 import MicrophoneListener from '../components/MicrophoneListener';
+import IntroSequence from '../components/world/IntroSequence';
+import { hasSeenIntro, markIntroSeen } from '../lib/world/state';
 
 type StepId = 'posture' | 'assembly' | 'hold' | 'first_sound' | 'first_song';
 
@@ -74,6 +76,7 @@ export default function BootCampPage() {
   const [showChallenge, setShowChallenge] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showGraduation, setShowGraduation] = useState(false);
+  const [showIntro, setShowIntro] = useState(() => !hasSeenIntro());
 
   useEffect(() => {
     if (!character) return;
@@ -97,6 +100,11 @@ export default function BootCampPage() {
         setLoading(false);
       });
   }, [character, navigate]);
+
+  // First-time players see the story intro before Boot Camp begins.
+  if (character && !character.bootCampComplete && showIntro) {
+    return <IntroSequence onDone={() => { markIntroSeen(); setShowIntro(false); }} />;
+  }
 
   async function markComplete(stepId: StepId) {
     if (!character) return;
