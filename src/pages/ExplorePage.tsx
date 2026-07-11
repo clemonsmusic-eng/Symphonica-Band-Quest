@@ -24,7 +24,7 @@ export default function ExplorePage() {
   const zid = parseInt(zoneId ?? '1', 10);
 
   const [locId, setLocId] = useState<string>(() =>
-    (character && getCurrentLocation(character.id)) || entryLocation(zid) || '');
+    (character && getCurrentLocation(character.id, zid)) || entryLocation(zid) || '');
   const [challenge, setChallenge] = useState<ChallengeSpec | null>(null);
   const [gate, setGate] = useState<Extract<Activity, { kind: 'gate' }> | null>(null);
   const [battle, setBattle] = useState<Extract<Activity, { kind: 'battle' }> | null>(null);
@@ -43,14 +43,18 @@ export default function ExplorePage() {
 
   const zone = getZone(zid);
   const locs = zoneLocations(zid);
-  if (!locId && locs[0]) setLocId(locs[0].id);
+  // Guard against a saved location that isn't on this zone's map (e.g. a stale
+  // value from a prior zone): snap back to the zone's entry point.
+  if (locs.length > 0 && !locs.some((l) => l.id === locId)) {
+    setLocId(entryLocation(zid) ?? locs[0].id);
+  }
   const node = MAP_NODES[locId];
   const location = getLocation(locId);
   const color = ACT_COLOR[zone?.act ?? 1];
 
   function travel(id: string) {
     setLocId(id);
-    setCurrentLocation(char.id, id);
+    setCurrentLocation(char.id, zid, id);
     setLastRating(null);
   }
 
