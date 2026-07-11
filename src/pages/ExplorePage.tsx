@@ -24,7 +24,7 @@ export default function ExplorePage() {
   const zid = parseInt(zoneId ?? '1', 10);
 
   const [locId, setLocId] = useState<string>(() =>
-    (character && getCurrentLocation(character.id)) || entryLocation(zid) || '');
+    (character && getCurrentLocation(character.id, zid)) || entryLocation(zid) || '');
   const [challenge, setChallenge] = useState<ChallengeSpec | null>(null);
   const [gate, setGate] = useState<Extract<Activity, { kind: 'gate' }> | null>(null);
   const [battle, setBattle] = useState<Extract<Activity, { kind: 'battle' }> | null>(null);
@@ -32,6 +32,10 @@ export default function ExplorePage() {
   const [lastRating, setLastRating] = useState<Rating | null>(null);
   const [gateFailed, setGateFailed] = useState(false);
   const [gearDrop, setGearDrop] = useState<GearItem | null>(null);
+  const [gearThenHub, setGearThenHub] = useState(false);
+  const [showShattering, setShowShattering] = useState(false);
+  const [shatterRating, setShatterRating] = useState<Rating>('good');
+  const [pendingGear, setPendingGear] = useState<GearItem | null>(null);
 
   if (!character) return null;
   const char = character;
@@ -39,14 +43,18 @@ export default function ExplorePage() {
 
   const zone = getZone(zid);
   const locs = zoneLocations(zid);
-  if (!locId && locs[0]) setLocId(locs[0].id);
+  // Guard against a saved location that isn't on this zone's map (e.g. a stale
+  // value from a prior zone): snap back to the zone's entry point.
+  if (locs.length > 0 && !locs.some((l) => l.id === locId)) {
+    setLocId(entryLocation(zid) ?? locs[0].id);
+  }
   const node = MAP_NODES[locId];
   const location = getLocation(locId);
   const color = ACT_COLOR[zone?.act ?? 1];
 
   function travel(id: string) {
     setLocId(id);
-    setCurrentLocation(char.id, id);
+    setCurrentLocation(char.id, zid, id);
     setLastRating(null);
   }
 
@@ -59,18 +67,40 @@ export default function ExplorePage() {
   }
   async function onGateDone(rating: Rating, score: number) {
     if (!gate) return;
-    await awardChallenge(gate.challenge.id, gate.challenge.type, score, rating);
+    const g = gate;
     const passed = rating === 'good' || rating === 'excellent' || rating === 'superior';
-    if (passed) {
-      const drop = getBossGearDrop(gate.challenge.id, char);
-      if (drop) { await equipGear(drop); setGearDrop(drop); }
-      await advanceZone(gate.advanceTo as Parameters<typeof advanceZone>[0]);
-      setGate(null);
-      navigate('/hub');
-    } else {
+    const awardType = g.awardType ?? g.challenge.type;
+    setGate(null);
+    if (!passed) {
+      // Attempt XP without marking the gate complete.
+      await awardChallenge(g.challenge.id, awardType, score, rating, { trackCompletion: false });
       setGateFailed(true);
-      setGate(null);
+      return;
     }
+    const winKey = g.winKey ?? g.challenge.id;
+    await awardChallenge(winKey, awardType, score, rating);
+    const drop = getBossGearDrop(g.gearKey ?? winKey, char);
+    if (drop) await equipGear(drop);
+    if (g.advanceTo) await advanceZone(g.advanceTo as Parameters<typeof advanceZone>[0]);
+
+    if (g.climax === 'shatter') {
+      setPendingGear(drop);
+      setShatterRating(rating);
+      setShowShattering(true);
+    } else if (g.advanceTo) {
+      // Advancing gate: show any gear, then return to the Hub on dismiss.
+      if (drop) { setGearDrop(drop); setGearThenHub(true); } else navigate('/hub');
+    } else {
+      // Non-advancing win gate (e.g. contest semifinal): stay and unlock next.
+      if (drop) setGearDrop(drop);
+      setLastRating(rating);
+    }
+  }
+
+  function finishShattering() {
+    setShowShattering(false);
+    if (pendingGear) { setGearDrop(pendingGear); setPendingGear(null); setGearThenHub(true); }
+    else navigate('/hub');
   }
   async function onBattleWin(_rp: number, spDelta: number) {
     if (!battle) return;
@@ -82,6 +112,9 @@ export default function ExplorePage() {
   }
 
   // ── full-screen sub-views ──
+  if (showShattering) {
+    return <ShatteringCutscene rating={shatterRating} onFinish={finishShattering} />;
+  }
   if (battle) {
     return (
       <BattleScreen character={character} enemies={battle.enemyKeys.map((k) => ENEMIES[k])} simulatorMode
@@ -196,7 +229,10 @@ export default function ExplorePage() {
         </div>
       </div>
 
-      {gearDrop && <GearDropBanner item={gearDrop} onDismiss={() => setGearDrop(null)} />}
+      {gearDrop && <GearDropBanner item={gearDrop} onDismiss={() => {
+        setGearDrop(null);
+        if (gearThenHub) { setGearThenHub(false); navigate('/hub'); }
+      }} />}
       {challenge && <ChallengeModal challenge={challenge} character={character} onComplete={onChallengeDone} onClose={() => setChallenge(null)} />}
       {gate && <ChallengeModal challenge={gate.challenge} character={character} onComplete={onGateDone} onClose={() => setGate(null)} />}
     </div>
@@ -254,13 +290,13 @@ function ActivityRow({ activity: a, character: c, onChallenge, onGate, onBattle,
     );
   }
   // gate
-  const d = done(a.challenge.id);
+  const d = done(a.winKey ?? a.challenge.id);
   const ready = a.unlock(c as never);
   if (!ready && !d) return null;
   return (
     <div className="w-full rounded-lg border border-academy-gold/40 py-2.5 px-3">
       <div className="flex items-center gap-3">
-        <span className="text-lg">🎓</span>
+        <span className="text-lg">{a.icon ?? '🎓'}</span>
         <span className="flex-1 min-w-0">
           <span className="block text-academy-cream/85 text-sm">{a.challenge.title}</span>
           <span className="block text-academy-cream/40 text-[10px]">{a.challenge.description}</span>
@@ -289,4 +325,51 @@ function GearDropBanner({ item, onDismiss }: { item: GearItem; onDismiss: () => 
 function RatingBadge({ rating }: { rating: Rating }) {
   const c: Record<Rating, string> = { superior: '#FFD700', excellent: '#4ADE80', good: '#60A5FA', fair: '#FB923C', poor: '#F87171' };
   return <div className="text-center font-fantasy text-2xl font-black tracking-widest" style={{ color: c[rating], textShadow: `0 0 20px ${c[rating]}60` }}>{rating.toUpperCase()}</div>;
+}
+
+// ── The Renewal → the Shattering (Act 1 climax) ─────────────────────────────
+function ShatteringCutscene({ rating, onFinish }: { rating: Rating; onFinish: () => void }) {
+  const ratingLine: Record<Rating, string> = {
+    superior: 'It is flawless — the kind of playing the Maestros themselves pause to hear.',
+    excellent: 'It is beautiful, and the whole hall knows it.',
+    good: 'It is honest and true, and that is more than enough.',
+    fair: 'It wavers, but it holds — and it is yours.',
+    poor: 'It is rough, but you finish it, and that is what counts tonight.',
+  };
+
+  const beats: { emoji: string; tone: string; text: string }[] = [
+    { emoji: '🎓', tone: '#FFD700',
+      text: `The last note of your performance fades. ${ratingLine[rating]} The Grand Auditorium rises to its feet, and for one shining moment the whole world is exactly as it should be.` },
+    { emoji: '🎼', tone: '#FFD700',
+      text: 'Then the hall falls silent — reverent — for the Renewal. Every Maestro who ever taught you takes the stage: your professors, the ten section leaders of the Grand Symphony. Vexus, the Conductor, lifts his baton.' },
+    { emoji: '⚠️', tone: '#FB923C',
+      text: "But the notes are wrong. Tritones bloom where nothing should grow. Your teachers' hands falter; their faces tighten. They try to play what Vexus conducts — and the harmony curdles in the air." },
+    { emoji: '💥', tone: '#F87171',
+      text: 'The sound climbs, and climbs, with nowhere to resolve — until the Grand Symphony Score shatters. Light bursts from the stage. Ten shards streak out and strike your ten professors, and they change before your eyes.' },
+    { emoji: '🌫️', tone: '#94A3B8',
+      text: 'The world goes grey in a heartbeat — the audience, the faculty, the gold draining out of everything at once. Everyone touched by the world\'s music dulls where they stand. Everyone but you, and the graduates beside you.' },
+    { emoji: '🎓', tone: '#FCD34D',
+      text: '"The Renewal is broken." Headmaster Fennelio reaches you through the chaos, his voice thin. "The Maestros are lost, and the world will follow unless the Score is made whole." He presses a travel case into your hands — your Journey gear. "You are the only ones left who can still play. Go. Bring them back."' },
+  ];
+
+  const [step, setStep] = useState(0);
+  const last = step === beats.length - 1;
+  const b = beats[step];
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center bg-black/40">
+      <div className="text-6xl mb-6" style={{ filter: `drop-shadow(0 0 24px ${b.tone}80)` }}>{b.emoji}</div>
+      <div className="card-panel max-w-md w-full mb-8" style={{ borderColor: `${b.tone}55` }}>
+        <p className="text-academy-cream/85 text-sm leading-relaxed">{b.text}</p>
+      </div>
+      <div className="flex items-center gap-3">
+        {beats.map((_, i) => (
+          <span key={i} className={`h-1.5 rounded-full transition-all ${i === step ? 'w-6 bg-academy-gold' : 'w-1.5 bg-academy-cream/20'}`} />
+        ))}
+      </div>
+      <button onClick={() => (last ? onFinish() : setStep(step + 1))} className="btn-primary mt-8">
+        {last ? 'Set out — to the Melodious Meadows →' : 'Continue'}
+      </button>
+    </div>
+  );
 }

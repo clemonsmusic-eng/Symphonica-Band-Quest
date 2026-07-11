@@ -47,12 +47,25 @@ const STATIC_NPCS: StaticNpc[] = [
     flavor: '"Good ears," Persichetti says, turning a humming scrap of old score in his hands. "The Theory Wing keeps a few secrets worth finding. Mind you put it back."' },
   { id: 'piccola', name: 'Piccola', emoji: '😰', role: 'Nervous first-year', locationId: 'theory_wing', kind: 'questgiver', present: () => true, offerQuests: ['sq_z2_stage_fright'] },
   { id: 'dr_sol', name: 'Dr. Sol', emoji: '📚', role: 'Theory librarian', locationId: 'theory_stacks', kind: 'questgiver', present: () => true, offerQuests: ['sq_z2_misfiled_interval'] },
+  // Zone 3
+  { id: 'valeria', name: 'Valeria Croft', emoji: '👩‍🎓', role: 'Academy chaperone', locationId: 'concerta', kind: 'story', present: () => true,
+    flavor: 'Valeria Croft finds you at the staging tent and straightens your collar. "Nervous? Good," she says. "Channel it. Four schools, one trophy — Choral College, Piano Preparatory, The String School, and us. Now go show them what the Academy can do."' },
+  { id: 'bellamy', name: 'Bellamy', emoji: '🎩', role: 'Concerta street busker', locationId: 'concerta', kind: 'questgiver', present: () => true, offerQuests: ['sq_z3_busker'] },
+  { id: 'coda_vendor', name: 'Coda', emoji: '🥨', role: 'Festival food vendor', locationId: 'concerta', kind: 'questgiver', present: () => true, offerQuests: ['sq_z3_vendor_fanfare'] },
+  // Zone 4
+  { id: 'fennelio_grad', name: 'Headmaster Fennelio', emoji: '🎓', role: 'Headmaster', locationId: 'backstage', kind: 'story', present: () => true,
+    flavor: 'Fennelio finds you backstage, straightening his collar and grinning despite himself. "One performance stands between you and the rest of your life," he says. "Play it for yourselves. And then stay — watch the Maestros give the Renewal. You\'ve earned your seat for it. It\'s the most beautiful thing you\'ll ever hear."' },
+  { id: 'rustle', name: 'Rustle', emoji: '🎭', role: 'Auditorium stagehand', locationId: 'backstage', kind: 'questgiver', present: () => true, offerQuests: ['sq_z4_tune_the_hall'] },
 ];
 
 // Where classmates and cameos appear on the map.
-const STUDENT_LOCATION: Record<string, string> = { piper: 'theory_wing', reed: 'theory_stacks' };
-const CAMEO_LOCATION: Record<string, string> = { gene_hall: 'theory_wing' };
-const CAMEO_NAME: Record<string, string> = { gene_hall: 'A bored drummer' };
+const STUDENT_LOCATION: Record<string, string> = {
+  piper: 'theory_wing', reed: 'theory_stacks',
+  tommy: 'concerta', benny: 'concerta', miles: 'concerta', gene: 'concerta',
+  otto: 'backstage', zoot: 'backstage',
+};
+const CAMEO_LOCATION: Record<string, string> = { gene_hall: 'theory_wing', gene_contest: 'concerta' };
+const CAMEO_NAME: Record<string, string> = { gene_hall: 'A bored drummer', gene_contest: 'A contest drummer' };
 
 function questReady(npc: StaticNpc, c: Character): boolean {
   return (npc.offerQuests ?? []).some((qid) => !c.completedQuests.includes(qid) && !c.completedChallenges.includes(npcOfferKey(qid)));

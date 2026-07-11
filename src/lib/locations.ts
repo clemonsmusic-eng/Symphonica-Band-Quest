@@ -18,6 +18,7 @@ export const LOCATIONS: GameLocation[] = [
   { id: 'theory_stacks',    name: 'The Library Stacks',  zoneId: 2,  act: 1 },
   { id: 'concerta',         name: 'Concerta',            zoneId: 3,  act: 1 },
   { id: 'crotchet',         name: 'Crotchet',            zoneId: 3,  act: 1 },
+  { id: 'backstage',        name: 'Backstage',           zoneId: 4,  act: 1 },
   { id: 'grand_auditorium', name: 'The Grand Auditorium',zoneId: 4,  act: 1 },
 
   // ── Act 2 — Into the World ──
