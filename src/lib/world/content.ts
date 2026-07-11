@@ -15,7 +15,13 @@ export interface ChallengeSpec {
 export type Activity =
   | { kind: 'challenge'; challenge: ChallengeSpec }
   | { kind: 'battle'; id: string; name: string; desc: string; icon: string; enemyKeys: string[]; doneKey: string; awardType: 'mini_boss' | 'zone_boss'; unlock?: (c: Character) => boolean; lockedNote?: string; hideUntilReady?: boolean }
-  | { kind: 'gate'; challenge: ChallengeSpec; advanceTo: number; label: string; unlock: (c: Character) => boolean };
+  // A performance gate. `winKey` is the completion key recorded on a pass
+  // (defaults to the challenge id); `awardType` the award bucket. A gate with
+  // `advanceTo` advances the campaign and returns to the Hub; one without it is
+  // a non-advancing "win gate" (e.g. a contest semifinal) that stays in place
+  // and unlocks the next activity. `climax: 'shatter'` plays the Act-1 finale.
+  | { kind: 'gate'; challenge: ChallengeSpec; label: string; unlock: (c: Character) => boolean;
+      icon?: string; winKey?: string; awardType?: string; gearKey?: string; advanceTo?: number; climax?: 'shatter' };
 
 const done = (c: Character, id: string) => c.completedChallenges.includes(id);
 const countDone = (c: Character, ids: string[]) => ids.filter((id) => done(c, id)).length;
@@ -102,7 +108,77 @@ const ZONE2: Record<string, Activity[]> = {
   ],
 };
 
-const ZONE_CONTENT: Record<number, Record<string, Activity[]>> = { 1: ZONE1, 2: ZONE2 };
+// ── Zone 3 · The City of Concerta (contest bracket) ─────────────────────────
+const Z3_REQUIRED = [
+  'z3_eb_scale', 'z3_dotted_quarter', 'z3_two_octave_scale',
+  'z3_aural_intervals', 'z3_aural_two_bar', 'z3_accent',
+];
+const z3AllRequired = (c: Character) => Z3_REQUIRED.every((id) => done(c, id));
+const z3SemifinalWon = (c: Character) => done(c, 'z3_semifinal_won');
+
+const ZONE3: Record<string, Activity[]> = {
+  crotchet: [
+    CH('z3_eb_scale', 'Concert E♭ Major Scale', 'technique_scale', 'UIL Zone 3 · Scales', 'Play the Concert E♭ major scale, one octave, then attempt two octaves.', 150),
+    CH('z3_dotted_quarter', 'Rhythm: Dotted Quarter + Eighth', 'rhythm_performance', 'UIL Zone 3 · Rhythm', 'Tap a pattern using the dotted quarter–eighth note rhythm combination.', 150),
+    CH('z3_two_octave_scale', 'Two-Octave Scale: Concert B♭', 'technique_scale', 'UIL Zone 3 · Scales', 'Perform the Concert B♭ major scale across two full octaves.', 150),
+    CH('z3_aural_intervals', 'Aural: Simple Intervals', 'aural_interval_quest', 'UIL Zone 3 · Aural', 'Identify three simple intervals by ear: unison, perfect octave, and perfect fifth.', 75),
+    CH('z3_aural_two_bar', 'Rhythm Echo: Two-Bar Patterns', 'aural_rhythm_echo', 'UIL Zone 3 · Aural', 'Listen to a two-bar rhythm pattern and tap it back.', 75),
+    CH('z3_cresc_decresc_long', 'Crescendo and Decrescendo', 'prepared_performance', 'UIL Zone 3 · Dynamics', 'Perform an 8-bar phrase with a full dynamic arc: p → mf → f → mf → p.', 150, false),
+  ],
+  concerta: [
+    CH('z3_accent', 'Articulation: Accent', 'prepared_performance', 'UIL Zone 3 · Articulation', 'Perform a phrase with accented notes. The accent (>) mark means a sudden, heavier attack.', 150),
+    {
+      kind: 'gate', label: 'Perform', icon: '🏆', unlock: z3AllRequired,
+      winKey: 'z3_semifinal_won', awardType: 'mini_boss',
+      challenge: {
+        id: 'z3_semifinal', title: 'Semifinal — vs Piano Preparatory', type: 'prepared_performance',
+        uilStandard: 'The Concerta Invitational · Semifinal', xpBase: 600,
+        description: 'Perform your prepared piece for the judges. Piano Preparatory just played a crisp, confident set — match or beat them (Good or better) to reach the final.',
+      },
+    },
+    {
+      kind: 'gate', label: 'Perform', icon: '🏆', unlock: z3SemifinalWon, advanceTo: 4,
+      winKey: 'z3_contest_won', awardType: 'zone_boss', gearKey: 'z3_contest_won',
+      challenge: {
+        id: 'z3_final', title: 'Final — vs The String School', type: 'prepared_performance',
+        uilStandard: 'The Concerta Invitational · Final', xpBase: 1500,
+        description: 'The whole town has packed the square. The String School are the favorites — perform a Sacred Score fragment and take the trophy (Good or better).',
+      },
+    },
+  ],
+};
+
+// ── Zone 4 · The Grand Auditorium (graduation → the Shattering) ──────────────
+const Z4_REQUIRED = [
+  'z4_ab_scale', 'z4_syncopation', 'z4_sight_reading_1',
+  'z4_aural_major_minor', 'z4_ensemble_fragment',
+];
+const z4AllRequired = (c: Character) => Z4_REQUIRED.every((id) => done(c, id));
+
+const ZONE4: Record<string, Activity[]> = {
+  backstage: [
+    CH('z4_ab_scale', 'Concert A♭ Major Scale', 'technique_scale', 'UIL Zone 4 · Scales', 'Play the Concert A♭ major scale. Four flats — check your key signature.', 150),
+    CH('z4_syncopation', 'Rhythm: Basic Syncopation', 'rhythm_performance', 'UIL Zone 4 · Rhythm', 'Tap a pattern with a tie across the barline — the off-beat held into the next measure.', 150),
+    CH('z4_sight_reading_1', 'Sight-Reading: Grade 1–2 Excerpt', 'prepared_performance', 'UIL Zone 4 · Sight-Reading', 'A Grade 1–2 sight-reading excerpt. Study time: 60 seconds. Then perform.', 225),
+    CH('z4_aural_major_minor', 'Aural: Major vs. Minor', 'aural_chord_oracle', 'UIL Zone 4 · Aural', 'Listen to short passages and identify whether each is major or minor.', 75),
+    CH('z4_ensemble_fragment', 'Dress Rehearsal: Sacred Score Fragment', 'prepared_performance', 'UIL Zone 4 · Ensemble', 'Rehearse your part in the Sacred Score fragment with your section — the piece you\'ll perform at graduation.', 500),
+    CH('z4_all_bb_eb_f', 'Scale Review: B♭, E♭, F', 'technique_scale', 'UIL Zone 4 · Scales', 'Play Concert B♭, E♭, and F major scales back-to-back without stopping.', 150, false),
+    CH('z4_staccato_tenuto', 'Articulation: Staccato and Tenuto', 'prepared_performance', 'UIL Zone 4 · Articulation', 'Perform a 4-bar phrase alternating between staccato (detached) and tenuto (full value) markings.', 150, false),
+  ],
+  grand_auditorium: [
+    {
+      kind: 'gate', label: 'Perform', icon: '🎓', unlock: z4AllRequired, advanceTo: 5, climax: 'shatter',
+      winKey: 'z4_graduation', awardType: 'zone_boss', gearKey: 'z4_graduation',
+      challenge: {
+        id: 'z4_graduation', title: 'The Graduation Performance', type: 'prepared_performance',
+        uilStandard: 'Zone 4 · Graduation', xpBase: 1500,
+        description: 'Your final performance as a student: your part in a restored Sacred Score fragment, with the whole Academy listening. Good or better to graduate — and then, the Renewal.',
+      },
+    },
+  ],
+};
+
+const ZONE_CONTENT: Record<number, Record<string, Activity[]>> = { 1: ZONE1, 2: ZONE2, 3: ZONE3, 4: ZONE4 };
 
 /** Activities available at a location (unlock gates still apply in the UI). */
 export function locationActivities(zoneId: number, locationId: string): Activity[] {
@@ -111,6 +187,7 @@ export function locationActivities(zoneId: number, locationId: string): Activity
 
 /** Required-challenge progress for a zone's header bar. */
 export function zoneRequired(zoneId: number): string[] {
-  return zoneId === 1 ? Z1_REQUIRED : zoneId === 2 ? Z2_REQUIRED : [];
+  return zoneId === 1 ? Z1_REQUIRED : zoneId === 2 ? Z2_REQUIRED
+    : zoneId === 3 ? Z3_REQUIRED : zoneId === 4 ? Z4_REQUIRED : [];
 }
 export { countDone };

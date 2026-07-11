@@ -2,7 +2,7 @@ import { LOCATIONS, type GameLocation } from '../locations';
 
 // Zones that use the new location-based world. Grows each migration phase;
 // unlisted zones keep their legacy bespoke page.
-export const LOCATION_BASED_ZONES = new Set<number>([1, 2]);
+export const LOCATION_BASED_ZONES = new Set<number>([1, 2, 3, 4]);
 
 export function isLocationBasedZone(zoneId: number): boolean {
   return LOCATION_BASED_ZONES.has(zoneId);
@@ -36,6 +36,26 @@ export const MAP_NODES: Record<string, MapNode> = {
   theory_stacks: {
     x: 70, y: 60,
     blurb: 'Deep in the library stacks, shelves lean with crossed-out references to a "forbidden interval." Something mis-played once still echoes down the aisles.',
+  },
+
+  // ── Zone 3 · The City of Concerta ──
+  concerta: {
+    x: 64, y: 40, entry: true,
+    blurb: 'The great central metropolis, dressed for the regional contest — banners strung rooftop to rooftop, every guild hall flying its colors, the square packed for the Concerta Invitational.',
+  },
+  crotchet: {
+    x: 28, y: 58,
+    blurb: 'A quiet practice quarter on the road in from the Staff Range, where visiting schools warm up before the contest. Reeds soak, scales climb the alley walls, and nerves settle.',
+  },
+
+  // ── Zone 4 · The Grand Auditorium ──
+  backstage: {
+    x: 30, y: 56, entry: true,
+    blurb: 'The wings of the great hall on graduation night — risers stacked, sections warming up, the Sacred Score fragment waiting on every stand. Somewhere out front, the Maestros ready the Renewal.',
+  },
+  grand_auditorium: {
+    x: 66, y: 38,
+    blurb: 'The Academy\'s crown jewel, lit gold for graduation. One performance stands between you and the rest of your life — and then, as every year, the Maestros will play the Renewal that keeps the world turning.',
   },
 };
 
