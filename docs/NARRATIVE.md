@@ -15,7 +15,10 @@ Score** — the unified body of the ten **Sacred Scores** — sustains its vital
 
 The Grand Symphony is performed by ten **Maestros**, the section leaders of the world's music
 — who also serve as the **professors of Harmonia Academy**, training each new generation. To
-direct them, the Composer appointed a **Conductor: Vexus.**
+direct them, the Composer created the office of **Conductor**. Its first holder, **Fennelio**,
+led the early Renewals — then passed his baton to his chosen successor, **Vexus**, and founded
+**Harmonia Academy** to school every generation of players that came after. Fennelio is today
+the Academy's Headmaster; Vexus stands on the podium in his place.
 
 Once a year, at the Academy's **graduation**, after the graduating students give their final
 performance, the Maestros take the stage and perform the Grand Symphony Score under Vexus's
@@ -24,8 +27,10 @@ most beloved tradition in the world, and this year's graduates have waited their
 to witness it as alumni.
 
 ### The Shattering
-Obsessed with proving himself the Composer's **equal**, Vexus has secretly rewritten this
-year's Score, threading **tritones** through it. At the Renewal, the Maestros raise their
+Obsessed with proving himself the Composer's **equal**, Vexus had long pored over the ten
+original Sacred Scores in the Academy's own theory halls — finding them beautiful but, to his
+ear, **timid**: full of dissonance the Composer had been too cautious to resolve his way. So he
+has secretly rewritten this year's Score, threading **tritones** through it. At the Renewal, the Maestros raise their
 instruments and begin — and as they play his tritonal score they grow visibly more disturbed:
 the intervals fight their hands and ears, the harmony curdles, the tension and dynamics climb
 with nowhere to resolve, until the music drives itself to a breaking point and the Score
@@ -54,8 +59,9 @@ Composer was too timid to write.
 
 ## 2. The Central Theme
 
-- **Hubris and vindication.** Vexus was the Composer's own appointed Conductor — and tried to
-  prove himself the Composer's equal. That overreach broke the world.
+- **Hubris and vindication.** Vexus carried the Composer's own baton — the office created to
+  serve the Grand Symphony, handed down to him by Fennelio himself — and tried to prove himself
+  the Composer's equal. That overreach broke the world.
 - **Tragic, but still stopped.** Vexus genuinely believes the decay he spreads is beauty. He
   cannot hear what he has done. He is not malicious — he is *blind* — and that is what makes
   him tragic. He must still be stopped.
@@ -122,8 +128,10 @@ party. Their arc: an ordinary graduate who, through practice and ensemble, **pro
 Vexus denied** — that living musicians matter — by saving the very professors who taught them.
 
 ### Allies
-- **Headmaster Fennelio** — the Academy's administrator; survives the Shattering dulled but
-  lucid. Gives the students their first guidance and charge, but is too diminished to journey.
+- **Headmaster Fennelio** — founder of Harmonia Academy and the Grand Symphony's **first
+  Conductor**, who long ago passed his baton to Vexus and turned to teaching. Survives the
+  Shattering dulled but lucid; gives the students their first guidance and charge, but is too
+  diminished to journey. (The betrayal is personal — he chose Vexus as his successor.)
 - **Maestro Persichetti** (theory) & **Maestro Barenboimi** (conducting) — non-performing
   academic staff who survive alongside Fennelio as advisors at the Academy.
 - **Valeria Croft** — a recent graduate, untouched by the corruption; **leads the expedition**

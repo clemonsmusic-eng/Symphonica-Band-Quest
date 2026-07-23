@@ -133,13 +133,14 @@ covered above; Temple of Sound is off the Recital Hall).
 
 ---
 
-## New canon introduced here (fold into NARRATIVE.md)
+## New canon introduced here (reconciled into NARRATIVE.md §1–2)
 
-Two story beats added while casting the Academy — worth reconciling with `NARRATIVE.md`:
+Two story beats added while casting the Academy, now folded into `NARRATIVE.md`:
 
 - **Fennelio is the founding Conductor of the Grand Symphony.** He led the very
   first Renewals, then passed his baton to **Vexus** and founded Harmonia Academy
-  to train the Maestros. (Deepens the betrayal — Vexus inherited the podium.)
+  to train the Maestros. (Deepens the betrayal — Vexus inherited the podium, and
+  Fennelio *chose* him.)
 - **Vexus is present at the Academy before the Shattering**, in the Theory
   Classroom, already annotating the ten original Renewal scores and finding them
   "beautiful, but timid" — the seed of his rewrite, in plain sight.
