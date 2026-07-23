@@ -57,7 +57,7 @@ graph TD
   mhall --- reeds["Single Reed Sanctum · cl+sax"]
   mhall --- brass["Brassatorium · brass x4"]
   library --- listening[Listening Room]
-  recital --- oboe["Oboe Temple · oboe (Hautbois)"]
+  recital --- oboe["Temple of Sound · oboe (Hautbois)"]
 
   classDef z1 fill:#7a5a1e22,stroke:#c9a227;
   classDef z2 fill:#6a5a8a22,stroke:#8f7ec2;
@@ -67,7 +67,7 @@ graph TD
 
 The ten Maestros keep **six offices, grouped by instrument family** (the flute
 maestro's Clinic and the bassoon maestro's Library double as those rooms; the
-Oboe Temple sits off the Recital Hall):
+Temple of Sound sits off the Recital Hall):
 
 | Office | Maestro(s) | Instrument(s) |
 |---|---|---|
@@ -76,7 +76,7 @@ Oboe Temple sits off the Recital Hall):
 | **Paige's Workshop** | Paige | percussion — drum kit + artificer's bench (foreshadows her Concerta forge) |
 | **The Single Reed Sanctum** | Clarence, Adolpha | clarinet, alto sax |
 | **The Brassatorium** | Cornelius, Sackbut, Waldhorn, Torbult | trumpet, trombone, French horn, tuba |
-| **The Oboe Temple** | Hautbois | oboe — a mystical shrine off the Recital Hall; birthplace of the tuning A |
+| **The Temple of Sound** | Hautbois | oboe — a mystical shrine off the Recital Hall; birthplace of the tuning A |
 
 ## Rooms
 
@@ -96,7 +96,7 @@ Oboe Temple sits off the Recital Hall):
 | **Main Hall** | _new_ (hub) | — | Central corridor; the Academy banner; directory to every wing. |
 | **Rehearsal Hall** | `rehearsal_halls` | Maestro Barenboimi | Talk Barenboimi (story); **challenge stands** → Zone 1 required challenges. |
 | **Concert Hall** | _new_ | — | The grand hall where the class first sounds like one ensemble (Zone 2 ensemble / Winter Concert). |
-| **Recital Hall** | `rehearsal_halls` | (Fennelio at graduation) | **Step onto the stage** → Boot Camp graduation gate; reserved Maestro seats. The **Oboe Temple** opens off it. |
+| **Recital Hall** | `rehearsal_halls` | (Fennelio at graduation) | **Step onto the stage** → Boot Camp graduation gate; reserved Maestro seats. The **Temple of Sound** opens off it. |
 | **Dining Hall** | _new_ | classmates | Sign: **Concerta Invitational** (foreshadows Zone 3); classmate chatter. |
 | **Dormitory** | _new_ | Piper, Reed | Talk Piper / Reed → **classmate recruitment**; **rest at your bunk** (save/mend). |
 
@@ -115,7 +115,7 @@ Oboe Temple sits off the Recital Hall):
 
 ### Upper floor — the Maestro Hallway & offices
 The section leaders' six offices open off the Maestro Hallway (Clinic and Library
-covered above; Oboe Temple is off the Recital Hall).
+covered above; Temple of Sound is off the Recital Hall).
 
 | Room | Maps to | Who's here | Key hotspots / hooks |
 |---|---|---|---|
@@ -129,9 +129,27 @@ covered above; Oboe Temple is off the Recital Hall).
 ### Off the Recital Hall
 | Room | Maps to | Who's here | Key hotspots / hooks |
 |---|---|---|---|
-| **The Oboe Temple** | _new_ | Maestro Hautbois (oboe) | A mystical shrine to music. Talk Hautbois; **sound the sacred A** (the tuning pitch the whole Academy bows to). |
+| **The Temple of Sound** | _new_ | Maestro Hautbois (oboe) | A mystical shrine to music. Talk Hautbois; **sound the sacred A** (the tuning pitch the whole Academy bows to). |
 
 ---
+
+## Adventure-game layer (prototype)
+
+A light **inventory** demonstrates Space Quest–style item logic — pick something
+up in one room, use it in another. Prototyped in the interactive map; a real build
+would persist `carrying` per character alongside `currentRoom`.
+
+| Item | Found in | Used in | Effect |
+|---|---|---|---|
+| **Tuning Fork** | Temple of Sound | Concert Hall | Tune the concert grand (a "use" gated on carrying the fork). |
+| **Library Card** | Library | Listening Room | Unlock the sealed ARCHIVE cylinder. |
+| **Pressed Flower** | Garden | Theory Classroom | Give to Piccola — eases her stage fright (consumed on give). |
+| **Warm Pretzel** | Dining Hall | — | Flavor pickup. |
+
+Pattern: a room may declare `pickups` (a "Take …" action that adds an item and
+then disappears) and `uses` (an action gated on carrying an item; shows a helpful
+"you'd need X" hint when you don't, and can consume the item — e.g. a gift). This
+is the same hotspot mechanism, just item-aware.
 
 ## Engine integration
 
