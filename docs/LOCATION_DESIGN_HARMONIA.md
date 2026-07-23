@@ -49,18 +49,34 @@ graph TD
   main --- mhall[Maestro Hallway]
   concert --- rehearsal[Rehearsal Hall]
   rehearsal --- mhall
-  mhall --- offices[Maestro Offices]
   mhall --- head[Headmaster's Office]
-  mhall --- clinic[Clinic]
-  mhall --- library[Library]
+  mhall --- clinic["Clinic · flute (Flaura)"]
+  mhall --- library["Library · bassoon (Fagotto)"]
   mhall --- history[Music History Classroom]
+  mhall --- paige["Paige's Workshop · perc"]
+  mhall --- reeds["Single Reed Sanctum · cl+sax"]
+  mhall --- brass["Brassatorium · brass x4"]
   library --- listening[Listening Room]
+  recital --- oboe["Oboe Temple · oboe (Hautbois)"]
 
   classDef z1 fill:#7a5a1e22,stroke:#c9a227;
   classDef z2 fill:#6a5a8a22,stroke:#8f7ec2;
   class rehearsal,practice z1;
   class theory,library,listening,history z2;
 ```
+
+The ten Maestros keep **six offices, grouped by instrument family** (the flute
+maestro's Clinic and the bassoon maestro's Library double as those rooms; the
+Oboe Temple sits off the Recital Hall):
+
+| Office | Maestro(s) | Instrument(s) |
+|---|---|---|
+| **The Clinic** | Flaura | flute — also the infirmary / heal point |
+| **The Library** | Fagotto | bassoon — shared with Dr. Sol, the librarian |
+| **Paige's Workshop** | Paige | percussion — drum kit + artificer's bench (foreshadows her Concerta forge) |
+| **The Single Reed Sanctum** | Clarence, Adolpha | clarinet, alto sax |
+| **The Brassatorium** | Cornelius, Sackbut, Waldhorn, Torbult | trumpet, trombone, French horn, tuba |
+| **The Oboe Temple** | Hautbois | oboe — a mystical shrine off the Recital Hall; birthplace of the tuning A |
 
 ## Rooms
 
@@ -80,7 +96,7 @@ graph TD
 | **Main Hall** | _new_ (hub) | — | Central corridor; the Academy banner; directory to every wing. |
 | **Rehearsal Hall** | `rehearsal_halls` | Maestro Barenboimi | Talk Barenboimi (story); **challenge stands** → Zone 1 required challenges. |
 | **Concert Hall** | _new_ | — | The grand hall where the class first sounds like one ensemble (Zone 2 ensemble / Winter Concert). |
-| **Recital Hall** | `rehearsal_halls` | (Fennelio at graduation) | **Step onto the stage** → Boot Camp graduation gate; reserved Maestro seats. |
+| **Recital Hall** | `rehearsal_halls` | (Fennelio at graduation) | **Step onto the stage** → Boot Camp graduation gate; reserved Maestro seats. The **Oboe Temple** opens off it. |
 | **Dining Hall** | _new_ | classmates | Sign: **Concerta Invitational** (foreshadows Zone 3); classmate chatter. |
 | **Dormitory** | _new_ | Piper, Reed | Talk Piper / Reed → **classmate recruitment**; **rest at your bunk** (save/mend). |
 
@@ -88,7 +104,7 @@ graph TD
 | Room | Maps to | Who's here | Key hotspots / hooks |
 |---|---|---|---|
 | **Theory Classroom** | `theory_wing` | Maestro Persichetti, Piccola | Talk Persichetti (story); Talk Piccola → **Stage Fright**; chalkboard. Zone 2 required challenges. |
-| **Library** | `library_stacks` | Dr. Sol | Talk Dr. Sol → **The Misfiled Interval**; struck-through **tritone** catalog; **follow the echo** → **Interval Imp** (mini-boss); the humming score (foreshadows the Shattering). |
+| **Library** | `library_stacks` | Maestro Fagotto (bassoon), Dr. Sol | Bassoon maestro's office. Talk Dr. Sol → **The Misfiled Interval**; struck-through **tritone** catalog; **follow the echo** → **Interval Imp** (mini-boss); Fagotto's warning about the sealed archive (foreshadows the Shattering). |
 | **Listening Room** | aural (Zone 1/2) | — | **Put on the headphones** → aural challenges (Pitch Spy, Rhythm Echo, intervals); recordings of past Renewals. |
 | **Music History Classroom** | _new_ | — | Timeline of the Composer & the Renewal; a mural of the Grand Symphony with **"Vexus, Conductor"** (foreshadows Vexus). |
 
@@ -97,13 +113,23 @@ graph TD
 |---|---|---|---|
 | **Practice Rooms** | `practice_rooms` | Reeda, Tick | Talk Reeda → **The Squeaky Door**; Talk Tick → **Keeping Time**; **the room at the end** → the **Rest Wraith** (Zone 1 mini-boss). |
 
-### Upper floor — the Maestros
+### Upper floor — the Maestro Hallway & offices
+The section leaders' six offices open off the Maestro Hallway (Clinic and Library
+covered above; Oboe Temple is off the Recital Hall).
+
 | Room | Maps to | Who's here | Key hotspots / hooks |
 |---|---|---|---|
-| **Maestro Hallway** | _new_ (hub) | — | Ten office doors + portraits of the ten Maestros; the Renewal notice (lore / foreshadow). |
-| **Maestro Offices** | _new_ | (section leaders) | Peek into a studio — the teachers you'll one day have to save (foreshadow); the Grand Symphony portrait. |
+| **Maestro Hallway** | _new_ (hub) | — | Portraits of the ten Maestros; the six family offices open off it; the Renewal notice (lore/foreshadow). |
+| **Clinic** | _new_ | Maestra Flaura (flute) | Flute maestro's studio + infirmary. **Rest and mend** (restore HP); Flaura's worry about students “grey around the edges” (quiet foreshadow). |
+| **Paige's Workshop** | _new_ | Maestra Paige (perc) | Drum kit + artificer's bench. Talk Paige (foreshadows her Concerta forge); the workbench of half-mended gear. |
+| **The Single Reed Sanctum** | _new_ | Clarence, Adolpha | Talk the clarinet & sax maestros; the reed benches. |
+| **The Brassatorium** | _new_ | Cornelius, Sackbut, Waldhorn, Torbult | Talk the four brass maestros; the wall of brass. |
 | **Headmaster's Office** | _new_ | Director Fennelio | Talk Fennelio (graduation charge / story); the Academy seal. |
-| **Clinic** | _new_ | the Nurse | **Rest and mend** (restore HP); the nurse's worry about students “grey around the edges” (quiet foreshadow). |
+
+### Off the Recital Hall
+| Room | Maps to | Who's here | Key hotspots / hooks |
+|---|---|---|---|
+| **The Oboe Temple** | _new_ | Maestro Hautbois (oboe) | A mystical shrine to music. Talk Hautbois; **sound the sacred A** (the tuning pitch the whole Academy bows to). |
 
 ---
 
@@ -137,7 +163,7 @@ The rooms reuse what's already built; nothing about combat/challenges changes.
 1. Do connective/lore rooms (Main Hall, Courtyard, Maestro Hallway, Clinic…) get
    their own `GameLocation` entries, or borrow a cluster id? (Affects where
    encounters can fire — a corridor vs. a rehearsal hall.)
-2. Art: one static scene image per room (19 here) via the same FF6 pixel-art
+2. Art: one static scene image per room (22 here) via the same FF6 pixel-art
    pipeline as the intro. Which rooms are must-have vs. text-only to start?
 3. Zone boundaries inside one building: Boot Camp (Zone 1) and Theory (Zone 2)
    share the Academy — does moving between their rooms advance the "zone," or is
