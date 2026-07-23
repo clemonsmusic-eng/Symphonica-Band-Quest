@@ -86,32 +86,32 @@ Temple of Sound sits off the Recital Hall):
 | Room | Maps to | Who's here | Key hotspots / hooks |
 |---|---|---|---|
 | **Entry Gate** | _new_ (entry) | — | View of Concerta in the valley; the treble-clef gate. Entry / return-to-world. |
-| **Courtyard** | _new_ (hub) | students | **Quest Board** (surfaces Zone 1 side-quests); statue of The Composer (lore). |
-| **Garden** | _new_ | — | Bench (quiet beat); the Renewal tree (quiet foreshadow). |
-| **Reflecting Pond** | _new_ | — | Look into the water (a reflection ripples wrong — subtle foreshadow); toss a coin. |
+| **Courtyard** | _new_ (hub) | Piper, Cora | Piper & Cora transfixed by the statue of The Composer (recruitable). (Quest Board moved to the Main Hall.) |
+| **Garden** | _new_ | Maestro Waldhorn | Waldhorn (horn maestro) walking the path; the bench; the Renewal tree; **pick a flower** (item). |
+| **Reflecting Pond** | _new_ | Obie | Obie (oboe student — reflective-but-cheerful; recruitable); the reflection that ripples wrong (foreshadow). |
 
 ### Ground floor — the Main Hall & performance rooms
 | Room | Maps to | Who's here | Key hotspots / hooks |
 |---|---|---|---|
-| **Main Hall** | _new_ (hub) | — | Central corridor; the Academy banner; directory to every wing. |
+| **Main Hall** | _new_ (hub) | — | **Quest Board** (surfaces Zone 1 side-quests); the Academy banner; the directory; "listen to the Academy". |
 | **Rehearsal Hall** | `rehearsal_halls` | Maestro Barenboimi | Talk Barenboimi (story); **challenge stands** → Zone 1 required challenges. |
-| **Concert Hall** | _new_ | — | The grand hall where the class first sounds like one ensemble (Zone 2 ensemble / Winter Concert). |
-| **Recital Hall** | `rehearsal_halls` | (Fennelio at graduation) | **Step onto the stage** → Boot Camp graduation gate; reserved Maestro seats. The **Temple of Sound** opens off it. |
-| **Dining Hall** | _new_ | classmates | Sign: **Concerta Invitational** (foreshadows Zone 3); classmate chatter. |
-| **Dormitory** | _new_ | Piper, Reed | Talk Piper / Reed → **classmate recruitment**; **rest at your bunk** (save/mend). |
+| **Concert Hall** | _new_ | — | The grand hall (Zone 2 ensemble / Winter Concert); **tune the grand** with the Tuning Fork (item use). |
+| **Recital Hall** | `rehearsal_halls` | Sackbut, Torbult | The trombone & tuba maestros' note-holding contest; **step onto the stage** → graduation gate; the **Temple of Sound** opens off it. |
+| **Dining Hall** | _new_ | Tommy, Otto | Tommy & Otto forever eating (recruitable); **Concerta Invitational** sign (Zone 3); a warm pretzel (item). |
+| **Dormitory** | _new_ | Gene | Gene tinkering with aux instruments to show Paige (recruitable); **rest at your bunk** (save/mend). |
 
 ### Study wing (Zone 2) & aural
 | Room | Maps to | Who's here | Key hotspots / hooks |
 |---|---|---|---|
-| **Theory Classroom** | `theory_wing` | Maestro Persichetti, Piccola | Talk Persichetti (story); Talk Piccola → **Stage Fright**; chalkboard. Zone 2 required challenges. |
-| **Library** | `library_stacks` | Maestro Fagotto (bassoon), Dr. Sol | Bassoon maestro's office. Talk Dr. Sol → **The Misfiled Interval**; struck-through **tritone** catalog; **follow the echo** → **Interval Imp** (mini-boss); Fagotto's warning about the sealed archive (foreshadows the Shattering). |
-| **Listening Room** | aural (Zone 1/2) | — | **Put on the headphones** → aural challenges (Pitch Spy, Rhythm Echo, intervals); recordings of past Renewals. |
+| **Theory Classroom** | `theory_wing` | Persichetti, Piccola, **Vexus** | Talk Persichetti; Talk Piccola → **Stage Fright** (gift her the flower); **watch Vexus** annotating the ten Renewal scores — "beautiful, but timid" (foreshadow). Zone 2 challenges. |
+| **Library** | `library_stacks` | Fagotto, Dr. Sol, Reed | Bassoon maestro's office. Talk Dr. Sol → **The Misfiled Interval**; **tritone** catalog; **follow the echo** → **Interval Imp**; Reed deep in Symphonica's history (recruitable); **borrowing card** (item). |
+| **Listening Room** | aural (Zone 1/2) | Zoot | Zoot ("know what's come before"; recruitable); **headphones** → aural challenges; **play the sealed cylinder** (needs the library card). |
 | **Music History Classroom** | _new_ | — | Timeline of the Composer & the Renewal; a mural of the Grand Symphony with **"Vexus, Conductor"** (foreshadows Vexus). |
 
 ### Zone 1 — practice
 | Room | Maps to | Who's here | Key hotspots / hooks |
 |---|---|---|---|
-| **Practice Rooms** | `practice_rooms` | Reeda, Tick | Talk Reeda → **The Squeaky Door**; Talk Tick → **Keeping Time**; **the room at the end** → the **Rest Wraith** (Zone 1 mini-boss). |
+| **Practice Rooms** | `practice_rooms` | Reeda, Tick, Benny | Talk Reeda → **The Squeaky Door**; Talk Tick → **Keeping Time**; Benny drilling technique (recruitable); **the room at the end** → the **Rest Wraith** (mini-boss). |
 
 ### Upper floor — the Maestro Hallway & offices
 The section leaders' six offices open off the Maestro Hallway (Clinic and Library
@@ -121,10 +121,10 @@ covered above; Temple of Sound is off the Recital Hall).
 |---|---|---|---|
 | **Maestro Hallway** | _new_ (hub) | — | Portraits of the ten Maestros; the six family offices open off it; the Renewal notice (lore/foreshadow). |
 | **Clinic** | _new_ | Maestra Flaura (flute) | Flute maestro's studio + infirmary. **Rest and mend** (restore HP); Flaura's worry about students “grey around the edges” (quiet foreshadow). |
-| **Paige's Workshop** | _new_ | Maestra Paige (perc) | Drum kit + artificer's bench. Talk Paige (foreshadows her Concerta forge); the workbench of half-mended gear. |
-| **The Single Reed Sanctum** | _new_ | Clarence, Adolpha | Talk the clarinet & sax maestros; the reed benches. |
-| **The Brassatorium** | _new_ | Cornelius, Sackbut, Waldhorn, Torbult | Talk the four brass maestros; the wall of brass. |
-| **Headmaster's Office** | _new_ | Director Fennelio | Talk Fennelio (graduation charge / story); the Academy seal. |
+| **Paige's Workshop** | _new_ | Maestra Paige (perc) | Concert percussion — timpani, snare, auxiliary station, xylophone — + artificer's bench. Talk Paige (foreshadows her Concerta forge). |
+| **The Single Reed Sanctum** | _new_ | Clarence, Adolpha | Clarence shaving reeds & throwing them like stars; Adolpha ripping dom-7 arpeggios & modal scales in every key at absurd tempo. |
+| **The Brassatorium** | _new_ | Cornelius | Only Cornelius is home, composing brass-ensemble music (Waldhorn's in the garden; Sackbut & Torbult in the recital hall). |
+| **Headmaster's Office** | _new_ | Director Fennelio | Talk Fennelio (graduation charge); **ask about the Grand Symphony** → he's the founding Conductor who passed the baton to Vexus; his ever-unfinished ensemble treatise. |
 
 ### Off the Recital Hall
 | Room | Maps to | Who's here | Key hotspots / hooks |
@@ -132,6 +132,17 @@ covered above; Temple of Sound is off the Recital Hall).
 | **The Temple of Sound** | _new_ | Maestro Hautbois (oboe) | A mystical shrine to music. Talk Hautbois; **sound the sacred A** (the tuning pitch the whole Academy bows to). |
 
 ---
+
+## New canon introduced here (fold into NARRATIVE.md)
+
+Two story beats added while casting the Academy — worth reconciling with `NARRATIVE.md`:
+
+- **Fennelio is the founding Conductor of the Grand Symphony.** He led the very
+  first Renewals, then passed his baton to **Vexus** and founded Harmonia Academy
+  to train the Maestros. (Deepens the betrayal — Vexus inherited the podium.)
+- **Vexus is present at the Academy before the Shattering**, in the Theory
+  Classroom, already annotating the ten original Renewal scores and finding them
+  "beautiful, but timid" — the seed of his rewrite, in plain sight.
 
 ## Adventure-game layer (prototype)
 
