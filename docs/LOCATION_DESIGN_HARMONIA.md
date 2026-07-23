@@ -5,12 +5,17 @@ discrete **rooms**, each a static illustrated scene with a short description,
 a few **exits** to adjacent rooms, and **hotspots** to look at / talk to / do.
 No animation — just click through rooms and choose prompts.
 
+Built to the uploaded **Harmonia Academy floor plan** (`docs/assets/` reference):
+a top-down, T-shaped building — Entry Gate → Courtyard feeding the ground-floor
+**Main Hall** hub, with the **Maestro Hallway** as the upper hub.
+
 > **Interactive prototype:** the clickable version of this map (navigate room to
 > room, see scenes/exits/options) is published as an Artifact. Ask Claude for the
 > link, or rebuild from this spec.
 
-This is the first location designed at room granularity. It deliberately builds on
-the existing engine rather than replacing it (see **Engine integration** below).
+> **Direction (decided):** the room view **replaces the top-down node map in every
+> zone.** `ExplorePage`'s node map is retired in favor of a room-based `RoomView`;
+> each zone gets decomposed into rooms the way the Academy is here.
 
 ---
 
@@ -19,77 +24,86 @@ the existing engine rather than replacing it (see **Engine integration** below).
 | Concept | Meaning |
 |---|---|
 | **Room** | One screen: a scene image, a description (adventure-game second person), exits, and hotspots. The unit of navigation. |
-| **Exit** | A directional link to an adjacent room (`N/S/E/W`, `U/D` for stairs, `IN/OUT` for deeper rooms). Bidirectional. |
-| **Hotspot** | A `Look / Talk / Listen / Read / Step / Rest …` action that prints a response. Some hotspots are **hooks** into existing systems (a challenge, a side-quest offer, a mini-boss, a story beat). |
-| **Cluster** | A group of rooms that rolls up to one existing `location` in `locations.ts` (so encounters/zone logic keep working). |
+| **Exit** | A link to an adjacent room. On a top-down floor plan, direction (N/S/E/W arrow + "Head north …") is derived from the two rooms' positions. Bidirectional. |
+| **Hotspot** | A `Look / Talk / Listen / Read / Rest …` action that prints a response. Some hotspots are **hooks** into existing systems (a challenge, a side-quest, a mini-boss, a story beat). |
+| **Cluster** | A group of rooms that rolls up to one `location` in `locations.ts`, so encounters/zone logic keep working. |
 
-The Academy is the Act I home base; **Zone 1** (Rehearsal Halls) and **Zone 2**
-(Theory Wing) both live inside it. Rooms in the four existing clusters map to
-current `locations.ts` ids; the rest are new connective tissue.
+The Academy is the Act I home base; **Zone 1** (Boot Camp) and **Zone 2** (Theory)
+both live inside it. Rooms in those clusters map to current `locations.ts` ids; the
+rest are new connective tissue and lore/utility rooms.
 
 ## Room graph
 
 ```mermaid
 graph TD
-  gates[Academy Gates] --- courtyard[Grand Courtyard]
-  courtyard --- dining[Dining Commons]
-  courtyard --- gardens[Cloister Gardens]
-  courtyard --- foyer[Main Foyer]
-  foyer --- rehearsal[Rehearsal Halls]
-  foyer --- theory[Theory Wing]
-  foyer --- landing[Upper Landing]
-  foyer --- practice[Practice Rooms]
-  rehearsal --- storage[Instrument Storage]
-  rehearsal --- recital[Recital Hall]
-  practice --- quiet[Quiet Practice Room]
-  theory --- classroom[Chalkboard Classroom]
-  theory --- library[Library Stacks]
-  library --- archive[Sealed Archive]
-  landing --- dorm[Student Dormitory]
-  landing --- office[Headmaster's Office]
+  gate[Entry Gate] --- court[Courtyard]
+  court --- garden[Garden]
+  court --- pond[Reflecting Pond]
+  court --- main[Main Hall]
+  main --- dining[Dining Hall]
+  main --- dorm[Dormitory]
+  main --- concert[Concert Hall]
+  main --- recital[Recital Hall]
+  main --- practice[Practice Rooms]
+  main --- theory[Theory Classroom]
+  main --- mhall[Maestro Hallway]
+  concert --- rehearsal[Rehearsal Hall]
+  rehearsal --- mhall
+  mhall --- offices[Maestro Offices]
+  mhall --- head[Headmaster's Office]
+  mhall --- clinic[Clinic]
+  mhall --- library[Library]
+  mhall --- history[Music History Classroom]
+  library --- listening[Listening Room]
 
   classDef z1 fill:#7a5a1e22,stroke:#c9a227;
   classDef z2 fill:#6a5a8a22,stroke:#8f7ec2;
-  class rehearsal,practice,storage,recital,quiet z1;
-  class theory,library,classroom,archive z2;
+  class rehearsal,practice z1;
+  class theory,library,listening,history z2;
 ```
 
 ## Rooms
 
-Legend for **Maps to**: an existing `locations.ts` id (cluster) or _new_.
+**Maps to**: an existing `locations.ts` cluster, or _new_.
 
-### Approach & hub
-| Room | Maps to | Exits | Who's here | Key hotspots / hooks |
-|---|---|---|---|---|
-| **The Academy Gates** | _new_ (entry) | N → Courtyard | — | Look at Concerta below; the treble-clef gates. Entry point / return-to-world. |
-| **The Grand Courtyard** | _new_ (hub) | S Gates · N Foyer · W Dining · E Gardens | passing students | **Quest Board** (surfaces Zone 1 side-quests); fountain; statue of The Composer (lore). |
-| **The Main Foyer** | _new_ (hub) | S Courtyard · W Rehearsal · E Theory · U Landing · D Practice | — | Portraits of the **ten Maestros** (lore/foreshadow); grand staircase. |
-| **The Dining Commons** | _new_ | E Courtyard | classmates | Sign: **Concerta Invitational** (foreshadows Zone 3); classmate chatter. |
-| **The Cloister Gardens** | _new_ | W Courtyard | — | Bench (quiet beat); the Renewal tree (quiet foreshadow). |
+### Approach & grounds
+| Room | Maps to | Who's here | Key hotspots / hooks |
+|---|---|---|---|
+| **Entry Gate** | _new_ (entry) | — | View of Concerta in the valley; the treble-clef gate. Entry / return-to-world. |
+| **Courtyard** | _new_ (hub) | students | **Quest Board** (surfaces Zone 1 side-quests); statue of The Composer (lore). |
+| **Garden** | _new_ | — | Bench (quiet beat); the Renewal tree (quiet foreshadow). |
+| **Reflecting Pond** | _new_ | — | Look into the water (a reflection ripples wrong — subtle foreshadow); toss a coin. |
 
-### Zone 1 cluster — Boot Camp (`rehearsal_halls`, `practice_rooms`)
-| Room | Maps to | Exits | Who's here | Key hotspots / hooks |
-|---|---|---|---|---|
-| **The Rehearsal Halls** | `rehearsal_halls` | E Foyer · W Storage · N Recital | Maestro Barenboimi | Talk Barenboimi (story); **challenge stands** → Zone 1 required challenges. |
-| **Instrument Storage** | `rehearsal_halls` | E Rehearsal | — | Loaner racks; workbench (flavor / future gear/repair). |
-| **The Recital Hall** | `rehearsal_halls` | S Rehearsal | (Fennelio at graduation) | **Step onto the stage** → Boot Camp graduation gate; Maestros' reserved seats. |
-| **The Practice Rooms** | `practice_rooms` | U Foyer · IN Quiet Room | Reeda, Tick | Talk Reeda → **The Squeaky Door**; Talk Tick → **Keeping Time**; the hungry hush (aural challenges live here). |
-| **A Quiet Practice Room** | `practice_rooms` | OUT Practice | — | **Face the silence** → the **Rest Wraith** (Zone 1 mini-boss); the rippling reed cup. |
+### Ground floor — the Main Hall & performance rooms
+| Room | Maps to | Who's here | Key hotspots / hooks |
+|---|---|---|---|
+| **Main Hall** | _new_ (hub) | — | Central corridor; the Academy banner; directory to every wing. |
+| **Rehearsal Hall** | `rehearsal_halls` | Maestro Barenboimi | Talk Barenboimi (story); **challenge stands** → Zone 1 required challenges. |
+| **Concert Hall** | _new_ | — | The grand hall where the class first sounds like one ensemble (Zone 2 ensemble / Winter Concert). |
+| **Recital Hall** | `rehearsal_halls` | (Fennelio at graduation) | **Step onto the stage** → Boot Camp graduation gate; reserved Maestro seats. |
+| **Dining Hall** | _new_ | classmates | Sign: **Concerta Invitational** (foreshadows Zone 3); classmate chatter. |
+| **Dormitory** | _new_ | Piper, Reed | Talk Piper / Reed → **classmate recruitment**; **rest at your bunk** (save/mend). |
 
-### Zone 2 cluster — Theory (`theory_wing`, `library_stacks`)
-| Room | Maps to | Exits | Who's here | Key hotspots / hooks |
-|---|---|---|---|---|
-| **The Theory Wing** | `theory_wing` | W Foyer · N Classroom · E Library | Maestro Persichetti, Piccola | Talk Persichetti (story); Talk Piccola → **Stage Fright**; the crossed-out old scores. Zone 2 required challenges. |
-| **The Chalkboard Classroom** | `theory_wing` | S Theory | — | Chalkboard (“dissonance demands resolution”); carved desks. |
-| **The Library Stacks** | `library_stacks` | W Theory · N Archive | Dr. Sol | Talk Dr. Sol → **The Misfiled Interval**; the struck-through **tritone** catalog; **follow the echo** → **Interval Imp** (Zone 2 mini-boss). |
-| **The Sealed Archive** | `library_stacks` | S Library | — | Chained cabinet; **the humming score** — a pitch between two notes (foreshadows the Shattering). |
+### Study wing (Zone 2) & aural
+| Room | Maps to | Who's here | Key hotspots / hooks |
+|---|---|---|---|
+| **Theory Classroom** | `theory_wing` | Maestro Persichetti, Piccola | Talk Persichetti (story); Talk Piccola → **Stage Fright**; chalkboard. Zone 2 required challenges. |
+| **Library** | `library_stacks` | Dr. Sol | Talk Dr. Sol → **The Misfiled Interval**; struck-through **tritone** catalog; **follow the echo** → **Interval Imp** (mini-boss); the humming score (foreshadows the Shattering). |
+| **Listening Room** | aural (Zone 1/2) | — | **Put on the headphones** → aural challenges (Pitch Spy, Rhythm Echo, intervals); recordings of past Renewals. |
+| **Music History Classroom** | _new_ | — | Timeline of the Composer & the Renewal; a mural of the Grand Symphony with **"Vexus, Conductor"** (foreshadows Vexus). |
 
-### Upstairs
-| Room | Maps to | Exits | Who's here | Key hotspots / hooks |
-|---|---|---|---|---|
-| **The Upper Landing** | _new_ (hub) | D Foyer · E Dormitory · W Office | — | Window over the courtyard/valley. |
-| **The Student Dormitory** | _new_ | W Landing | Piper, Reed | Talk Piper / Talk Reed → **classmate recruitment**; **rest at your bunk** (save/mend). |
-| **The Headmaster's Office** | _new_ | E Landing | Director Fennelio | Talk Fennelio (graduation charge / story); the Academy seal. |
+### Zone 1 — practice
+| Room | Maps to | Who's here | Key hotspots / hooks |
+|---|---|---|---|
+| **Practice Rooms** | `practice_rooms` | Reeda, Tick | Talk Reeda → **The Squeaky Door**; Talk Tick → **Keeping Time**; **the room at the end** → the **Rest Wraith** (Zone 1 mini-boss). |
+
+### Upper floor — the Maestros
+| Room | Maps to | Who's here | Key hotspots / hooks |
+|---|---|---|---|
+| **Maestro Hallway** | _new_ (hub) | — | Ten office doors + portraits of the ten Maestros; the Renewal notice (lore / foreshadow). |
+| **Maestro Offices** | _new_ | (section leaders) | Peek into a studio — the teachers you'll one day have to save (foreshadow); the Grand Symphony portrait. |
+| **Headmaster's Office** | _new_ | Director Fennelio | Talk Fennelio (graduation charge / story); the Academy seal. |
+| **Clinic** | _new_ | the Nurse | **Rest and mend** (restore HP); the nurse's worry about students “grey around the edges” (quiet foreshadow). |
 
 ---
 
@@ -99,32 +113,36 @@ The rooms reuse what's already built; nothing about combat/challenges changes.
 
 - **Rooms roll up to `locations.ts`.** Each room carries a `locationId` (its
   cluster). Encounter/zone logic stays location-based, so a room in the
-  `practice_rooms` cluster still triggers Zone 1 encounters. New connective rooms
-  (courtyard, foyer, dorm, office, archive, gardens, dining) can either get their
-  own lightweight `GameLocation` entries (Act 1) or borrow their cluster's id.
+  `practice_rooms` cluster still triggers Zone 1 encounters. New connective/lore
+  rooms either get a lightweight `GameLocation` entry (Act 1) or borrow a nearby
+  cluster's id — see open question 1.
 - **Scenes reuse existing primitives.** A room's description + hotspots are the
   same shape as the current `ExplorePage` scene panel: blurb, present NPCs
   (`npcsAt`), and activities (`locationActivities`). "Talk" hotspots route to the
   existing `LiberationScene` / quest-offer / recruitment flows; challenge and
   gate hotspots open `ChallengeModal`; mini-boss hotspots open `BattleScreen`.
-- **What's genuinely new** is the **room layer**: a `rooms` graph (id, name,
-  scene, `exits[]`, `hotspots[]`, `locationId`, map x/y) and a room-based
-  `ExploreRoom` view that renders one room's scene + exit buttons instead of the
-  top-down node map. Suggested home: `src/lib/world/rooms.ts` (data) + a
-  `RoomView` component; keep the current node map as a fallback for
-  not-yet-roomed zones behind a flag, exactly like `LOCATION_BASED_ZONES`.
+- **The new room layer (replaces the node map).** A `rooms` graph
+  (id, name, scene, `locationId`, `edges[]`, map x/y) plus a `RoomView` that
+  renders one room's scene + derived directional exits. `RoomView` **replaces**
+  the top-down node map in `ExplorePage` for every zone. Suggested home:
+  `src/lib/world/rooms.ts` (data) + a `RoomView` component. Roll it out per-zone
+  behind the existing `LOCATION_BASED_ZONES`-style flag so unconverted zones stay
+  playable during the migration.
 - **Movement/state:** `currentRoom` per character in localStorage (same pattern
   as `currentLocation`), keyed by character + zone; default to the cluster's
-  entry room.
+  entry room (Entry Gate for the Academy).
 
 ## Open questions for the next pass
 
-1. Do connective rooms get their own `GameLocation` entries, or borrow the
-   cluster id? (Affects encounter placement in the halls vs. the courtyard.)
-2. Should the room view **replace** the top-down node map everywhere, or coexist
-   (map for travel between clusters, rooms within a cluster)?
-3. Art: one static scene image per room (17 here) — same FF6 pixel-art pipeline
-   as the intro. Which rooms are must-have vs. text-only to start?
+1. Do connective/lore rooms (Main Hall, Courtyard, Maestro Hallway, Clinic…) get
+   their own `GameLocation` entries, or borrow a cluster id? (Affects where
+   encounters can fire — a corridor vs. a rehearsal hall.)
+2. Art: one static scene image per room (19 here) via the same FF6 pixel-art
+   pipeline as the intro. Which rooms are must-have vs. text-only to start?
+3. Zone boundaries inside one building: Boot Camp (Zone 1) and Theory (Zone 2)
+   share the Academy — does moving between their rooms advance the "zone," or is
+   the Academy one continuous space with challenges gated by progress?
 
-Once the model is agreed, the natural next step is a `rooms.ts` + `RoomView`
-prototype wired to the Academy, then rolling the same treatment out zone by zone.
+Next step once the model is agreed: a `rooms.ts` + `RoomView` prototype wired to
+the Academy (replacing the node map here first), then the same treatment zone by
+zone.
