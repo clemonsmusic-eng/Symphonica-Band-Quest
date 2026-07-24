@@ -52,65 +52,62 @@ Match the in-game sprite look in `docs/assets/character_sheet.png` and `public/p
 > they all face inwards towards a tall slim conductor in a dark tailcoat raises a baton. Festive,
 > reverent, luminous, pale-gold and ivory light. Authentic 16-bit pixel art.
 
-## Scene 3 — Vexus secretly threads in the tritones
+> *The intro is an **origin/setup** story — it ends before the Shattering (which the player
+> experiences at the end of Act 1). Scenes 1–2 are already generated and kept; scenes 3–6 below are
+> new.*
 
-> A quiet, cool-toned pixel-art interior at night, backstage. A gaunt conductor, Vexus, sits hunched
-> at a wooden writing desk, quill in hand, secretly re-inking a musical score. The notes he writes
-> glow a sickly violet and visibly warp and crack the staff lines around them, thin fractures of pale
-> purple light leaking off the page. A single small candle gives just a little warm light; the rest
-> of the room is soft blue shadow and dithered darkness. Obsessive, secretive mood — but the palette
-> stays light-to-mid, dominated by cool blues and violet, not black or brown. Authentic 16-bit pixel
-> art.
+## Scene 3 — Fennelio founds Harmonia Academy
 
-## Scene 4 — The Score shatters at the Renewal
+> A bright Final Fantasy VI-style pixel scene: a grand pixel-art music academy — Harmonia Academy —
+> of pale stone and gold on a green hill, banners flying, young students streaming in through the
+> gates with instrument cases. In the foreground, a dignified elderly conductor, Fennelio, in dark
+> academic robes and a graduation cap, one arm raised proudly toward the school he has built. Golden
+> morning light, hopeful, the founding of a legacy. Authentic 16-bit pixel art, bright and airy
+> palette.
 
-> A dramatic Final Fantasy VI-style cutscene on the bright theater stage. At center, the glowing
-> Grand Symphony Score — a radiant floating sheet of music — violently bursts apart into ten jagged
-> shards of white-and-violet light. Each shard streaks outward on a dithered beam and strikes one of
-> the ten Maestro sprites, whose bodies flinch as pale corruption creeps over them; instruments
-> tumble from their hands. A big bright bloom of pixel light at the point of shattering, radiating
-> rays. High drama but LIGHT overall — brilliant whites, pale violet, sky-blue stage — not a dark
-> scene. Authentic 16-bit pixel art.
+## Scene 4 — Fennelio passes the baton to Vexus
 
-## Scene 5 — The world grays; the students stay in color
+> A tender Final Fantasy VI-style pixel scene on the academy stage: the elderly Headmaster Fennelio
+> placing a thin conductor's baton into the hands of a younger man — Vexus, a passionate dark-haired
+> conductor in a formal tailcoat. Vexus is overcome with gratitude, eyes shining, hands trembling as
+> he receives it, half-bowing in thanks. Behind them the ten Maestros look on warmly. A
+> passing-of-the-torch moment, warm gold and cream light, emotional and reverent — **Vexus is
+> sympathetic here, not yet a villain.** Authentic 16-bit pixel art.
 
-> A wide pixel-art view of the grand hall the instant after the shattering, drained to soft ash-grey.
-> The audience and faculty sprites are frozen mid-motion, colorless and statue-still; in the
-> background the same ten Maestros from before loom as corrupted, shadowy and twisted silhouettes
-> with glowing purple tinted eyes. The conductor is floating within his arms spread wide and a dark
-> purple glow around him. In the foreground, standing out sharply, a small cluster of young student
-> musicians in Academy cadet uniforms — a flute girl, a boy with a trombone and a banner, a clarinet
-> boy, a percussionist with drumsticks, a big tuba student — all rendered in full bright color,
-> instruments clutched close, wide-eyed. Strong contrast: muted grey world, vivid colorful students.
-> Authentic 16-bit pixel art, dithered grey tones. The attached photo are established students in my
-> game's pixel art style. Match their designs and this exact art style in the image.
+## Scene 5 — Vexus's obsession with the ten Scores
 
-## Scene 6 — You step forward
+> A quiet, late-night Final Fantasy VI-style pixel interior: Vexus alone in his study off the
+> rehearsal hall, the ten original Sacred Scores spread open across a wide desk and pinned to the
+> walls around him. He leans over them by candlelight, quill in hand, feverish and absorbed,
+> annotating — utterly obsessed. Cool blues and the faintest hint of violet creeping into the
+> candle-glow (a first, subtle omen), but not yet corrupted. Intense, secretive,
+> foreboding-but-still-human. Authentic 16-bit pixel art.
 
-> A hopeful, light-filled Final Fantasy VI-style hero shot, slight low angle. A single, black
-> silhouetted young student-musician (the player character) stands in the foreground in front of a
-> small band of colorfully-dressed young graduates, instruments held ready, determined looks on their
-> pixel face, as pale golden morning light breaks across them from the side. Behind them the greyed,
-> broken hall; far in the distance, across a bright pixel sea under a soft blue sky, a small, dark and
-> stormy jagged island silhouette — Discordia — pulses faintly with cool violet light. Optimistic,
-> adventurous, the beginning of a journey. Bright sky-blue and ivory palette. Authentic 16-bit pixel
+## Scene 6 — You, the new student
+
+> A hopeful, light-filled Final Fantasy VI-style pixel scene: a young student-musician (the player
+> character) arriving at the gates of Harmonia Academy at dawn, instrument case in hand, looking up
+> at the golden school ahead with excitement; other new students file in around them. Bright sky-blue
+> and ivory palette, warm morning sun, the optimistic beginning of a journey. Authentic 16-bit pixel
 > art.
 
 ---
 
 ## Mapping to the intro beats
 
-| Scene | Intro beat (`IntroSequence.tsx`) | Current emoji |
-|---|---|---|
-| 1 | The Composer wrote the world into being | ✍️ |
-| 2 | Ten Maestros perform the Renewal under Vexus | 🎼 |
-| 3 | Vexus threaded dissonant tritones through the Score | 🎭 |
-| 4 | At the Renewal it curdled and shattered | 💥 |
-| 5 | The world grays; only the newest students remain clear | 🌫️ |
-| 6 | You are one of them — reclaim the ten Noteshards | 🎺 |
+| Scene | Intro beat (`IntroSequence.tsx`) | Emoji | Art status |
+|---|---|---|---|
+| 1 | The Composer creates Symphonica & the Grand Symphony | ✍️ | kept (`scene1.webp`) |
+| 2 | The Renewal, and the office of Conductor | 🎼 | kept (`scene2.webp`) |
+| 3 | Fennelio founds Harmonia Academy | 🏛️ | **new** |
+| 4 | Fennelio passes the baton to a grateful Vexus | 🤝 | **new** |
+| 5 | Vexus's obsession with the ten Scores | 📜 | **new** |
+| 6 | You — the Academy's newest student; first lesson | 🎺 | **new** |
 
-## Wiring generated art into the intro (todo)
+## Wiring generated art into the intro
 
-Once the six images exist, drop them in `public/intro/` (e.g. `scene1.png`…`scene6.png`) and add an
-`image` field to each beat in `src/components/world/IntroSequence.tsx`, rendered above the text.
-Generate at 16:9 (or crop on import) to fit the intro panel.
+Scenes 1–2 are already wired. For the new scenes 3–6: generate each, optimize to ~1280px WebP,
+drop them in `public/intro/` as `scene3.webp`…`scene6.webp`, and they'll replace the emoji fallback
+in `src/components/world/IntroSequence.tsx` (the `image` field is already stubbed to add). Generate
+at 16:9 (or crop on import) to fit the intro panel. (The old shattering-themed `scene3–6.webp` are
+no longer referenced by the intro; reuse or overwrite them.)

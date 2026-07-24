@@ -7,11 +7,11 @@ interface Beat { emoji: string; image?: string; text: string }
 // pixel art); a beat without art falls back to its emoji.
 const BEATS: Beat[] = [
   { emoji: '✍️', image: '/intro/scene1.webp', text: 'In the beginning there was the Composer, who wrote the world of Symphonica into being, note by note. Its every heartbeat is the Grand Symphony — ten Sacred Scores that, sounded whole, keep the world alive.' },
-  { emoji: '🎼', image: '/intro/scene2.webp', text: 'The ten Maestros teach at Harmonia Academy, and each graduation they perform the Grand Symphony anew — the Renewal. Fennelio founded the school and first raised the baton, before he passed it to his star pupil and Conductor: Vexus.' },
-  { emoji: '🎭', image: '/intro/scene3.webp', text: 'But Vexus judged the Composer\'s music timid. Alone in his office, in secret, he rewrote this year\'s Score — threading it through with poisoned, unresolving tritones.' },
-  { emoji: '💥', image: '/intro/scene4.webp', text: 'At the Renewal his tritones curdled, and the Grand Symphony shattered. Ten Noteshards tore into the ten Maestros; Fennelio was struck down; and Vexus, blaming his players, fled west to his island — Discordia.' },
-  { emoji: '🌫️', image: '/intro/scene5.webp', text: 'The color drained from the world. The Maestros are monsters now, the great musicians grey and still — everyone dulled but the newest players, whose hearts the corruption could not reach.' },
-  { emoji: '🎺', image: '/intro/scene6.webp', text: 'You are one of them. Reclaim the ten Noteshards from the teachers you loved, make the Grand Symphony whole, and carry it to Discordia to silence Vexus. But every hero starts somewhere — and yours starts with your very first lesson.' },
+  { emoji: '🎼', image: '/intro/scene2.webp', text: 'To keep it alive, ten Maestros perform the Grand Symphony anew each year — the Renewal. And to lead them, the Composer created a single office above all others: the Conductor.' },
+  { emoji: '🏛️', text: 'The first Conductor was Fennelio. When his conducting days waned, he founded Harmonia Academy — a school to raise each new generation of Maestros, so the Renewal would sound on forever.' },
+  { emoji: '🤝', text: 'His finest student was Vexus. When Fennelio at last offered him the baton, Vexus wept with gratitude — to conduct the Grand Symphony was all he had ever dreamed. No one loved the music more.' },
+  { emoji: '📜', text: 'But Vexus could not leave the ten original Scores alone. Night after night he pored over them, certain the Composer had left them unfinished — that he, and he alone, might one day make them perfect.' },
+  { emoji: '🎺', text: 'That is the world you were born into. Today you enter it as Harmonia Academy\'s newest student — a Maestro, perhaps, in the making. But greatness starts small. Your very first lesson awaits.' },
 ];
 
 export default function IntroSequence({ onDone }: { onDone: () => void }) {
