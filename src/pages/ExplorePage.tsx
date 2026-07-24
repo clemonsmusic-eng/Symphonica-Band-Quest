@@ -347,9 +347,9 @@ function ShatteringCutscene({ rating, onFinish }: { rating: Rating; onFinish: ()
     { emoji: '💥', tone: '#F87171',
       text: 'The sound climbs, and climbs, with nowhere to resolve — until the Grand Symphony Score shatters. Light bursts from the stage. Ten shards streak out and strike your ten professors, and they change before your eyes.' },
     { emoji: '🌫️', tone: '#94A3B8',
-      text: 'The world goes grey in a heartbeat — the audience, the faculty, the gold draining out of everything at once. Everyone touched by the world\'s music dulls where they stand. Everyone but you, and the graduates beside you.' },
+      text: 'The world goes grey in a heartbeat — the audience, the gold draining out of everything at once. Everyone touched by the world\'s music dulls where they stand. Everyone but you, and the graduates beside you.' },
     { emoji: '🎓', tone: '#FCD34D',
-      text: '"The Renewal is broken." Headmaster Fennelio reaches you through the chaos, his voice thin. "The Maestros are lost, and the world will follow unless the Score is made whole." He presses a travel case into your hands — your Journey gear. "You are the only ones left who can still play. Go. Bring them back."' },
+      text: '"The Renewal is broken." Headmaster Fennelio reaches you through the chaos, his voice failing. "The Maestros are lost, and the world will follow — unless the Score is made whole." He presses a travel case into your hands — your Journey gear. "You are the only ones left who can still play. Go — bring them—" And then the Academy\'s founder sinks to the boards, and does not rise.' },
   ];
 
   const [step, setStep] = useState(0);

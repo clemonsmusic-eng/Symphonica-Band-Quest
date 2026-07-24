@@ -49,6 +49,7 @@ graph TD
   main --- mhall[Maestro Hallway]
   concert --- rehearsal[Rehearsal Hall]
   rehearsal --- mhall
+  rehearsal --- vexus["Vexus's Office · theory &amp; conducting"]
   mhall --- head[Headmaster's Office]
   mhall --- clinic["Clinic · flute (Flaura)"]
   mhall --- library["Library · bassoon (Fagotto)"]
@@ -94,7 +95,8 @@ Temple of Sound sits off the Recital Hall):
 | Room | Maps to | Who's here | Key hotspots / hooks |
 |---|---|---|---|
 | **Main Hall** | _new_ (hub) | — | **Quest Board** (surfaces Zone 1 side-quests); the Academy banner; the directory; "listen to the Academy". |
-| **Rehearsal Hall** | `rehearsal_halls` | Maestro Barenboimi | Talk Barenboimi (story); **challenge stands** → Zone 1 required challenges. |
+| **Rehearsal Hall** | `rehearsal_halls` | — | The ensemble hall (rehearses under the Conductor); **challenge stands** → Zone 1 required challenges. **Vexus's Office** opens off it. |
+| **Vexus's Office** | _new_ | **Vexus** | Off the Rehearsal Hall. Vexus (theory & conducting master) annotating the ten Renewal scores — "beautiful, but timid" (the seed of the Shattering). |
 | **Concert Hall** | _new_ | — | The grand hall (Zone 2 ensemble / Winter Concert); **tune the grand** with the Tuning Fork (item use). |
 | **Recital Hall** | `rehearsal_halls` | Sackbut, Torbult | The trombone & tuba maestros' note-holding contest; **step onto the stage** → graduation gate; the **Temple of Sound** opens off it. |
 | **Dining Hall** | _new_ | Tommy, Otto | Tommy & Otto forever eating (recruitable); **Concerta Invitational** sign (Zone 3); a warm pretzel (item). |
@@ -103,7 +105,7 @@ Temple of Sound sits off the Recital Hall):
 ### Study wing (Zone 2) & aural
 | Room | Maps to | Who's here | Key hotspots / hooks |
 |---|---|---|---|
-| **Theory Classroom** | `theory_wing` | Persichetti, Piccola, **Vexus** | Talk Persichetti; Talk Piccola → **Stage Fright** (gift her the flower); **watch Vexus** annotating the ten Renewal scores — "beautiful, but timid" (foreshadow). Zone 2 challenges. |
+| **Theory Classroom** | `theory_wing` | Piccola | Vexus's theory room (he's off in his office). Talk Piccola → **Stage Fright** (gift her the flower); the chalkboard & violet-graded exercises. Zone 2 challenges. |
 | **Library** | `library_stacks` | Fagotto, Dr. Sol, Reed | Bassoon maestro's office. Talk Dr. Sol → **The Misfiled Interval**; **tritone** catalog; **follow the echo** → **Interval Imp**; Reed deep in Symphonica's history (recruitable); **borrowing card** (item). |
 | **Listening Room** | aural (Zone 1/2) | Zoot | Zoot ("know what's come before"; recruitable); **headphones** → aural challenges; **play the sealed cylinder** (needs the library card). |
 | **Music History Classroom** | _new_ | — | Timeline of the Composer & the Renewal; a mural of the Grand Symphony with **"Vexus, Conductor"** (foreshadows Vexus). |
@@ -133,17 +135,22 @@ covered above; Temple of Sound is off the Recital Hall).
 
 ---
 
-## New canon introduced here (reconciled into NARRATIVE.md §1–2)
+## New canon introduced here (reconciled into NARRATIVE.md)
 
-Two story beats added while casting the Academy, now folded into `NARRATIVE.md`:
+Story beats settled while building the Academy, now folded into `NARRATIVE.md`:
 
 - **Fennelio is the founding Conductor of the Grand Symphony.** He led the very
-  first Renewals, then passed his baton to **Vexus** and founded Harmonia Academy
-  to train the Maestros. (Deepens the betrayal — Vexus inherited the podium, and
-  Fennelio *chose* him.)
-- **Vexus is present at the Academy before the Shattering**, in the Theory
-  Classroom, already annotating the ten original Renewal scores and finding them
-  "beautiful, but timid" — the seed of his rewrite, in plain sight.
+  first Renewals, then passed his baton to **Vexus** and founded Harmonia Academy.
+  (The betrayal is personal — Fennelio *chose* him.)
+- **The ten Maestros are the Academy's entire faculty** — each teaches their own
+  section. **Vexus teaches theory and conducting**, from an office off the
+  Rehearsal Hall, where he's already annotating the ten Renewal scores as
+  "beautiful, but timid" — the seed of his rewrite. (Persichetti and Barenboimi
+  are removed; there are no other teachers.)
+- **At the Shattering, Fennelio gives the students their charge, then collapses**
+  — struck unconscious, not waking until the **end of Act 2**, and even then weak
+  and heartbroken, useful only for **advice on facing Vexus**. Valeria Croft takes
+  up the lead from there.
 
 ## Adventure-game layer (prototype)
 

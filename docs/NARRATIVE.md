@@ -20,9 +20,13 @@ led the early Renewals — then passed his baton to his chosen successor, **Vexu
 **Harmonia Academy** to school every generation of players that came after. Fennelio is today
 the Academy's Headmaster; Vexus stands on the podium in his place.
 
+The **ten Maestros are the Academy's entire faculty** — each teaches their own section — while
+**Vexus teaches theory and conducting**, his office off the rehearsal hall. There are no other
+teachers.
+
 Once a year, at the Academy's **graduation**, after the graduating students give their final
 performance, the Maestros take the stage and perform the Grand Symphony Score under Vexus's
-baton. This performance — **the Renewal** — sustains Symphonica for another year. It is the
+baton — the baton Fennelio handed him. This performance — **the Renewal** — sustains Symphonica for another year. It is the
 most beloved tradition in the world, and this year's graduates have waited their whole lives
 to witness it as alumni.
 
@@ -42,10 +46,12 @@ of realizing his genius. So he abandons living players altogether, masters **tri
 to animate instruments **with no players at all**, and retreats to his island, **Discordia.**
 
 ### The unraveling
-With the Renewal corrupted, Symphonica destabilizes. Everyone woven into the world's music —
-the Maestros, the faculty, the established musicians — is corrupted or left **dulled and
-graying**, unable to act. Only the newest musicians — **this year's graduates, and a handful
-of recent ones** — remain untouched and clear-headed.
+With the Renewal corrupted, Symphonica destabilizes. Everyone woven deep into the world's music —
+the ten Maestros and every established player — is corrupted or left **dulled and graying**,
+unable to act; even **Fennelio**, the Academy's founder, gives the graduates their charge and then
+falls, struck **unconscious**.
+Only the newest musicians — **this year's graduates, and a handful of recent ones** — remain
+untouched and clear-headed.
 
 Vexus's tritonal influence radiates from Discordia in the far west and deepens by the day;
 the **Staff Range** is a partial bulwark, so it is far worse west of the mountains than east.
@@ -129,14 +135,14 @@ Vexus denied** — that living musicians matter — by saving the very professor
 
 ### Allies
 - **Headmaster Fennelio** — founder of Harmonia Academy and the Grand Symphony's **first
-  Conductor**, who long ago passed his baton to Vexus and turned to teaching. Survives the
-  Shattering dulled but lucid; gives the students their first guidance and charge, but is too
-  diminished to journey. (The betrayal is personal — he chose Vexus as his successor.)
-- **Maestro Persichetti** (theory) & **Maestro Barenboimi** (conducting) — non-performing
-  academic staff who survive alongside Fennelio as advisors at the Academy.
+  Conductor**, who long ago passed his baton to Vexus and turned to teaching. At the Shattering he
+  reaches the graduates and **gives them their charge** — then collapses, struck **unconscious**,
+  and does not wake until the **end of Act 2**; even then he is weak and heartbroken, of no
+  practical use beyond hard-won **advice on how to face Vexus**. (The betrayal is personal — he
+  chose Vexus as his successor.)
 - **Valeria Croft** — a recent graduate, untouched by the corruption; **leads the expedition**
-  (the in-fiction authority who "advances the class") and supplies the map of confirmed Maestro
-  locations.
+  from the Academy onward (the in-fiction authority who "advances the class") and supplies the map
+  of confirmed Maestro locations. (Fennelio gives the first charge; Valeria carries it forward.)
 - **The Wandering Quartet** — four graduates a year ahead (Lyra, Soren, Mira, Dex); also
   spared, model ensemble trust, and provide the ship **The Fourth Wind**.
 - **Captain André** — veteran trumpeter; leads the cliff militia at the Clef Cliffs.
@@ -187,9 +193,10 @@ biographies that unlock as lore. These are the real-musician homages: **Galwayni
 - **The Fourth Wind** — the Wandering Quartet's ship, for the sea crossing (Zones 9–12).
 
 ### Antagonists
-- **Vexus, the Conductor (the Discordian Overlord)** — the final boss. His weapon is the
-  **baton** and his tritonal magic, conducting a phantom orchestra of player-less instruments.
-  Tragic, blind, vindication-driven, stopped.
+- **Vexus, the Conductor (the Discordian Overlord)** — the final boss. Before the Shattering, the
+  Academy's master of **theory and conducting** (office off the rehearsal hall) and Fennelio's
+  chosen successor on the podium. His weapon is the **baton** and his tritonal magic, conducting a
+  phantom orchestra of player-less instruments. Tragic, blind, vindication-driven, stopped.
 - **Lieutenant Contra** — a **contrabass clarinet** automaton commanding the Discordian Outpost
   (Zone 7).
 - **Ebony** & **Ivory** — two Vexian knight-commander automatons patrolling the Dissonant Dunes
@@ -281,7 +288,7 @@ the instant the Shattering hits.
 Stand** — an ambient bit of school magic, a haunted practice-room curio, not an omen. **Ends with
 Boot Camp Graduation** (the first 3-note song for Headmaster Fennelio). *(Implemented.)*
 
-**Zone 2 — The Theory Wing** *(Q2).* Study under the theory faculty; the **Interval Imp**, a
+**Zone 2 — The Theory Wing** *(Q2).* Study theory under **Vexus** himself; the **Interval Imp**, a
 mischievous training-hall sprite. **Ends with the Winter Concert** — crashed by an **ambient
 concert-sprite drawn to the music's energy** (the former "Shard Phantom," reframed: no Noteshards
 exist yet). Drive it off, then perform. *(Implemented; lore reframe needed.)*
@@ -296,8 +303,9 @@ and advances to Quarter 4.
 **Zone 4 — The Grand Auditorium** *(Q4).* The students give their **final performance** as
 graduates. Then the Maestros take the stage for the annual **Renewal** under Vexus's baton — and
 Vexus debuts his tritonal Score. **This is the Shattering** (see §1): the Maestros strain, the
-music builds and breaks, the shards corrupt them, the world destabilizes. The students — the only
-ones left clear-headed — are charged by Headmaster Fennelio to save their teachers and the world.
+music builds and breaks, the shards corrupt them, the world destabilizes. **Headmaster Fennelio
+charges the students** — the only ones left clear-headed — to save their teachers and the world,
+and then, spent, is struck **unconscious**; **Valeria Croft** takes up the lead from there.
 **This is the Act 1 climax and the turn into Act 2.**
 
 ---

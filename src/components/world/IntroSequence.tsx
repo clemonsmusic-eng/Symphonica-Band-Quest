@@ -6,12 +6,12 @@ interface Beat { emoji: string; image?: string; text: string }
 // replayable from the Hub. Per-beat key art lives in public/intro/ (FF6-style
 // pixel art); a beat without art falls back to its emoji.
 const BEATS: Beat[] = [
-  { emoji: '✍️', image: '/intro/scene1.webp', text: 'The Composer wrote the world of Symphonica into being. Its life is held by the Grand Symphony — the ten Sacred Scores, sounded whole.' },
-  { emoji: '🎼', image: '/intro/scene2.webp', text: 'Ten Maestros — the section-leader professors of Harmonia Academy — perform it each year at graduation. This Renewal keeps the world alive. The Composer made the office of Conductor; Headmaster Fennelio held it first, then passed his baton to Vexus.' },
-  { emoji: '🎭', image: '/intro/scene3.webp', text: 'But Vexus grew obsessed with proving himself the Composer\'s equal. In secret, he threaded dissonant tritones through this year\'s Score.' },
-  { emoji: '💥', image: '/intro/scene4.webp', text: 'At the Renewal it curdled and shattered. Each shard drove into a Maestro, corrupting them. Vexus blamed his players, abandoned living music, and retreated to his island — Discordia.' },
-  { emoji: '🌫️', image: '/intro/scene5.webp', text: 'The world grays. The professors are twisted into monsters. Only the newest musicians — this year\'s students — remain clear-headed enough to play with a whole heart.' },
-  { emoji: '🎺', image: '/intro/scene6.webp', text: 'You are one of them. Reclaim the ten Noteshards from your own professors, restore the Grand Symphony, and perform it at the source to silence Vexus. But first — your very first lesson.' },
+  { emoji: '✍️', image: '/intro/scene1.webp', text: 'In the beginning there was the Composer, who wrote the world of Symphonica into being, note by note. Its every heartbeat is the Grand Symphony — ten Sacred Scores that, sounded whole, keep the world alive.' },
+  { emoji: '🎼', image: '/intro/scene2.webp', text: 'The ten Maestros teach at Harmonia Academy, and each graduation they perform the Grand Symphony anew — the Renewal. Fennelio founded the school and first raised the baton, before he passed it to his star pupil and Conductor: Vexus.' },
+  { emoji: '🎭', image: '/intro/scene3.webp', text: 'But Vexus judged the Composer\'s music timid. Alone in his office, in secret, he rewrote this year\'s Score — threading it through with poisoned, unresolving tritones.' },
+  { emoji: '💥', image: '/intro/scene4.webp', text: 'At the Renewal his tritones curdled, and the Grand Symphony shattered. Ten Noteshards tore into the ten Maestros; Fennelio was struck down; and Vexus, blaming his players, fled west to his island — Discordia.' },
+  { emoji: '🌫️', image: '/intro/scene5.webp', text: 'The color drained from the world. The Maestros are monsters now, the great musicians grey and still — everyone dulled but the newest players, whose hearts the corruption could not reach.' },
+  { emoji: '🎺', image: '/intro/scene6.webp', text: 'You are one of them. Reclaim the ten Noteshards from the teachers you loved, make the Grand Symphony whole, and carry it to Discordia to silence Vexus. But every hero starts somewhere — and yours starts with your very first lesson.' },
 ];
 
 export default function IntroSequence({ onDone }: { onDone: () => void }) {
