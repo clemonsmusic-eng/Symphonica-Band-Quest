@@ -36,21 +36,26 @@ Match the in-game sprite look in `docs/assets/character_sheet.png` and `public/p
 > creation and wonder. Light lavender-and-blue background, ivory highlights, minimal gold. Authentic
 > 16-bit pixel art, dithered glow.
 
-## Scene 2 — The ten Maestros perform the Renewal
+## Scene 2 — The Renewal, conducted by a young Fennelio *(regenerate)*
 
-> A bright Final Fantasy VI opera-house stage, seen wide from the audience. Ten master-musician
-> pixel sprites playing their instruments while sitting in chairs in two rows across a grand
-> cream-and-teal theater stage under soft pale spotlights. Front row from left to right: a woman
-> with auburn curls in a cream gown with a flute; and a tall silver-haired elf in a blue-and-white
-> striped robe holding an oboe; a dark-skinned man in a teal-green embroidered coat with a clarinet;
-> a pale dark-haired man in a grey fur-collared coat holding a bassoon on his right side. Row two
-> left to right: a slender figure with long platinum hair in a slim midnight-blue coat holding an
-> alto saxophone, a blond man in a cream-and-gold star-patterned robe with a trumpet; a bearded man
-> in olive-green robes with a coiled french horn; a huge blond-bearded knight in bright silver plate
-> armor cradling a big brass tuba; a stout red-bearded dwarf in ornate armor playing a trombone; a
-> woman with brass goggles and curly dark hair at a multi-drum percussion rig. In front of them,
-> they all face inwards towards a tall slim conductor in a dark tailcoat raises a baton. Festive,
-> reverent, luminous, pale-gold and ivory light. Authentic 16-bit pixel art.
+**Attach:** the **scene-4 image** (for the stage), the **"maestros on stage" image** (for the seating
+layout), and the character sheet.
+
+> A grand Final Fantasy VI-style pixel scene, seen wide from the audience. Use the ornate concert-hall
+> STAGE from the attached scene-4 reference — tall gilded columns, swagged red-and-blue curtains,
+> arched windows, flower urns, a raised circular tan-tiled stage with a low central podium, and rows
+> of blue-and-gold audience chairs in the foreground. On the stage, the ten Maestros perform the Grand
+> Symphony, seated in a two-row semicircle in the SAME positions as the attached "maestros on stage"
+> reference. Front row, left to right: a woman with auburn hair and a flute; a silver-haired elf in a
+> blue-and-white robe with an oboe; [the conductor]; a dark-skinned man in a green coat with a
+> clarinet; a bearded man in a fur-collared coat with a bassoon. Back row, left to right: a figure
+> with platinum hair and an alto saxophone; a blond man in cream-and-gold with a trumpet; a man in
+> olive-green with a french horn; an armored figure with a tuba; a red-bearded dwarf with a trombone;
+> a goggled percussionist at a drum kit. At the center podium, back to us, stands the CONDUCTOR — a
+> **younger Fennelio** (brown hair only lightly greying, dignified, in a conductor's coat), baton
+> raised mid-downbeat. IMPORTANT: render Fennelio and ALL ten Maestros noticeably YOUNGER than in the
+> other scenes — this is an earlier era. Warm gold-and-ivory light, festive and reverent. Authentic
+> 16-bit pixel art.
 
 > *The intro is an **origin/setup** story — it ends before the Shattering (which the player
 > experiences at the end of Act 1). Scenes 1–2 are already generated and kept; scenes 3–6 below are
@@ -100,7 +105,7 @@ Match the in-game sprite look in `docs/assets/character_sheet.png` and `public/p
 | Scene | Intro beat (`IntroSequence.tsx`) | Emoji | Art status |
 |---|---|---|---|
 | 1 | The Composer creates Symphonica & the Grand Symphony | ✍️ | kept (`scene1.webp`) |
-| 2 | The Renewal, and the office of Conductor | 🎼 | kept (`scene2.webp`) |
+| 2 | The Renewal, conducted by a young Fennelio | 🎼 | **regenerate** (`scene2.webp`) |
 | 3 | Vexus alight over the ten Scores; Fennelio impressed | 📜 | **new** |
 | 4 | Fennelio passes the baton to Vexus & steps down | 🤝 | **new** |
 | 5 | Fennelio opens the Academy, the ten Maestros as teachers | 🏛️ | **new** |
