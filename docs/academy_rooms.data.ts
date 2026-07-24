@@ -2,11 +2,15 @@
 // Harmonia Academy — verbatim room content (23 rooms), exported from the design
 // prototype. REFERENCE DATA for building src/lib/world/rooms.ts. Copy the prose
 // (desc, hotspots, pickups, uses) exactly. Notes:
-//  - `locationId` rolls a room up to an existing locations.ts cluster where one
-//    exists; otherwise it is the room's own id (a NEW GameLocation to add, or
-//    borrow a neighbouring cluster — see docs open question 1).
-//  - `zoneId` is provisional (Boot Camp = 1, Theory = 2 inside one building;
-//    see docs open question 3).
+//  - `locationId`: per DECISION D1 (docs/LOCATION_DESIGN_HARMONIA.md), do NOT add
+//    new GameLocations. Where this field is a room's own id below, remap it to the
+//    room's zone primary cluster: Zone-1 -> "rehearsal_halls", Zone-2 ->
+//    "theory_wing". The six real mappings (rehearsal_hall/recital_hall ->
+//    rehearsal_halls, practice_rooms -> practice_rooms, theory_classroom ->
+//    theory_wing, library/listening_room -> library_stacks) stay as-is.
+//  - `zoneId`: Boot Camp = 1, Theory (theory_classroom/library/listening_room) = 2.
+//    Per DECISION D2 the Academy is ONE building; zoneId gates CONTENT (Zone-2
+//    activities lock until currentZone>=2), it does NOT split the map.
 //  - Hotspot HOOKS are encoded in the response text in parentheses, e.g.
 //    "(Zone 1 required challenges.)", "(Rest Wraith mini-boss.)",
 //    "(Boot Camp graduation gate.)", "(Quest: The Squeaky Door.)". Wire these to

@@ -195,17 +195,45 @@ The rooms reuse what's already built; nothing about combat/challenges changes.
   as `currentLocation`), keyed by character + zone; default to the cluster's
   entry room (Entry Gate for the Academy).
 
-## Open questions for the next pass
+## Decisions (resolved — build to these)
 
-1. Do connective/lore rooms (Main Hall, Courtyard, Maestro Hallway, Clinic…) get
-   their own `GameLocation` entries, or borrow a cluster id? (Affects where
-   encounters can fire — a corridor vs. a rehearsal hall.)
-2. Art: one static scene image per room (22 here) via the same FF6 pixel-art
-   pipeline as the intro. Which rooms are must-have vs. text-only to start?
-3. Zone boundaries inside one building: Boot Camp (Zone 1) and Theory (Zone 2)
-   share the Academy — does moving between their rooms advance the "zone," or is
-   the Academy one continuous space with challenges gated by progress?
+### D1 — Room ↔ location mapping (no new `GameLocation` entries for the Academy)
+The Academy has **no random encounters** (the only combat is the two scripted,
+hotspot-triggered mini-bosses), so `locationId` only needs to resolve each room
+to the correct **zone**. **Do not add new `GameLocation` entries.** Every room
+carries a `locationId` that is one of the four existing Academy clusters:
 
-Next step once the model is agreed: a `rooms.ts` + `RoomView` prototype wired to
-the Academy (replacing the node map here first), then the same treatment zone by
-zone.
+- Explicit (already real locations): `rehearsal_hall` → `rehearsal_halls`,
+  `recital_hall` → `rehearsal_halls`, `practice_rooms` → `practice_rooms`,
+  `theory_classroom` → `theory_wing`, `library` → `library_stacks`,
+  `listening_room` → `library_stacks`.
+- Every other (connective/lore) room **borrows its zone's primary cluster**:
+  a **Zone-1** room → `rehearsal_halls`; a **Zone-2** room → `theory_wing`.
+
+Revisit per-room `GameLocation` entries only when a *later* zone needs
+room-specific random encounters (e.g. the wilderness/caravan zones).
+
+### D2 — The Academy is ONE continuous building spanning Zones 1–2
+Do **not** split the building across separate `/explore/:zoneId` screens. RoomView
+renders the **whole Academy** (all 23 rooms) as one navigable map; **movement is
+never gated**. What gates is **content**, keyed on `character.currentZone`:
+
+- Each room tags its content with a `zoneId` (Boot Camp = 1; Theory wing:
+  `theory_classroom`, `library`, `listening_room` = 2).
+- Zone-2 activities (theory challenges, the **Interval Imp** in the Library) are
+  **visible but locked** until `currentZone >= 2` — reuse the existing
+  `unlock(character)` predicate pattern from `content.ts`; do not hide the rooms.
+- The **Boot Camp graduation gate** (Recital Hall) advances 1→2 **in place** —
+  it unlocks the Theory wing's content without changing the map or navigating away.
+- Route: keep the `LOCATION_BASED_ZONES` flag; when the player is in an Academy
+  zone (1 or 2), load the single Academy building. (Concerta = Zone 3 and the
+  Grand Auditorium = Zone 4 are *separate* buildings/room-sets, designed later.)
+
+### D3 — Art priority (non-blocking)
+Ship text-first: every room falls back to its emoji, so the build doesn't wait on
+art. Prioritize art for the highest-traffic/most-cinematic rooms first — Entry
+Gate, Courtyard, Main Hall, Rehearsal Hall, the Recital Hall, and the six Maestro
+offices — using the same FF6 pixel pipeline as the intro; the rest can follow.
+
+Next step: `rooms.ts` + `RoomView` wired to the Academy per
+`docs/ROOMVIEW_BUILD_SPEC.md`, then the same treatment location by location.
