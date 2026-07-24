@@ -8,10 +8,10 @@ interface Beat { emoji: string; image?: string; text: string }
 const BEATS: Beat[] = [
   { emoji: '✍️', image: '/intro/scene1.webp', text: 'In the beginning there was the Composer, who wrote the world of Symphonica into being, note by note. Its every heartbeat is the Grand Symphony — ten Sacred Scores that, sounded whole, keep the world alive.' },
   { emoji: '🎼', image: '/intro/scene2.webp', text: 'To keep it alive, the ten Maestros perform the Grand Symphony anew each year — the Renewal — led by a single Conductor. In those early days the baton was Fennelio\'s, and under it the whole world sang.' },
-  { emoji: '📜', text: 'Fennelio\'s finest student was Vexus, who loved the Grand Symphony beyond all reason — night after night he pored over the ten original Scores, alight with ideas. Watching that fire, the old Conductor thought: here is my heir.' },
-  { emoji: '🤝', text: 'So Fennelio placed his baton in Vexus\'s hands and stepped down from the podium. Vexus wept with gratitude — to conduct the Grand Symphony was all he had ever dreamed. No one loved the music more.' },
-  { emoji: '🏛️', text: 'His conducting days behind him, Fennelio founded Harmonia Academy and gathered the ten Maestros as its teachers — so every new generation would learn to sound the Renewal, and the world would never fall silent.' },
-  { emoji: '🎺', text: 'That is the world you were born into. Today you arrive at the Academy gates as its newest student — a Maestro, perhaps, in the making. But greatness starts small. Your very first lesson awaits.' },
+  { emoji: '📜', image: '/intro/scene3.webp', text: 'Fennelio\'s finest student was Vexus, who loved the Grand Symphony beyond all reason — night after night he pored over the ten original Scores, alight with ideas. Watching that fire, the old Conductor thought: here is my heir.' },
+  { emoji: '🤝', image: '/intro/scene4.webp', text: 'So Fennelio placed his baton in Vexus\'s hands and stepped down from the podium. Vexus wept with gratitude — to conduct the Grand Symphony was all he had ever dreamed. No one loved the music more.' },
+  { emoji: '🏛️', image: '/intro/scene5.webp', text: 'His conducting days behind him, Fennelio founded Harmonia Academy and gathered the ten Maestros as its teachers — so every new generation would learn to sound the Renewal, and the world would never fall silent.' },
+  { emoji: '🎺', image: '/intro/scene6.webp', text: 'That is the world you were born into. Today you arrive at the Academy gates as its newest student — a Maestro, perhaps, in the making. But greatness starts small. Your very first lesson awaits.' },
 ];
 
 export default function IntroSequence({ onDone }: { onDone: () => void }) {
