@@ -43,9 +43,9 @@ export const MAP_NODES: Record<string, MapNode> = {
     x: 64, y: 40, entry: true,
     blurb: 'The great central metropolis, dressed for the regional contest — banners strung rooftop to rooftop, every guild hall flying its colors, the square packed for the Concerta Invitational.',
   },
-  crotchet: {
+  batterhead_burrough: {
     x: 28, y: 58,
-    blurb: 'A quiet practice quarter on the road in from the Staff Range, where visiting schools warm up before the contest. Reeds soak, scales climb the alley walls, and nerves settle.',
+    blurb: 'The last town on the Concerta road out of the Academy — a quiet burrough where every visiting school stops to warm up before the contest. Reeds soak, scales climb the alley walls, and nerves settle.',
   },
 
   // ── Zone 4 · The Grand Auditorium ──

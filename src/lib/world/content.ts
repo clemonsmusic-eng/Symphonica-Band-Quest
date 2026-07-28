@@ -117,7 +117,7 @@ const z3AllRequired = (c: Character) => Z3_REQUIRED.every((id) => done(c, id));
 const z3SemifinalWon = (c: Character) => done(c, 'z3_semifinal_won');
 
 const ZONE3: Record<string, Activity[]> = {
-  crotchet: [
+  batterhead_burrough: [
     CH('z3_eb_scale', 'Concert E♭ Major Scale', 'technique_scale', 'UIL Zone 3 · Scales', 'Play the Concert E♭ major scale, one octave, then attempt two octaves.', 150),
     CH('z3_dotted_quarter', 'Rhythm: Dotted Quarter + Eighth', 'rhythm_performance', 'UIL Zone 3 · Rhythm', 'Tap a pattern using the dotted quarter–eighth note rhythm combination.', 150),
     CH('z3_two_octave_scale', 'Two-Octave Scale: Concert B♭', 'technique_scale', 'UIL Zone 3 · Scales', 'Perform the Concert B♭ major scale across two full octaves.', 150),

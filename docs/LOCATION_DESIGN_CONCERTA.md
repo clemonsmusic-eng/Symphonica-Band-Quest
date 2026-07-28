@@ -17,9 +17,9 @@ semifinal/final bracket — plus the Zone-3 side-quests and classmate recruits.
 
 ## Decisions carried over
 - **D1 (locations):** Concerta already has two real `locations.ts` ids —
-  **`concerta`** and **`crotchet`**. No new `GameLocation`s: every city room →
-  `concerta`; every Crotchet room → `crotchet`. All rooms `zoneId: 3`.
-- **D2 (one place):** Concerta + its practice-town Crotchet render as **one
+  **`concerta`** and **`batterhead_burrough`**. No new `GameLocation`s: every city room →
+  `concerta`; every Burrough room → `batterhead_burrough`. All rooms `zoneId: 3`.
+- **D2 (one place):** Concerta + its practice-town Batterhead Burrough render as **one
   navigable map**; movement ungated. Content gates by progress via the existing
   `unlock` predicates: the **Invitational bracket** stays locked until all six
   required challenges are done (`allRequiredDone`), the **final** until the
@@ -30,8 +30,8 @@ semifinal/final bracket — plus the Zone-3 side-quests and classmate recruits.
 ```mermaid
 graph TD
   gate[City Gate] --- concourse[Grand Concourse]
-  gate --- crotsq["Crotchet Square · crotchet"]
-  crotsq --- crotalley["Practice Alley · crotchet"]
+  gate --- burrsq["Burrough Square · batterhead_burrough"]
+  burrsq --- burralley["Practice Alley · batterhead_burrough"]
   concourse --- fountain[Fountain Plaza]
   concourse --- pretzel[Pretzel Lane]
   concourse --- guild[Guild Hall Row]
@@ -41,20 +41,20 @@ graph TD
   square --- tent[The Staging Tent]
   fountain --- river[The River Walk]
 
-  classDef crot fill:#6a5a8a22,stroke:#8f7ec2;
-  class crotsq,crotalley crot;
+  classDef burr fill:#6a5a8a22,stroke:#8f7ec2;
+  class burrsq,burralley burr;
 ```
 
 ## Rooms
 
 **Maps to** = existing `locations.ts` id · all `zoneId: 3`.
 
-### Arrival & Crotchet (the practice town — required drills)
+### Arrival & Batterhead Burrough (the practice town — required drills)
 | Room | Maps to | Who's here | Scene & hotspots / hooks |
 |---|---|---|---|
 | **City Gate** | `concerta` | — | You arrive from the Academy road; Concerta glows in the valley, banners strung rooftop to rooftop for the Invitational. Look at the city; look back at the road. Entry room. |
-| **Crotchet Square** | `crotchet` | — | The quiet practice-town on the way in, where every visiting school warms up. Drills: **z3_eb_scale** (E♭ scale), **z3_dotted_quarter** (rhythm), **z3_aural_intervals**. |
-| **Practice Alley** | `crotchet` | — | Reeds soaking, scales climbing the alley walls. Drills: **z3_two_octave_scale** (two-octave B♭), **z3_aural_two_bar** (rhythm echo), **z3_cresc_decresc_long** (optional dynamics). |
+| **Burrough Square** | `batterhead_burrough` | — | The quiet practice-town on the way in, where every visiting school warms up. Drills: **z3_eb_scale** (E♭ scale), **z3_dotted_quarter** (rhythm), **z3_aural_intervals**. |
+| **Practice Alley** | `batterhead_burrough` | — | Reeds soaking, scales climbing the alley walls. Drills: **z3_two_octave_scale** (two-octave B♭), **z3_aural_two_bar** (rhythm echo), **z3_cresc_decresc_long** (optional dynamics). |
 
 ### The Festival City
 | Room | Maps to | Who's here | Scene & hotspots / hooks |
@@ -74,7 +74,7 @@ graph TD
 
 ## Content-hook summary (all already in `content.ts` / `sidequests.ts` / `students.ts`)
 - **Required (6):** `z3_eb_scale`, `z3_dotted_quarter`, `z3_aural_intervals`
-  (Crotchet Square); `z3_two_octave_scale`, `z3_aural_two_bar` (Practice Alley);
+  (Burrough Square); `z3_two_octave_scale`, `z3_aural_two_bar` (Practice Alley);
   `z3_accent` (Contest Square). Optional `z3_cresc_decresc_long` (Practice Alley).
 - **Bracket gates:** semifinal (`z3_semifinal` → `z3_semifinal_won`, non-advancing;
   unlock `allRequiredDone`) and final (`z3_final` → `z3_contest_won`, `advanceTo 4`;
@@ -94,14 +94,14 @@ Keep it lighter than the Academy — Concerta's draw is the contest and the crow
 not item puzzles.
 
 ## Minimap coordinates (x,y 0–100, for RoomView)
-`city_gate (50,92)` · `crotchet_square (20,78)` · `practice_alley (12,62)` ·
+`city_gate (50,92)` · `burrough_square (20,78)` · `practice_alley (12,62)` ·
 `grand_concourse (55,68)` · `pretzel_lane (80,74)` · `fountain_plaza (82,55)` ·
 `guild_hall_row (32,52)` · `luthiers_shop (80,40)` · `contest_square (52,40)` ·
 `staging_tent (52,24)` · `river_walk (90,64)`.
 
 ## Build order (after the Academy RoomView proves out)
 Concerta drops into the same `rooms.ts` + `RoomView`: add these 11 rooms + edges
-(all `zoneId 3`, `locationId` `concerta`/`crotchet`), wire the hooks to the
+(all `zoneId 3`, `locationId` `concerta`/`batterhead_burrough`), wire the hooks to the
 existing `ZONE3` challenges/bracket and the Zone-3 quests/recruits, and it renders
 through the same component. No engine changes. An interactive click-through
 prototype (like the Academy's) can be spun up on request for review/refinement.

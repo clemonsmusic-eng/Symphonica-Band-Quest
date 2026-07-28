@@ -18,7 +18,7 @@ cities = {  # to-scale positions; icon is symbolic
 }
 towns = {
  "Crotchet": (-60,0),
- "Batterhead Dale": (55,-55),
+ "Batterhead Burrough": (55,-55),
  "Legato": (60,65),
  "Crescendo Keep": (-165,0),
  "Caesura Crossing": (-255,-115),

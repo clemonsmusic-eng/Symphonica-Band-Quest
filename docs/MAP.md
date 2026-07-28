@@ -52,9 +52,9 @@ symbols + a scale bar (standard cartographic practice).
 | **Arco** (String School) | 300 E, ~25 N | far-eastern edge, isolated |
 | **Fairwind** (Wind Academy) | 106 E, 106 S | far SE; Academy just **NE** of it |
 | **Coralis** (Choral College) | 0, 200 S | S coast, tiered "riser" cliffs |
-| Crotchet | 60 W, 0 | between Concerta & range |
+| Crotchet | 60 W, 0 | between Concerta & range; the western schools' road-stop |
 | Legato | 60 E, 65 N | in Melodious Meadows |
-| Batterhead Dale | 55 E, 55 S | on Concerta→Fairwind road |
+| **Batterhead Burrough** | 55 E, 55 S | on the Concerta→Fairwind road — the Academy's road-stop, where the class warms up before the Invitational (**Zone 3**) |
 | Crescendo Keep | 165 W, 0 | W mouth of Presto Pass |
 | Adagio | 250 W, 120 N | NW frontier, forest edge |
 | Caesura Crossing / Trioasis | 255 W, 115 S | in Sands of Time |
@@ -77,7 +77,7 @@ SE through Concerta into the Concord Sea on the southern coast.
   friendly-rival, outsider status).
 
 ### Towns & villages
-Batterhead Dale · Legato · Crotchet · Caesura Crossing · Crescendo Keep · Coda Cove · Adagio.
+Batterhead Burrough · Legato · Crotchet · Caesura Crossing · Crescendo Keep · Coda Cove · Adagio.
 **Discordia is the only settlement on the island.**
 
 ---
@@ -104,7 +104,7 @@ Batterhead Dale · Legato · Crotchet · Caesura Crossing · Crescendo Keep · C
 > edge (~300 mi E); **Fairwind** to the far south-east (~150 mi SE) with a small **Wind
 > Academy** keep just north-east of it; and **Coralis** on the far southern coast at the
 > foot of tiered choral-riser cliffs (~200 mi due S). Smaller towns: **Legato** (NE
-> meadows), **Crotchet** (between Concerta and the range), **Batterhead Dale** (SE, on the
+> meadows), **Crotchet** (between Concerta and the range), **Batterhead Burrough** (SE, on the
 > Concerta–Fairwind road). A river, the **Cadence**, springs from the north end of the
 > range and winds south-east through Concerta into the **Concord Sea** along the southern
 > coast.
