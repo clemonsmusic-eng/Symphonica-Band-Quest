@@ -185,6 +185,34 @@ export function locationActivities(zoneId: number, locationId: string): Activity
   return ZONE_CONTENT[zoneId]?.[locationId] ?? [];
 }
 
+/** The stable key an activity is completed under. */
+export function activityKey(a: Activity): string {
+  return a.kind === 'challenge' ? a.challenge.id
+    : a.kind === 'gate' ? (a.winKey ?? a.challenge.id)
+    : a.id;
+}
+
+// Flat index of every authored activity, so a room can surface an activity by
+// key regardless of which location cluster it was authored under. `zoneId` is
+// the activity's *source* zone — RoomView locks an activity whose source zone
+// is ahead of the player, which is how one building can hold several zones'
+// content (DECISION D2).
+export interface IndexedActivity { zoneId: number; locationId: string; activity: Activity }
+
+const ACTIVITY_INDEX: Record<string, IndexedActivity> = (() => {
+  const out: Record<string, IndexedActivity> = {};
+  for (const [zid, byLocation] of Object.entries(ZONE_CONTENT)) {
+    for (const [locationId, list] of Object.entries(byLocation)) {
+      for (const activity of list) out[activityKey(activity)] = { zoneId: Number(zid), locationId, activity };
+    }
+  }
+  return out;
+})();
+
+export function activityByKey(key: string): IndexedActivity | undefined {
+  return ACTIVITY_INDEX[key];
+}
+
 /** Required-challenge progress for a zone's header bar. */
 export function zoneRequired(zoneId: number): string[] {
   return zoneId === 1 ? Z1_REQUIRED : zoneId === 2 ? Z2_REQUIRED

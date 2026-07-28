@@ -10,6 +10,8 @@ import ChallengeModal from '../components/ChallengeModal';
 import BattleScreen from '../components/BattleScreen';
 import LiberationScene from '../components/LiberationScene';
 import { MAP_NODES, zoneLocations, entryLocation, isLocationBasedZone } from '../lib/world/worldMap';
+import RoomView from '../components/world/RoomView';
+import { isRoomBasedZone } from '../lib/world/rooms';
 import { getCurrentLocation, setCurrentLocation } from '../lib/world/state';
 import { npcsAt, type PresentNpc } from '../lib/world/npcs';
 import { locationActivities, zoneRequired, countDone, type Activity, type ChallengeSpec } from '../lib/world/content';
@@ -40,6 +42,9 @@ export default function ExplorePage() {
   if (!character) return null;
   const char = character;
   if (zid > character.currentZone || !isLocationBasedZone(zid)) { navigate('/hub'); return null; }
+  // Zones with authored rooms navigate room-to-room; the rest keep the
+  // top-down node map below until their rooms are built.
+  if (isRoomBasedZone(zid)) return <RoomView zoneId={zid} />;
 
   const zone = getZone(zid);
   const locs = zoneLocations(zid);
