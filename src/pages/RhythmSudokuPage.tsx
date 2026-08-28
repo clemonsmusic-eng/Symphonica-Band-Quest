@@ -747,7 +747,7 @@ function ValueLegend({ variant, className, open, onToggle }: {
           {!collapsible && (
             <div className="text-academy-cream/35 text-[10px] uppercase tracking-widest mb-3">Rhythm chart</div>
           )}
-          <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))' }}>
+          <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))' }}>
             {variant.values.map((v, i) => (
               <div key={v.id} className="flex items-center gap-2">
                 <div
