@@ -52,6 +52,13 @@ VITE_SUPABASE_ANON_KEY=...
   who return as summons (`src/lib/students.ts`, `src/lib/allies.ts`).
 - **Side quests** — NPC favors, post-graduation town jobs, and unlock-gated
   errands (`src/lib/sidequests.ts`).
+- **Note Rush** — a scrolling-staff rhythm mini-game: notes travel right to left
+  toward a strike line and you press the letter each one sits on (home row
+  `A S D F G H J` = C D E F G A B, or the seven on-screen buttons), or play the
+  line for real and let the microphone judge it. Streak multipliers, held tails,
+  a Resonance Surge meter, and per-chart high scores; every selection in the
+  library is a playable chart, transposed for your instrument
+  (`src/lib/music/noteRush.ts`, `src/components/music/NoteRushGame.tsx`).
 - **Demo Mode** — a silent tap-timing mini-game replaces microphone challenges,
   so the whole game is playable with no audible input.
 - **Guest Mode** — play instantly with no account.

@@ -20,6 +20,7 @@ import LeaderboardPage from './pages/LeaderboardPage';
 import LibraryPage from './pages/LibraryPage';
 import AlliesPage from './pages/AlliesPage';
 import SimulatorPage from './pages/SimulatorPage';
+import NoteRushPage from './pages/NoteRushPage';
 import GearPage from './pages/GearPage';
 import ShopPage from './pages/ShopPage';
 import WorldMapPage from './pages/WorldMapPage';
@@ -168,6 +169,11 @@ export default function App() {
       {/* Battle Simulator */}
       <Route path="/simulator" element={
         <RequireCharacter><SimulatorPage /></RequireCharacter>
+      } />
+
+      {/* Note Rush — scrolling-staff rhythm game */}
+      <Route path="/note-rush" element={
+        <RequireCharacter><NoteRushPage /></RequireCharacter>
       } />
 
       {/* Selection Composer — author / import performance excerpts */}

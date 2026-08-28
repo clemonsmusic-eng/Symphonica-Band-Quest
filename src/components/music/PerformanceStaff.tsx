@@ -1,6 +1,6 @@
 import type { SeatedExcerpt, SeatedNote } from '../../lib/music/transposition';
 import { seatedStep } from '../../lib/music/transposition';
-import type { Clef } from '../../lib/music/staff';
+import { keySigSteps, type Clef } from '../../lib/music/staff';
 
 const BG = '#0d1520';
 const CREAM = '#d4c9a8';
@@ -13,12 +13,6 @@ const SVG_H = PAD_T + STAFF_H + 34;
 const NOTE_RX = 5.5;
 const NOTE_RY = 3.7;
 const STEM_LEN = 30;
-
-// Key-signature accidental step positions (from MusicDiagram).
-const TREBLE_SHARP_STEPS = [8, 5, 9, 6, 3, 7, 4];
-const TREBLE_FLAT_STEPS = [4, 7, 3, 6, 2, 5, 1];
-const BASS_SHARP_STEPS = [6, 3, 7, 4, 1, 5, 2];
-const BASS_FLAT_STEPS = [2, 5, 1, 4, 0, 3, -1];
 
 function stepY(step: number): number {
   return PAD_T + STAFF_H - step * (LINE_SP / 2);
@@ -46,9 +40,7 @@ export default function PerformanceStaff({
   const notesX = LEFT + CLEF_W + keyW + timeW + 10;
   const width = notesX + Math.max(1, totalBeats) * pxPerBeat + 24;
 
-  const keySteps = isSharp
-    ? clef === 'treble' ? TREBLE_SHARP_STEPS : BASS_SHARP_STEPS
-    : clef === 'treble' ? TREBLE_FLAT_STEPS : BASS_FLAT_STEPS;
+  const keySteps = keySigSteps(clef, seated.writtenKeySig);
 
   return (
     <div className="overflow-x-auto rounded-lg" style={{ background: BG, border: '1px solid rgba(212,160,23,0.2)' }}>

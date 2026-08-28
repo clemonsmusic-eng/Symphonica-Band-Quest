@@ -9,6 +9,7 @@ import type {
   StaffNoteSpec,
   Duration,
 } from '../types/diagrams';
+import { keySigSteps } from '../lib/music/staff';
 
 // ── Color constants ────────────────────────────────────────────────────────────
 const BG = '#0d1520';
@@ -379,14 +380,6 @@ function StaffDiagramSVG({ spec }: { spec: StaffDiagram }) {
 }
 
 // ── Key Signature diagram ─────────────────────────────────────────────────────
-// Sharp step positions (treble): F C G D A E B
-const TREBLE_SHARP_STEPS = [8, 5, 9, 6, 3, 7, 4];
-// Flat step positions (treble): B E A D G C F
-const TREBLE_FLAT_STEPS = [4, 7, 3, 6, 2, 5, 1];
-// Bass sharp: G D A E B F# C#
-const BASS_SHARP_STEPS = [6, 3, 7, 4, 1, 5, 2];
-// Bass flat: Bb Eb Ab Db Gb Cb Fb
-const BASS_FLAT_STEPS = [2, 5, 1, 4, 0, 3, -1];
 
 function KeySigDiagramSVG({ spec }: { spec: KeySigDiagram }) {
   const clef = spec.clef ?? 'treble';
@@ -398,9 +391,7 @@ function KeySigDiagramSVG({ spec }: { spec: KeySigDiagram }) {
   const accWidth = count * ACC_SPACING + 6;
   const totalW = LEFT_PAD + CLEF_W + 8 + accWidth + 20;
 
-  const stepPositions = isSharp
-    ? clef === 'treble' ? TREBLE_SHARP_STEPS : BASS_SHARP_STEPS
-    : clef === 'treble' ? TREBLE_FLAT_STEPS : BASS_FLAT_STEPS;
+  const stepPositions = keySigSteps(clef, spec.count);
 
   const accChar = isSharp ? '♯' : '♭';
   const accStartX = LEFT_PAD + CLEF_W + 10;

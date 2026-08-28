@@ -41,6 +41,7 @@ export interface MetronomeOptions {
   beatsPerBar: number;
   countInBeats?: number;   // audible count-in before beat 0 (default 0)
   totalBeats?: number;     // stop clicking after this many beats past 0 (default Infinity)
+  silent?: boolean;        // run the clock with no clicks (the caller wants timing only)
   onDone?: () => void;
 }
 
@@ -55,6 +56,7 @@ export class Metronome {
   private beatsPerBar = 4;
   private countIn = 0;
   private totalBeats = Infinity;
+  private silent = false;
   private startTime = 0;           // ctx time of beat 0
   private nextBeat = 0;            // next beat index to schedule (starts at -countIn)
   private timer: ReturnType<typeof setInterval> | null = null;
@@ -69,6 +71,7 @@ export class Metronome {
     this.beatsPerBar = opts.beatsPerBar;
     this.countIn = opts.countInBeats ?? 0;
     this.totalBeats = opts.totalBeats ?? Infinity;
+    this.silent = opts.silent ?? false;
     this.onDone = opts.onDone;
     this.done = false;
     this.running = true;
@@ -85,7 +88,7 @@ export class Metronome {
     while (this.nextBeat < this.totalBeats && this.startTime + this.nextBeat * spb < aheadUntil) {
       const t = this.startTime + this.nextBeat * spb;
       const isDownbeat = ((this.nextBeat % this.beatsPerBar) + this.beatsPerBar) % this.beatsPerBar === 0;
-      scheduleClick(this.ac, Math.max(this.ac.currentTime, t), isDownbeat);
+      if (!this.silent) scheduleClick(this.ac, Math.max(this.ac.currentTime, t), isDownbeat);
       this.nextBeat++;
     }
     if (this.nextBeat >= this.totalBeats && !this.done) {
@@ -107,6 +110,12 @@ export class Metronome {
     this.running = false;
     if (this.timer) { clearInterval(this.timer); this.timer = null; }
   }
+}
+
+/** A short plucked blip — immediate confirmation that a rhythm-game note landed. */
+export async function playNoteBlip(midi: number, dur = 0.24) {
+  const ac = await getAudioCtx();
+  scheduleTone(ac, midiToFreq(midi), ac.currentTime, dur, 'triangle', 0.2);
 }
 
 /** Play a reference/tuner tone for a concert MIDI note. */

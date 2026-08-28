@@ -39,7 +39,10 @@ export default function PerformancePractice({ character }: { character: Characte
           Practice any selection with a metronome and demonstration, at your own tempo, with pitch &amp;
           rhythm accuracy feedback and a colour overlay.
         </p>
-        <button onClick={() => navigate('/compose')} className="btn-secondary text-xs whitespace-nowrap flex-shrink-0">＋ Compose / Import</button>
+        <div className="flex gap-2 flex-shrink-0">
+          <button onClick={() => navigate('/note-rush')} className="btn-secondary text-xs whitespace-nowrap">⚡ Note Rush</button>
+          <button onClick={() => navigate('/compose')} className="btn-secondary text-xs whitespace-nowrap">＋ Compose / Import</button>
+        </div>
       </div>
       {(Object.keys(byType) as ExcerptChallengeType[]).map((type) => (
         <div key={type} className="mb-6">

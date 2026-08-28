@@ -138,6 +138,7 @@ export default function HubPage() {
           </h2>
           <div className="grid grid-cols-2 gap-3 mb-6">
             <NavCard icon="⚔️" label="Battle Simulator" sublabel="Practice with feedback" onClick={() => navigate('/simulator')} />
+            <NavCard icon="⚡" label="Note Rush" sublabel="Scrolling-staff rhythm game" onClick={() => navigate('/note-rush')} />
             <NavCard icon="📚" label="The Library" sublabel="Music history & theory" onClick={() => navigate('/library')} />
             <NavCard icon="🎵" label="Fingering Charts" sublabel="All instruments" onClick={() => navigate('/fingering')} />
             <NavCard icon="🏆" label="Leaderboard" sublabel="Class standings" onClick={() => navigate('/leaderboard')} />

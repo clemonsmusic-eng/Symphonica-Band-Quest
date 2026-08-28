@@ -127,3 +127,19 @@ export function pitchStringToMidi(pitch: string): number | null {
   const acc = m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0;
   return (parseInt(m[3], 10) + 1) * 12 + base + acc;
 }
+
+// ── Key-signature layout ──────────────────────────────────────────────────────
+// Staff steps (0 = bottom line) each accidental of a key signature sits on, in
+// the order they are written.
+const TREBLE_SHARP_STEPS = [8, 5, 9, 6, 3, 7, 4]; // F C G D A E B
+const TREBLE_FLAT_STEPS = [4, 7, 3, 6, 2, 5, 1];  // B E A D G C F
+const BASS_SHARP_STEPS = [6, 3, 7, 4, 1, 5, 2];
+const BASS_FLAT_STEPS = [2, 5, 1, 4, 0, 3, -1];
+
+/** Steps for the accidentals of a key signature (`fifths`: +sharps / −flats). */
+export function keySigSteps(clef: Clef, fifths: number): number[] {
+  const steps = fifths > 0
+    ? clef === 'treble' ? TREBLE_SHARP_STEPS : BASS_SHARP_STEPS
+    : clef === 'treble' ? TREBLE_FLAT_STEPS : BASS_FLAT_STEPS;
+  return steps.slice(0, Math.min(7, Math.abs(fifths)));
+}
