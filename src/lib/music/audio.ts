@@ -16,12 +16,12 @@ export async function getAudioCtx(): Promise<AudioContext> {
 /** Schedule one oscillator tone. `when` is an absolute ctx time. */
 function scheduleTone(
   ac: AudioContext, freq: number, when: number, dur: number,
-  type: OscillatorType = 'sine', peak = 0.22, destination?: AudioNode,
+  type: OscillatorType = 'sine', peak = 0.22,
 ) {
   const osc = ac.createOscillator();
   const gain = ac.createGain();
   osc.connect(gain);
-  gain.connect(destination ?? ac.destination);
+  gain.connect(ac.destination);
   osc.type = type;
   osc.frequency.value = freq;
   gain.gain.setValueAtTime(0.0001, when);
@@ -32,8 +32,8 @@ function scheduleTone(
 }
 
 /** A short metronome click; accented (louder/higher) on downbeats. */
-function scheduleClick(ac: AudioContext, when: number, accent: boolean, level = 1, destination?: AudioNode) {
-  scheduleTone(ac, accent ? 1760 : 1245, when, 0.05, 'square', (accent ? 0.3 : 0.16) * level, destination);
+function scheduleClick(ac: AudioContext, when: number, accent: boolean) {
+  scheduleTone(ac, accent ? 1760 : 1245, when, 0.05, 'square', accent ? 0.3 : 0.16);
 }
 
 export interface MetronomeOptions {
@@ -148,55 +148,4 @@ export async function playExcerpt(
   const timer = setTimeout(() => { if (!cancelled) opts.onDone?.(); }, endMs);
 
   return { stop: () => { cancelled = true; clearTimeout(timer); } };
-}
-
-export interface RhythmEvent { beats: number; rest: boolean }
-
-/**
- * Sound a bare rhythm — one pitch, durations only — so a written value can be
- * heard as a length. Notes ring for their full value (a whole note holds four
- * beats), rests are silent, and a quiet click marks every beat underneath so
- * the durations have something to measure against.
- */
-export async function playRhythmPattern(
-  events: RhythmEvent[],
-  bpm: number,
-  opts: { midi?: number; withClick?: boolean; beatsPerBar?: number; onDone?: () => void } = {},
-): Promise<ExcerptPlayback> {
-  const ac = await getAudioCtx();
-  const spb = 60 / bpm;
-  const t0 = ac.currentTime + 0.15;
-  const freq = midiToFreq(opts.midi ?? 69);
-  // Everything runs through one gate so `stop()` silences notes already
-  // scheduled — a whole note shouldn't keep ringing after you leave the page.
-  const gate = ac.createGain();
-  gate.connect(ac.destination);
-  let cancelled = false;
-
-  let beat = 0;
-  for (const ev of events) {
-    if (!ev.rest) {
-      // Stop just shy of the next attack so repeated values stay articulated.
-      scheduleTone(ac, freq, t0 + beat * spb, Math.max(0.1, ev.beats * spb * 0.88), 'triangle', 0.26, gate);
-    }
-    beat += ev.beats;
-  }
-  const totalBeats = beat;
-
-  if (opts.withClick !== false) {
-    const bpb = opts.beatsPerBar ?? 4;
-    for (let b = 0; b < Math.ceil(totalBeats); b++) {
-      scheduleClick(ac, t0 + b * spb, b % bpb === 0, 0.45, gate);
-    }
-  }
-
-  const endMs = (totalBeats * spb + 0.25) * 1000;
-  const timer = setTimeout(() => { if (!cancelled) opts.onDone?.(); }, endMs);
-  return {
-    stop: () => {
-      cancelled = true;
-      clearTimeout(timer);
-      gate.gain.setTargetAtTime(0, ac.currentTime, 0.01);   // short fade, no click
-    },
-  };
 }

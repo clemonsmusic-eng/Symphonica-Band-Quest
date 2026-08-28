@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/gameStore';
 import { getInstrumentColor } from '../lib/instruments';
-import { playRhythmPattern } from '../lib/music/audio';
 import RhythmGlyph from '../components/minigames/RhythmGlyph';
 import {
   VARIANTS, DIFFICULTIES, PAR_SECONDS,
@@ -25,7 +24,6 @@ const VARIANT_XP: Record<VariantId, number> = { mini: 0.7, full: 1.3 };
 const DIFFICULTY_XP: Record<Difficulty, number> = { apprentice: 0.8, performer: 1.0, maestro: 1.3 };
 
 const CELL_BG = '#0d1520';
-const PLAYBACK_BPM = 100;
 
 // ── Saved progress ────────────────────────────────────────────────────────────
 
@@ -97,13 +95,11 @@ export default function RhythmSudokuPage() {
   const [seconds, setSeconds] = useState(0);
   const [paused, setPaused] = useState(false);
   const [showLegend, setShowLegend] = useState(false);
-  const [playingRow, setPlayingRow] = useState<number | null>(null);
 
   const [result, setResult] = useState<{ score: number; rating: Rating; seconds: number; xp: number } | null>(null);
   const [bests, setBests] = useState<BestTimes>({});
   const [saved, setSaved] = useState<SavedGame | null>(null);
 
-  const playbackRef = useRef<{ stop: () => void } | null>(null);
   const awardedRef = useRef(false);
 
   const charId = character?.id ?? '';
@@ -132,8 +128,6 @@ export default function RhythmSudokuPage() {
     if (phase !== 'playing' || !puzzle || !charId) return;
     writeSaved(charId, { puzzle, board, marks, mistakes, hints, seconds, revealed: [...revealed] });
   }, [phase, puzzle, board, marks, mistakes, hints, seconds, revealed, charId]);
-
-  useEffect(() => () => { playbackRef.current?.stop(); }, []);
 
   // ── Lifecycle ───────────────────────────────────────────────────────────────
 
@@ -174,7 +168,6 @@ export default function RhythmSudokuPage() {
 
   /** Back to the board picker, leaving the puzzle saved for a Resume. */
   function leaveToSelect() {
-    playbackRef.current?.stop();
     setSaved(loadSaved(charId));
     setPuzzle(null);
     setPhase('select');
@@ -182,7 +175,6 @@ export default function RhythmSudokuPage() {
 
   /** Throw the puzzle away for good. */
   function abandon() {
-    playbackRef.current?.stop();
     writeSaved(charId, null);
     setSaved(null);
     setPuzzle(null);
@@ -291,28 +283,6 @@ export default function RhythmSudokuPage() {
     setSelected(target);
   }
 
-  /** Sound the selected row's rhythm — the point of the whole exercise. */
-  async function hearRow() {
-    if (selected === null || !puzzle) return;
-    const row = Math.floor(selected / def.size);
-    const cells = Array.from({ length: def.size }, (_, c) => board[row * def.size + c]);
-    if (cells.some((c) => c === null)) return;
-
-    playbackRef.current?.stop();
-    setPlayingRow(row);
-    const events = cells.map((c) => {
-      const v = def.values[c as number];
-      return { beats: v.beats, rest: v.rest };
-    });
-    playbackRef.current = await playRhythmPattern(events, PLAYBACK_BPM, {
-      onDone: () => setPlayingRow(null),
-    });
-  }
-
-  const selectedRowComplete = selected !== null && puzzle !== null
-    && Array.from({ length: def.size }, (_, c) => board[Math.floor(selected / def.size) * def.size + c])
-      .every((c) => c !== null);
-
   // ── Win detection ───────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -321,7 +291,6 @@ export default function RhythmSudokuPage() {
     if (awardedRef.current) return;
     awardedRef.current = true;
 
-    playbackRef.current?.stop();
     const stats = { mistakes, hints, seconds };
     const score = scoreRun(puzzle.variant, puzzle.difficulty, stats);
     const rating = ratingForScore(score) as Rating;
@@ -543,7 +512,6 @@ export default function RhythmSudokuPage() {
               const sameValue = cell !== null && selValue !== null && cell === selValue && !isSel;
               const isWrong = wrong.has(i);
               const isConflict = conflicts.has(i);
-              const inPlayingRow = playingRow === r;
 
               const ink = isWrong || isConflict ? '#F87171' : given ? '#F5ECD7' : hinted ? '#60A5FA' : color;
 
@@ -551,7 +519,6 @@ export default function RhythmSudokuPage() {
               if (given) bg = 'rgba(245,236,215,0.05)';
               if (isPeer) bg = 'rgba(201,162,39,0.07)';
               if (sameValue) bg = 'rgba(201,162,39,0.16)';
-              if (inPlayingRow) bg = 'rgba(96,165,250,0.16)';
               if (isConflict || isWrong) bg = 'rgba(248,113,113,0.16)';
               if (isSel) bg = `${color}33`;
 
@@ -644,20 +611,6 @@ export default function RhythmSudokuPage() {
           <ToolButton icon="✓" label="Check" onClick={checkBoard} />
           <ToolButton icon="💡" label="Reveal" onClick={revealCell} />
         </div>
-
-        <button
-          onClick={hearRow}
-          disabled={!selectedRowComplete}
-          className="w-full btn-secondary text-sm py-2.5 mb-3 disabled:opacity-40"
-          title="Hear the selected row played as a rhythm"
-        >
-          {playingRow !== null ? '♫ Playing…' : '▶ Hear this row'}
-        </button>
-        {!selectedRowComplete && (
-          <div className="text-academy-cream/30 text-[10px] text-center -mt-2 mb-3">
-            Fill a whole row, then select any cell in it to hear the rhythm.
-          </div>
-        )}
 
         <ValueLegend variant={def} open={showLegend} onToggle={() => setShowLegend((s) => !s)} />
 
@@ -806,7 +759,7 @@ function ValueLegend({ variant, className, open, onToggle }: {
                 <div className="min-w-0">
                   <div className="text-academy-cream/70 text-[11px] truncate">{v.name}</div>
                   <div className="text-academy-cream/35 text-[9px]">
-                    {v.beats} beat{v.beats === 1 ? '' : 's'} · key {i + 1}
+                    {v.beats} beat{v.beats === 1 ? '' : 's'}{v.rest ? ' of silence' : ''} · key {i + 1}
                   </div>
                 </div>
               </div>

@@ -24,33 +24,31 @@ export interface RhythmValue {
   dotted: boolean;
   /** Duration in beats, counting a quarter note as one beat. */
   beats: number;
-  /** True for rests — silent during row playback. */
+  /** True for rests — the value is counted, not played. */
   rest: boolean;
-  /** How a student counts it aloud, for the legend. */
-  counting: string;
 }
 
 // The order here is the palette order (longest to shortest, rests last), and the
 // index into it is what the board stores.
 export const MINI_VALUES: RhythmValue[] = [
-  { id: 'w',   name: 'Whole note',        short: 'whole',      shape: 'whole',        dotted: false, beats: 4,   rest: false, counting: '1 – 2 – 3 – 4' },
-  { id: 'hd',  name: 'Dotted half note',  short: 'dot. half',  shape: 'half',         dotted: true,  beats: 3,   rest: false, counting: '1 – 2 – 3' },
-  { id: 'h',   name: 'Half note',         short: 'half',       shape: 'half',         dotted: false, beats: 2,   rest: false, counting: '1 – 2' },
-  { id: 'q',   name: 'Quarter note',      short: 'quarter',    shape: 'quarter',      dotted: false, beats: 1,   rest: false, counting: '1' },
-  { id: 'e',   name: 'Eighth note',       short: 'eighth',     shape: 'eighth',       dotted: false, beats: 0.5, rest: false, counting: '1 (or "&")' },
-  { id: 'qr',  name: 'Quarter rest',      short: 'qtr rest',   shape: 'rest_quarter', dotted: false, beats: 1,   rest: true,  counting: '(silent 1)' },
+  { id: 'w',   name: 'Whole note',        short: 'whole',      shape: 'whole',        dotted: false, beats: 4,   rest: false },
+  { id: 'hd',  name: 'Dotted half note',  short: 'dot. half',  shape: 'half',         dotted: true,  beats: 3,   rest: false },
+  { id: 'h',   name: 'Half note',         short: 'half',       shape: 'half',         dotted: false, beats: 2,   rest: false },
+  { id: 'q',   name: 'Quarter note',      short: 'quarter',    shape: 'quarter',      dotted: false, beats: 1,   rest: false },
+  { id: 'e',   name: 'Eighth note',       short: 'eighth',     shape: 'eighth',       dotted: false, beats: 0.5, rest: false },
+  { id: 'qr',  name: 'Quarter rest',      short: 'qtr rest',   shape: 'rest_quarter', dotted: false, beats: 1,   rest: true },
 ];
 
 export const FULL_VALUES: RhythmValue[] = [
-  { id: 'w',   name: 'Whole note',          short: 'whole',      shape: 'whole',        dotted: false, beats: 4,    rest: false, counting: '1 – 2 – 3 – 4' },
-  { id: 'hd',  name: 'Dotted half note',    short: 'dot. half',  shape: 'half',         dotted: true,  beats: 3,    rest: false, counting: '1 – 2 – 3' },
-  { id: 'h',   name: 'Half note',           short: 'half',       shape: 'half',         dotted: false, beats: 2,    rest: false, counting: '1 – 2' },
-  { id: 'qd',  name: 'Dotted quarter note', short: 'dot. qtr',   shape: 'quarter',      dotted: true,  beats: 1.5,  rest: false, counting: '1 &' },
-  { id: 'q',   name: 'Quarter note',        short: 'quarter',    shape: 'quarter',      dotted: false, beats: 1,    rest: false, counting: '1' },
-  { id: 'e',   name: 'Eighth note',         short: 'eighth',     shape: 'eighth',       dotted: false, beats: 0.5,  rest: false, counting: '1 (or "&")' },
-  { id: 's',   name: 'Sixteenth note',      short: 'sixteenth',  shape: 'sixteenth',    dotted: false, beats: 0.25, rest: false, counting: '1 e & a — one of four' },
-  { id: 'qr',  name: 'Quarter rest',        short: 'qtr rest',   shape: 'rest_quarter', dotted: false, beats: 1,    rest: true,  counting: '(silent 1)' },
-  { id: 'er',  name: 'Eighth rest',         short: '8th rest',   shape: 'rest_eighth',  dotted: false, beats: 0.5,  rest: true,  counting: '(silent &)' },
+  { id: 'w',   name: 'Whole note',          short: 'whole',      shape: 'whole',        dotted: false, beats: 4,    rest: false },
+  { id: 'hd',  name: 'Dotted half note',    short: 'dot. half',  shape: 'half',         dotted: true,  beats: 3,    rest: false },
+  { id: 'h',   name: 'Half note',           short: 'half',       shape: 'half',         dotted: false, beats: 2,    rest: false },
+  { id: 'qd',  name: 'Dotted quarter note', short: 'dot. qtr',   shape: 'quarter',      dotted: true,  beats: 1.5,  rest: false },
+  { id: 'q',   name: 'Quarter note',        short: 'quarter',    shape: 'quarter',      dotted: false, beats: 1,    rest: false },
+  { id: 'e',   name: 'Eighth note',         short: 'eighth',     shape: 'eighth',       dotted: false, beats: 0.5,  rest: false },
+  { id: 's',   name: 'Sixteenth note',      short: 'sixteenth',  shape: 'sixteenth',    dotted: false, beats: 0.25, rest: false },
+  { id: 'qr',  name: 'Quarter rest',        short: 'qtr rest',   shape: 'rest_quarter', dotted: false, beats: 1,    rest: true },
+  { id: 'er',  name: 'Eighth rest',         short: '8th rest',   shape: 'rest_eighth',  dotted: false, beats: 0.5,  rest: true },
 ];
 
 // ── Board shape ───────────────────────────────────────────────────────────────

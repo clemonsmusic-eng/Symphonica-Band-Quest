@@ -52,11 +52,10 @@ VITE_SUPABASE_ANON_KEY=...
   who return as summons (`src/lib/students.ts`, `src/lib/allies.ts`).
 - **Side quests** — NPC favors, post-graduation town jobs, and unlock-gated
   errands (`src/lib/sidequests.ts`).
-- **Rhythm Sudoku** — a notation logic puzzle in two sizes: a 6×6 "Mini Staff"
-  (whole, dotted half, half, quarter, eighth, quarter rest) and a 9×9 "Full
-  Score" that adds dotted quarter, sixteenth and eighth rest. Every generated
-  board has exactly one solution, and a completed row can be played back so the
-  symbols are heard as durations (`src/lib/minigames/rhythmSudoku.ts`,
+- **Rhythm Sudoku** — a silent notation logic puzzle in two sizes: a 6×6 "Mini
+  Staff" (whole, dotted half, half, quarter, eighth, quarter rest) and a 9×9
+  "Full Score" that adds dotted quarter, sixteenth and eighth rest. Every
+  generated board has exactly one solution (`src/lib/minigames/rhythmSudoku.ts`,
   `src/pages/RhythmSudokuPage.tsx`).
 - **Demo Mode** — a silent tap-timing mini-game replaces microphone challenges,
   so the whole game is playable with no audible input.
