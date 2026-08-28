@@ -64,6 +64,7 @@ const BASE_XP: Record<string, number> = {
   zone_boss: 1500,
   side_quest_short: 500,
   side_quest_long: 1000,
+  rhythm_puzzle: 150,
 };
 
 const COIN_PER_RATING: Record<Rating, number> = {

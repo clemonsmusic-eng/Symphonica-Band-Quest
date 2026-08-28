@@ -30,6 +30,7 @@ import SideQuestsPage from './pages/SideQuestsPage';
 import LoadingScreen from './components/LoadingScreen';
 import TunerWidget from './components/music/TunerWidget';
 import ComposerPage from './pages/ComposerPage';
+import RhythmSudokuPage from './pages/RhythmSudokuPage';
 import ExplorePage from './pages/ExplorePage';
 import IntroSequence from './components/world/IntroSequence';
 
@@ -202,6 +203,11 @@ export default function App() {
       {/* World Map */}
       <Route path="/world" element={
         <RequireCharacter><WorldMapPage /></RequireCharacter>
+      } />
+
+      {/* Rhythm Sudoku — notation logic mini-game */}
+      <Route path="/rhythm-sudoku" element={
+        <RequireCharacter><RhythmSudokuPage /></RequireCharacter>
       } />
 
       {/* Fingering Charts */}

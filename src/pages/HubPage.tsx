@@ -140,6 +140,7 @@ export default function HubPage() {
             <NavCard icon="⚔️" label="Battle Simulator" sublabel="Practice with feedback" onClick={() => navigate('/simulator')} />
             <NavCard icon="📚" label="The Library" sublabel="Music history & theory" onClick={() => navigate('/library')} />
             <NavCard icon="🎵" label="Fingering Charts" sublabel="All instruments" onClick={() => navigate('/fingering')} />
+            <NavCard icon="🧩" label="Rhythm Sudoku" sublabel="Note-value puzzles" onClick={() => navigate('/rhythm-sudoku')} />
             <NavCard icon="🏆" label="Leaderboard" sublabel="Class standings" onClick={() => navigate('/leaderboard')} />
             <NavCard icon="🎶" label="Symphony Allies" sublabel={`${character.freedAllies.length}/10 freed`} onClick={() => navigate('/allies')} />
             <NavCard icon="🎼" label="Your Band" sublabel="Choose your party" onClick={() => navigate('/party')} />
