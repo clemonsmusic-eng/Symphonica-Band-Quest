@@ -149,3 +149,39 @@ export async function playExcerpt(
 
   return { stop: () => { cancelled = true; clearTimeout(timer); } };
 }
+
+// ── Echo Chamber (staff memory game) cues ─────────────────────────────────────
+// Short, self-contained one-shots. Each resolves once scheduled; the tones are
+// brief and self-stopping, so there is nothing to clean up.
+
+/** Sound a single pad note (concert MIDI) for the memory game. */
+export async function playPadTone(midi: number, dur = 0.45) {
+  const ac = await getAudioCtx();
+  scheduleTone(ac, midiToFreq(midi), ac.currentTime, dur, 'triangle', 0.26);
+}
+
+/** Dissonant low buzz for a wrong answer. */
+export async function playErrorBuzz() {
+  const ac = await getAudioCtx();
+  const t = ac.currentTime;
+  scheduleTone(ac, 138.6, t, 0.34, 'sawtooth', 0.2);  // C#3
+  scheduleTone(ac, 146.8, t, 0.34, 'sawtooth', 0.2);  // D3 — a minor 2nd against it
+}
+
+/** Bright rising figure when a phrase is echoed back correctly. */
+export async function playRoundClear(rootMidi: number) {
+  const ac = await getAudioCtx();
+  const t = ac.currentTime;
+  [0, 4, 7, 12].forEach((semi, i) => {
+    scheduleTone(ac, midiToFreq(rootMidi + semi), t + i * 0.075, 0.26, 'triangle', 0.18);
+  });
+}
+
+/** Falling figure when a run ends. */
+export async function playRunOver(rootMidi: number) {
+  const ac = await getAudioCtx();
+  const t = ac.currentTime;
+  [12, 7, 3, 0].forEach((semi, i) => {
+    scheduleTone(ac, midiToFreq(rootMidi + semi), t + i * 0.13, 0.4, 'sine', 0.2);
+  });
+}

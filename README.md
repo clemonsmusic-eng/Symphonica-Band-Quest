@@ -52,6 +52,14 @@ VITE_SUPABASE_ANON_KEY=...
   who return as summons (`src/lib/students.ts`, `src/lib/allies.ts`).
 - **Side quests** — NPC favors, post-graduation town jobs, and unlock-gated
   errands (`src/lib/sidequests.ts`).
+- **The Echo Chamber** — a Simon-style memory game played on notation
+  (`src/pages/EchoChamberPage.tsx`, `src/lib/music/memoryGame.ts`). The Chamber
+  sounds and lights a phrase on the staff; the player echoes it back by pressing
+  the same noteheads, and the phrase grows by one note each round. The pads are
+  scale degrees in the player's own clef and written key, so the notes are the
+  ones they'd actually finger. Four difficulties trade pad count, tempo and
+  letter-name labels against an XP multiplier; runs bank ear-training XP and are
+  replayable. Playable silently for classrooms without headphones.
 - **Demo Mode** — a silent tap-timing mini-game replaces microphone challenges,
   so the whole game is playable with no audible input.
 - **Guest Mode** — play instantly with no account.

@@ -20,6 +20,7 @@ import LeaderboardPage from './pages/LeaderboardPage';
 import LibraryPage from './pages/LibraryPage';
 import AlliesPage from './pages/AlliesPage';
 import SimulatorPage from './pages/SimulatorPage';
+import EchoChamberPage from './pages/EchoChamberPage';
 import GearPage from './pages/GearPage';
 import ShopPage from './pages/ShopPage';
 import WorldMapPage from './pages/WorldMapPage';
@@ -168,6 +169,11 @@ export default function App() {
       {/* Battle Simulator */}
       <Route path="/simulator" element={
         <RequireCharacter><SimulatorPage /></RequireCharacter>
+      } />
+
+      {/* The Echo Chamber — staff-note memory game */}
+      <Route path="/echo" element={
+        <RequireCharacter><EchoChamberPage /></RequireCharacter>
       } />
 
       {/* Selection Composer — author / import performance excerpts */}
